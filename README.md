@@ -148,23 +148,23 @@ python scripts/exp3_ablation_grouping.py --config configs/default.yaml --model x
 ./run_exp3_grid.sh
 ```
 
-### exp4: Cross-Hospital Transfer Failure (odi_shrinkage)
+### exp4: Age-Based ODI Inequity (mimic_gap)
 
-Trains on MIMIC-IV, evaluates per-hospital ODI shrinkage on eICU.
+Computes ODI by age group on MIMIC-IV and pooled eICU; core statistic is mimic_gap = ODI(>80) − ODI(<45).
 
 ```bash
-python scripts/exp4_external_validation.py --config configs/default.yaml --model xgb --window 24
+python scripts/exp4_age_odi_transfer.py --config configs/default.yaml --model xgb --window 24
 
 # GPU-aware grid dispatcher (6 models x 5 windows)
 ./run_exp4_grid.sh
 ```
 
-### exp5: Age-Based ODI Inequity (mimic_gap)
+### exp5: Cross-Hospital Transfer Failure (odi_shrinkage)
 
-Computes ODI by age group on MIMIC-IV and pooled eICU; core statistic is mimic_gap = ODI(>80) − ODI(<45).
+Trains on MIMIC-IV, evaluates per-hospital ODI shrinkage on eICU.
 
 ```bash
-python scripts/exp5_age_odi_transfer.py --config configs/default.yaml --model xgb --window 24
+python scripts/exp5_external_validation.py --config configs/default.yaml --model xgb --window 24
 
 # GPU-aware grid dispatcher (6 models x 5 windows)
 ./run_exp5_grid.sh
@@ -181,6 +181,8 @@ outside `data/` (for example, under `checkpoints/`) so they can be tracked.
 
 ## Output Structure
 
+`multiseed_summary.json` uses the keys `exp1` through `exp5`, matching the experiment order.
+
 Each experiment's results live under `results/exp{1-5}/`, structured as
 `{task}/{feature_group}/{model}/{window}h_*`. exp1 has three feature groups
 (disease/observation/mixed); exp2-5 only train disease and mixed models to
@@ -195,11 +197,11 @@ results/
 ├── exp3/
 │   └── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_grouping_ablation.json
 ├── exp4/
-│   ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv
-│   └── pooled/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv   # pooled across tasks
+│   ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_by_age_transfer.csv
+│   └── summary/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_age_transfer_summary.json  # mimic_gap per task
 └── exp5/
-    ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_by_age_transfer.csv
-    └── summary/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_age_transfer_summary.json  # mimic_gap per task
+    ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv
+    └── pooled/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv   # pooled across tasks
 ```
 
 ---
@@ -216,8 +218,8 @@ medical-ai-monitoring-shortcuts/
 │   ├── exp1/           # trainer.py — EHRTrainer for the main ODI grid
 │   ├── exp2/           # oii.py, severity_control.py — PSM / diagnosis stratification / SOFA covariate
 │   ├── exp3/           # grouping.py — variable grouping variants (original/variant_A/variant_B)
-│   ├── exp4/           # external_validation.py — MIMIC->eICU odi_shrinkage
-│   ├── exp5/           # age_transfer.py — age-stratified ODI + transfer to eICU
+│   ├── exp4/           # age_transfer.py — age-stratified ODI + transfer to eICU
+│   ├── exp5/           # external_validation.py — MIMIC->eICU odi_shrinkage
 │   └── utils/          # metrics, bootstrap CI, logger
 ├── scripts/            # build_cohort.py + exp1-5_*.py entry points
 ├── run_exp{1-5}_grid.sh # GPU-aware grid dispatchers for each experiment

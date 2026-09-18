@@ -1,4 +1,4 @@
-"""Experiment 4: Cross-hospital transfer failure (odi_shrinkage).
+"""Experiment 5: Cross-hospital transfer failure (odi_shrinkage).
 
 Trains mixed + disease models on MIMIC-IV, evaluates ODI (AUROC_mixed -
 AUROC_disease) on the MIMIC-internal test set and on each eICU hospital, and
@@ -8,8 +8,8 @@ Iterates over all tasks x model_types x time_windows (aligned with exp1's grid
 scale, though not all combinations may have data yet).
 
 Usage:
-    python scripts/exp4_external_validation.py --config configs/default.yaml
-    python scripts/exp4_external_validation.py --task icu_mortality --model xgb --window 24
+    python scripts/exp5_external_validation.py --config configs/default.yaml
+    python scripts/exp5_external_validation.py --task icu_mortality --model xgb --window 24
 """
 
 import argparse
@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import yaml
 import pandas as pd
 
-from src.exp4.external_validation import fit_mixed_and_disease, evaluate_odi
+from src.exp5.external_validation import fit_mixed_and_disease, evaluate_odi
 from src.data.transforms import split_cohort
 
 
@@ -68,7 +68,7 @@ def main() -> None:
                     print(f"[SKIP] Label column '{task}' not found in parquet.")
                     continue
 
-                out_path = (Path("results") / "exp4" / task / "mixed" / model_type / seed_dir /
+                out_path = (Path("results") / "exp5" / task / "mixed" / model_type / seed_dir /
                             f"{window_h}h_by_hospital.csv")
                 if out_path.exists():
                     print(f"[SKIP] {out_path} already exists.")
@@ -136,7 +136,7 @@ def main() -> None:
             if not pooled_results:
                 continue
             pooled = pd.concat(pooled_results, ignore_index=True)
-            pooled_path = (Path("results") / "exp4" / "pooled" / "mixed" / model_type / seed_dir /
+            pooled_path = (Path("results") / "exp5" / "pooled" / "mixed" / model_type / seed_dir /
                            f"{window_h}h_by_hospital.csv")
             pooled_path.parent.mkdir(parents=True, exist_ok=True)
             pooled.to_csv(pooled_path, index=False)

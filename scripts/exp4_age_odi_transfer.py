@@ -1,19 +1,19 @@
-"""Experiment 5: Age-based ODI inequity (mimic_gap), and whether it survives
+"""Experiment 4: Age-based ODI inequity (mimic_gap), and whether it survives
 transfer to eICU.
 
-Trains mixed + disease models on MIMIC (same procedure as exp4), then computes
+Trains mixed + disease models on MIMIC (same procedure as exp5), then computes
 ODI = AUROC(M) - AUROC(D) by age group on:
   (a) MIMIC-internal test set
   (b) pooled eICU (all hospitals together, since per-hospital age strata are
       too small for stable AUROC)
 
-mimic_gap = ODI(>80) - ODI(<45) is the core exp5 statistic; the eICU-side gap
+mimic_gap = ODI(>80) - ODI(<45) is the core exp4 statistic; the eICU-side gap
 and its change on transfer are reported as exploratory, not part of the core
 support-rate statistic.
 
 Usage:
-    python scripts/exp5_age_odi_transfer.py --config configs/default.yaml
-    python scripts/exp5_age_odi_transfer.py --task icu_mortality --model xgb --window 24
+    python scripts/exp4_age_odi_transfer.py --config configs/default.yaml
+    python scripts/exp4_age_odi_transfer.py --task icu_mortality --model xgb --window 24
 """
 
 import argparse
@@ -27,7 +27,7 @@ import yaml
 import numpy as np
 import pandas as pd
 
-from src.exp5.age_transfer import odi_by_age, age_gap
+from src.exp4.age_transfer import odi_by_age, age_gap
 from src.data.transforms import split_cohort, prepare_xy
 from src.data.feature_groups import DISEASE_FEATURES, OBSERVATION_FEATURES, MIXED_FEATURES
 from src.models.train_utils import create_and_fit
@@ -78,7 +78,7 @@ def main() -> None:
                     print(f"[SKIP] Label column '{task}' not found in parquet.")
                     continue
 
-                out_path = (Path("results") / "exp5" / task / "mixed" / model_type / seed_dir /
+                out_path = (Path("results") / "exp4" / task / "mixed" / model_type / seed_dir /
                             f"{window_h}h_odi_by_age_transfer.csv")
                 if out_path.exists():
                     print(f"[SKIP] {out_path} already exists.")
@@ -136,7 +136,7 @@ def main() -> None:
                 print(f"  MIMIC gap vs 0: t={t_m:.3f} p={p_m:.4f}")
                 print(f"  eICU  gap vs 0: t={t_e:.3f} p={p_e:.4f}")
 
-            summary_path = (Path("results") / "exp5" / "summary" / model_type / seed_dir /
+            summary_path = (Path("results") / "exp4" / "summary" / model_type / seed_dir /
                              f"{window_h}h_odi_age_transfer_summary.json")
             summary_path.parent.mkdir(parents=True, exist_ok=True)
             with open(summary_path, "w") as f:

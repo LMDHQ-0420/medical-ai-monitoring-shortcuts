@@ -68,101 +68,7 @@ def summarize_exp1(df):
 
 
 # ---------------------------------------------------------------------------
-# 实验2 报告口径 (results/exp4): odi_shrinkage = odi_mimic - odi_eicu，
-# 按 model x window 池化全部 task x hospital 行做单样本 t 检验
-# ---------------------------------------------------------------------------
-def aggregate_exp4(seeds):
-    rows = []
-    for model, win in product(MODELS, WINDOWS):
-        for seed in seeds:
-            for task in TASKS:
-                p = (RESULTS_DIR / "exp4" / "pooled" / "mixed" / model / f"seed{seed}"
-                     / f"{win}h_by_hospital.csv")
-                if not p.exists():
-                    continue
-                d = pd.read_csv(p)
-                d = d[d["task"] == task]
-                if d.empty:
-                    continue
-                d = d.assign(model=model, window=win, seed=seed)
-                rows.append(d[["model", "window", "seed", "task", "odi_shrinkage"]])
-    if not rows:
-        return pd.DataFrame()
-    return pd.concat(rows, ignore_index=True)
-
-
-def summarize_exp4(df):
-    if df.empty:
-        return dict(n_total=0)
-    results = []
-    for (model, win), sub in df.groupby(["model", "window"]):
-        vals = sub["odi_shrinkage"].dropna().values
-        if len(vals) < 2:
-            continue
-        mean = float(np.mean(vals))
-        _, p = ttest_1samp(vals, 0.0)
-        results.append(dict(model=model, window=win, mean=mean, p=float(p), n=len(vals)))
-    r = pd.DataFrame(results)
-    n_total = len(r)
-    n_pos = int((r["mean"] > 0).sum())
-    n_sig_pos = int(((r["mean"] > 0) & (r["p"] < 0.05)).sum())
-    n_sig_neg = int(((r["mean"] < 0) & (r["p"] < 0.05)).sum())
-    sig_neg = r[(r["mean"] < 0) & (r["p"] < 0.05)][["model", "window", "mean", "p"]].to_dict("records")
-    by_model = r.groupby("model")["mean"].mean().sort_values()
-    by_window = r.groupby("window")["mean"].mean().sort_values()
-    return dict(
-        n_total=n_total, n_pos=n_pos, pct_pos=n_pos / n_total * 100 if n_total else 0,
-        n_sig_pos=n_sig_pos, pct_sig_pos=n_sig_pos / n_total * 100 if n_total else 0,
-        n_sig_neg=n_sig_neg, sig_neg_combos=sig_neg,
-        by_model_mean=by_model.to_dict(), by_window_mean=by_window.to_dict(),
-    )
-
-
-# ---------------------------------------------------------------------------
-# 实验3 报告口径 (results/exp5): mimic_gap = ODI(>80) - ODI(<45)，来自 summary json
-# ---------------------------------------------------------------------------
-def aggregate_exp5(seeds):
-    rows = []
-    for task, model, win in product(TASKS, MODELS, WINDOWS):
-        for seed in seeds:
-            p = (RESULTS_DIR / "exp5" / "summary" / model / f"seed{seed}"
-                 / f"{win}h_odi_age_transfer_summary.json")
-            data = load_json(p)
-            if data is None or task not in data:
-                continue
-            v = data[task]
-            gap = v.get("mimic_gap_old_minus_young", v.get("mimic_gap"))
-            if gap is None:
-                continue
-            rows.append(dict(task=task, model=model, window=win, seed=seed, mimic_gap=gap))
-    return pd.DataFrame(rows)
-
-
-def summarize_exp5(df):
-    if df.empty:
-        return dict(n_total=0)
-    grp = df.groupby(["task", "model", "window"])["mimic_gap"].agg(["mean", "std"]).reset_index()
-    n_total = len(grp)
-    n_pos = int((grp["mean"] > 0).sum())
-    by_task = grp.groupby("task").apply(
-        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100, "mean_gap": g["mean"].mean()})
-    ).sort_values("support_rate")
-    by_window = grp.groupby("window").apply(
-        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100})
-    ).sort_values("support_rate")
-    by_model = grp.groupby("model").apply(
-        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100})
-    ).sort_values("support_rate")
-    return dict(
-        n_total=n_total, n_pos=n_pos, pct_pos=n_pos / n_total * 100,
-        by_task=by_task.to_dict("index"),
-        by_window_support_rate=by_window["support_rate"].to_dict(),
-        by_model_support_rate=by_model["support_rate"].to_dict(),
-    )
-
-
-# ---------------------------------------------------------------------------
-# 实验4 报告口径 (results/exp2): PSM-ODI (severity control ablation)
+# 实验2 (results/exp2): PSM-ODI (severity control ablation)
 # ---------------------------------------------------------------------------
 def aggregate_exp2(seeds):
     rows = []
@@ -215,7 +121,7 @@ def summarize_exp2(df):
 
 
 # ---------------------------------------------------------------------------
-# 实验5 报告口径 (results/exp3): 变体A/B ODI (variable grouping sensitivity)
+# 实验3 (results/exp3): 变体A/B ODI (variable grouping sensitivity)
 # ---------------------------------------------------------------------------
 def aggregate_exp3(seeds):
     rows = []
@@ -265,6 +171,100 @@ def summarize_exp3(df):
     )
 
 
+# ---------------------------------------------------------------------------
+# 实验4 (results/exp4): mimic_gap = ODI(>80) - ODI(<45)，来自 summary json
+# ---------------------------------------------------------------------------
+def aggregate_exp4(seeds):
+    rows = []
+    for task, model, win in product(TASKS, MODELS, WINDOWS):
+        for seed in seeds:
+            p = (RESULTS_DIR / "exp4" / "summary" / model / f"seed{seed}"
+                 / f"{win}h_odi_age_transfer_summary.json")
+            data = load_json(p)
+            if data is None or task not in data:
+                continue
+            v = data[task]
+            gap = v.get("mimic_gap_old_minus_young", v.get("mimic_gap"))
+            if gap is None:
+                continue
+            rows.append(dict(task=task, model=model, window=win, seed=seed, mimic_gap=gap))
+    return pd.DataFrame(rows)
+
+
+def summarize_exp4(df):
+    if df.empty:
+        return dict(n_total=0)
+    grp = df.groupby(["task", "model", "window"])["mimic_gap"].agg(["mean", "std"]).reset_index()
+    n_total = len(grp)
+    n_pos = int((grp["mean"] > 0).sum())
+    by_task = grp.groupby("task").apply(
+        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100, "mean_gap": g["mean"].mean()})
+    ).sort_values("support_rate")
+    by_window = grp.groupby("window").apply(
+        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100})
+    ).sort_values("support_rate")
+    by_model = grp.groupby("model").apply(
+        lambda g: pd.Series({"support_rate": (g["mean"] > 0).mean() * 100})
+    ).sort_values("support_rate")
+    return dict(
+        n_total=n_total, n_pos=n_pos, pct_pos=n_pos / n_total * 100,
+        by_task=by_task.to_dict("index"),
+        by_window_support_rate=by_window["support_rate"].to_dict(),
+        by_model_support_rate=by_model["support_rate"].to_dict(),
+    )
+
+
+# ---------------------------------------------------------------------------
+# 实验5 (results/exp5): odi_shrinkage = odi_mimic - odi_eicu，
+# 按 model x window 池化全部 task x hospital 行做单样本 t 检验
+# ---------------------------------------------------------------------------
+def aggregate_exp5(seeds):
+    rows = []
+    for model, win in product(MODELS, WINDOWS):
+        for seed in seeds:
+            for task in TASKS:
+                p = (RESULTS_DIR / "exp5" / "pooled" / "mixed" / model / f"seed{seed}"
+                     / f"{win}h_by_hospital.csv")
+                if not p.exists():
+                    continue
+                d = pd.read_csv(p)
+                d = d[d["task"] == task]
+                if d.empty:
+                    continue
+                d = d.assign(model=model, window=win, seed=seed)
+                rows.append(d[["model", "window", "seed", "task", "odi_shrinkage"]])
+    if not rows:
+        return pd.DataFrame()
+    return pd.concat(rows, ignore_index=True)
+
+
+def summarize_exp5(df):
+    if df.empty:
+        return dict(n_total=0)
+    results = []
+    for (model, win), sub in df.groupby(["model", "window"]):
+        vals = sub["odi_shrinkage"].dropna().values
+        if len(vals) < 2:
+            continue
+        mean = float(np.mean(vals))
+        _, p = ttest_1samp(vals, 0.0)
+        results.append(dict(model=model, window=win, mean=mean, p=float(p), n=len(vals)))
+    r = pd.DataFrame(results)
+    n_total = len(r)
+    n_pos = int((r["mean"] > 0).sum())
+    n_sig_pos = int(((r["mean"] > 0) & (r["p"] < 0.05)).sum())
+    n_sig_neg = int(((r["mean"] < 0) & (r["p"] < 0.05)).sum())
+    sig_neg = r[(r["mean"] < 0) & (r["p"] < 0.05)][["model", "window", "mean", "p"]].to_dict("records")
+    by_model = r.groupby("model")["mean"].mean().sort_values()
+    by_window = r.groupby("window")["mean"].mean().sort_values()
+    return dict(
+        n_total=n_total, n_pos=n_pos, pct_pos=n_pos / n_total * 100 if n_total else 0,
+        n_sig_pos=n_sig_pos, pct_sig_pos=n_sig_pos / n_total * 100 if n_total else 0,
+        n_sig_neg=n_sig_neg, sig_neg_combos=sig_neg,
+        by_model_mean=by_model.to_dict(), by_window_mean=by_window.to_dict(),
+    )
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", nargs="+", type=int, default=[42, 43, 44, 45, 46])
@@ -276,29 +276,29 @@ def main():
     out = {}
 
     df1 = aggregate_exp1(seeds)
-    out["exp1_RQ1"] = summarize_exp1(df1)
-    print("=== 实验1 (RQ1, results/exp1, ODI=mixed-disease) ===")
-    print(json.dumps(out["exp1_RQ1"], indent=2, ensure_ascii=False, default=str))
-
-    df4 = aggregate_exp4(seeds)
-    out["exp2_RQ2"] = summarize_exp4(df4)
-    print("\n=== 实验2 (RQ2, results/exp4, odi_shrinkage) ===")
-    print(json.dumps(out["exp2_RQ2"], indent=2, ensure_ascii=False, default=str))
-
-    df5 = aggregate_exp5(seeds)
-    out["exp3_RQ3"] = summarize_exp5(df5)
-    print("\n=== 实验3 (RQ3, results/exp5, mimic_gap) ===")
-    print(json.dumps(out["exp3_RQ3"], indent=2, ensure_ascii=False, default=str))
+    out["exp1"] = summarize_exp1(df1)
+    print("\n=== 实验1 (results/exp1, RQ1, ODI=mixed-disease) ===")
+    print(json.dumps(out["exp1"], indent=2, ensure_ascii=False, default=str))
 
     df2 = aggregate_exp2(seeds)
-    out["exp4_severity"] = summarize_exp2(df2)
-    print("\n=== 实验4 (严重度控制消融, results/exp2, PSM-ODI) ===")
-    print(json.dumps(out["exp4_severity"], indent=2, ensure_ascii=False, default=str))
+    out["exp2"] = summarize_exp2(df2)
+    print("\n=== 实验2 (results/exp2, 严重度控制消融, PSM-ODI) ===")
+    print(json.dumps(out["exp2"], indent=2, ensure_ascii=False, default=str))
 
     df3 = aggregate_exp3(seeds)
-    out["exp5_grouping"] = summarize_exp3(df3)
-    print("\n=== 实验5 (变量分组敏感性, results/exp3, 变体A/B) ===")
-    print(json.dumps(out["exp5_grouping"], indent=2, ensure_ascii=False, default=str))
+    out["exp3"] = summarize_exp3(df3)
+    print("\n=== 实验3 (results/exp3, 变量分组敏感性, 变体A/B) ===")
+    print(json.dumps(out["exp3"], indent=2, ensure_ascii=False, default=str))
+
+    df4 = aggregate_exp4(seeds)
+    out["exp4"] = summarize_exp4(df4)
+    print("\n=== 实验4 (results/exp4, RQ3, mimic_gap) ===")
+    print(json.dumps(out["exp4"], indent=2, ensure_ascii=False, default=str))
+
+    df5 = aggregate_exp5(seeds)
+    out["exp5"] = summarize_exp5(df5)
+    print("\n=== 实验5 (results/exp5, RQ2, odi_shrinkage) ===")
+    print(json.dumps(out["exp5"], indent=2, ensure_ascii=False, default=str))
 
     out_path = RESULTS_DIR / "multiseed_summary.json"
     with open(out_path, "w") as f:

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run_exp4_grid.sh — exp4 (cross-hospital transfer failure, odi_shrinkage) dispatcher
+# run_exp4_grid.sh — exp4 (age-based ODI transfer, mimic_gap) dispatcher
 # 6 models x 5 windows = 30 tasks; each task runs all 5 clinical tasks internally.
 # 12 tasks run concurrently. As soon as one finishes, the next queued task launches.
 # CPU models (lr/rf/xgb/lgbm/mlp) launch directly. gru (the only CUDA model)
@@ -41,7 +41,7 @@ launch() {
     local model="${item%,*}"
     local win="${item#*,}"
     local log="$LOG_DIR/${model}_${win}h.log"
-    local cmd="cd '$PROJECT_DIR' && python3 scripts/exp4_external_validation.py --config configs/default.yaml --model $model --window $win --seed $SEED"
+    local cmd="cd '$PROJECT_DIR' && python3 scripts/exp4_age_odi_transfer.py --config configs/default.yaml --model $model --window $win --seed $SEED"
 
     if [[ "$model" == "gru" ]]; then
         local gpu="${GPUS[$GPU_PTR]}"
