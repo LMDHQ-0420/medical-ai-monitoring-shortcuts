@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.4098327159881592,
+  "auroc": 0.7621915087601817,
+  "auroc_ci_lower": 0.7528152757137212,
+  "auroc_ci_upper": 0.7708574551938892,
+  "auprc": 0.6677080206689312,
+  "brier": 0.19269983476822491,
+  "calib_slope": 0.07000789791345596,
+  "calib_intercept": 0.4754698872566223,
+  "fnr": 0.38825286212045795,
+  "fpr": 0.2540615278257864,
+  "task": "sepsis_deterioration",
+  "feature_group": "mixed",
+  "model_type": "gru",
+  "window_h": 3
+}

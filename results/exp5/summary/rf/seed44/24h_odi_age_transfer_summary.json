@@ -1,0 +1,12 @@
+{
+  "aki": {
+    "mimic_gap": 0.016135066831192812,
+    "eicu_gap": 0.027241800584600795,
+    "gap_change_on_transfer": 0.011106733753407982
+  },
+  "sepsis_deterioration": {
+    "mimic_gap": -0.0027867560450881568,
+    "eicu_gap": 0.14327080686334648,
+    "gap_change_on_transfer": 0.14605756290843463
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "icu_mortality": {
+    "mimic_gap_old_minus_young": 0.051835465636424494,
+    "eicu_gap_old_minus_young": -0.03664364449229518,
+    "gap_change_on_transfer": -0.08847911012871967
+  },
+  "inhosp_mortality": {
+    "mimic_gap_old_minus_young": 0.026257046350968927,
+    "eicu_gap_old_minus_young": -0.02646218574047532,
+    "gap_change_on_transfer": -0.052719232091444246
+  },
+  "aki": {
+    "mimic_gap_old_minus_young": 0.027511632636172845,
+    "eicu_gap_old_minus_young": 0.05219389729588231,
+    "gap_change_on_transfer": 0.024682264659709463
+  },
+  "sepsis_deterioration": {
+    "mimic_gap_old_minus_young": -0.029543944821881385,
+    "eicu_gap_old_minus_young": 0.17279946219518377,
+    "gap_change_on_transfer": 0.20234340701706516
+  },
+  "escalation": {
+    "mimic_gap_old_minus_young": 0.05918013832631963,
+    "eicu_gap_old_minus_young": -0.029662303331803974,
+    "gap_change_on_transfer": -0.0888424416581236
+  }
+}

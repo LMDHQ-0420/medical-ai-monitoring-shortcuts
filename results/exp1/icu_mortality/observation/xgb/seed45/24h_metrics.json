@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.06456547975540161,
+  "auroc": 0.8247349852538473,
+  "auroc_ci_lower": 0.8075989646932543,
+  "auroc_ci_upper": 0.8413404657042218,
+  "auprc": 0.27863770371927243,
+  "brier": 0.05270162563185393,
+  "calib_slope": 0.0724295899271965,
+  "calib_intercept": 0.29963865876197815,
+  "fnr": 0.9731437598736177,
+  "fpr": 0.0016355904481517827,
+  "task": "icu_mortality",
+  "feature_group": "observation",
+  "model_type": "xgb",
+  "window_h": 24
+}

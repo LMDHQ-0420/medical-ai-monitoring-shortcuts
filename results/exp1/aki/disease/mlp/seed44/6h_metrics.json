@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.14657282829284668,
+  "auroc": 0.7989385097151142,
+  "auroc_ci_lower": 0.7863327575236442,
+  "auroc_ci_upper": 0.8108968941017566,
+  "auprc": 0.42902199958688,
+  "brier": 0.10298076503043843,
+  "calib_slope": 0.10638732463121414,
+  "calib_intercept": 0.3879335820674896,
+  "fnr": 0.8114126652748782,
+  "fpr": 0.02390343014222541,
+  "task": "aki",
+  "feature_group": "disease",
+  "model_type": "mlp",
+  "window_h": 6
+}

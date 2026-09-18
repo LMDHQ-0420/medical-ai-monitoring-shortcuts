@@ -1,0 +1,17 @@
+{
+  "icu_mortality": {
+    "mimic_gap": 0.056655891591788854,
+    "eicu_gap": -0.07817661879894566,
+    "gap_change_on_transfer": -0.13483251039073452
+  },
+  "inhosp_mortality": {
+    "mimic_gap": 0.02342244263163329,
+    "eicu_gap": -0.05588760586750585,
+    "gap_change_on_transfer": -0.07931004849913914
+  },
+  "aki": {
+    "mimic_gap": 0.010526312100368584,
+    "eicu_gap": 0.017267554864313528,
+    "gap_change_on_transfer": 0.0067412427639449435
+  }
+}

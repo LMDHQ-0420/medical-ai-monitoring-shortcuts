@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.1518767923116684,
+  "auroc": 0.7224506674926612,
+  "auroc_ci_lower": 0.7099621694242522,
+  "auroc_ci_upper": 0.7349578561797395,
+  "auprc": 0.32158088579009386,
+  "brier": 0.11799613211983653,
+  "calib_slope": 0.10127958655357361,
+  "calib_intercept": 0.3482077717781067,
+  "fnr": 0.9241101410342512,
+  "fpr": 0.015514131088394468,
+  "task": "aki",
+  "feature_group": "observation",
+  "model_type": "mlp",
+  "window_h": 24
+}

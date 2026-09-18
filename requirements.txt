@@ -1,0 +1,16 @@
+numpy
+pandas
+scikit-learn
+xgboost
+lightgbm
+scipy
+PyYAML
+pyarrow
+tqdm
+matplotlib
+seaborn
+statsmodels
+
+# torch/torchvision (GRU model) are NOT listed here — install manually,
+# matching the target machine's CUDA/driver version. See README for the
+# command used on this project's GPU servers.

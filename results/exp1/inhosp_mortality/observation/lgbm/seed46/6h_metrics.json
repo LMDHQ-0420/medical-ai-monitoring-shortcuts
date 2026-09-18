@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.09557323902845383,
+  "auroc": 0.6969610437848345,
+  "auroc_ci_lower": 0.6789984908135547,
+  "auroc_ci_upper": 0.7156864971946085,
+  "auprc": 0.21687347895039033,
+  "brier": 0.18047486287431794,
+  "calib_slope": 0.041764229844191786,
+  "calib_intercept": 0.1264922595327389,
+  "fnr": 0.4823906083244397,
+  "fpr": 0.24405097552723581,
+  "task": "inhosp_mortality",
+  "feature_group": "observation",
+  "model_type": "lgbm",
+  "window_h": 6
+}

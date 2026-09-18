@@ -1,0 +1,206 @@
+{
+  "exp1_RQ1": {
+    "n_total": 150,
+    "n_pos": 149,
+    "pct_pos": 99.33333333333333,
+    "by_task_mean_odi": {
+      "inhosp_mortality": 0.014577162831376441,
+      "aki": 0.015567408227985744,
+      "icu_mortality": 0.022588961115365173,
+      "sepsis_deterioration": 0.04089355149582693,
+      "escalation": 0.12594868228953948
+    },
+    "by_model_mean_odi": {
+      "rf": 0.035672839482773853,
+      "xgb": 0.039946932603813316,
+      "lgbm": 0.041447310846759865,
+      "gru": 0.04428140483083887,
+      "mlp": 0.04803545499059589,
+      "lr": 0.054106976397330725
+    },
+    "obs_beats_disease_rate_by_task": {
+      "aki": 0.0,
+      "icu_mortality": 0.0,
+      "inhosp_mortality": 0.0,
+      "sepsis_deterioration": 0.5666666666666667,
+      "escalation": 0.8933333333333333
+    },
+    "per_combo_seed_std_mean": 0.005059705741312353,
+    "exceptions": [
+      {
+        "task": "inhosp_mortality",
+        "model": "mlp",
+        "window": 18,
+        "mean": -0.005087419269780802
+      }
+    ]
+  },
+  "exp2_RQ2": {
+    "n_total": 30,
+    "n_pos": 28,
+    "pct_pos": 93.33333333333333,
+    "n_sig_pos": 28,
+    "pct_sig_pos": 93.33333333333333,
+    "n_sig_neg": 2,
+    "sig_neg_combos": [
+      {
+        "model": "rf",
+        "window": 18,
+        "mean": -0.01556049755928711,
+        "p": 1.1327462632668504e-20
+      },
+      {
+        "model": "rf",
+        "window": 24,
+        "mean": -0.018677370363595736,
+        "p": 5.922397139415193e-23
+      }
+    ],
+    "by_model_mean": {
+      "rf": 0.01250869565610339,
+      "gru": 0.03260725442350164,
+      "xgb": 0.0570517912974138,
+      "lgbm": 0.060020197366206764,
+      "lr": 0.07874733820906535,
+      "mlp": 0.0806985045628558
+    },
+    "by_window_mean": {
+      "18": 0.034558855919327926,
+      "24": 0.037544328584103455,
+      "12": 0.05246595256850287,
+      "3": 0.06782562792090135,
+      "6": 0.07563338626978668
+    }
+  },
+  "exp3_RQ3": {
+    "n_total": 150,
+    "n_pos": 129,
+    "pct_pos": 86.0,
+    "by_task": {
+      "sepsis_deterioration": {
+        "support_rate": 46.666666666666664,
+        "mean_gap": -0.002927532380800793
+      },
+      "escalation": {
+        "support_rate": 90.0,
+        "mean_gap": 0.02546976549006872
+      },
+      "inhosp_mortality": {
+        "support_rate": 93.33333333333333,
+        "mean_gap": 0.017782911996478044
+      },
+      "aki": {
+        "support_rate": 100.0,
+        "mean_gap": 0.01242699766807942
+      },
+      "icu_mortality": {
+        "support_rate": 100.0,
+        "mean_gap": 0.0345273076201044
+      }
+    },
+    "by_window_support_rate": {
+      "3": 70.0,
+      "6": 83.33333333333334,
+      "18": 90.0,
+      "12": 93.33333333333333,
+      "24": 93.33333333333333
+    },
+    "by_model_support_rate": {
+      "rf": 80.0,
+      "lgbm": 84.0,
+      "lr": 84.0,
+      "gru": 88.0,
+      "mlp": 88.0,
+      "xgb": 92.0
+    }
+  },
+  "exp4_severity": {
+    "n_total": 150,
+    "n_pos": 148,
+    "pct_pos": 98.66666666666667,
+    "n_sig_pos": 139,
+    "pct_sig_pos": 92.66666666666666,
+    "n_strat_all_pos": 115,
+    "pct_strat_all_pos": 76.66666666666667,
+    "by_task": {
+      "inhosp_mortality": {
+        "sig_rate": 73.33333333333333,
+        "mean_psm_odi": 0.013383834142986412
+      },
+      "aki": {
+        "sig_rate": 93.33333333333333,
+        "mean_psm_odi": 0.020412360500291517
+      },
+      "icu_mortality": {
+        "sig_rate": 96.66666666666667,
+        "mean_psm_odi": 0.030670949443862346
+      },
+      "escalation": {
+        "sig_rate": 100.0,
+        "mean_psm_odi": 0.18056383604621312
+      },
+      "sepsis_deterioration": {
+        "sig_rate": 100.0,
+        "mean_psm_odi": 0.053976934997477
+      }
+    },
+    "by_window_sig_rate": {
+      "12": 86.66666666666667,
+      "18": 90.0,
+      "6": 93.33333333333333,
+      "24": 93.33333333333333,
+      "3": 100.0
+    },
+    "by_model_sig_rate": {
+      "mlp": 76.0,
+      "gru": 92.0,
+      "lgbm": 96.0,
+      "rf": 96.0,
+      "xgb": 96.0,
+      "lr": 100.0
+    }
+  },
+  "exp5_grouping": {
+    "n_total": 150,
+    "n_sig_B": 147,
+    "pct_sig_B": 98.0,
+    "n_sig_A": 114,
+    "pct_sig_A": 76.0,
+    "n_all_pos": 138,
+    "pct_all_pos": 92.0,
+    "by_task": {
+      "icu_mortality": {
+        "sig_rate_A": 60.0,
+        "mean_odi_B": 0.022877510177485613,
+        "mean_odi_A": 0.008442915495740274
+      },
+      "inhosp_mortality": {
+        "sig_rate_A": 73.33333333333333,
+        "mean_odi_B": 0.014663441565659812,
+        "mean_odi_A": 0.007820100129720862
+      },
+      "aki": {
+        "sig_rate_A": 76.66666666666667,
+        "mean_odi_B": 0.01558774371204756,
+        "mean_odi_A": 0.007572075688850946
+      },
+      "sepsis_deterioration": {
+        "sig_rate_A": 76.66666666666667,
+        "mean_odi_B": 0.04095370767966302,
+        "mean_odi_A": 0.019763638043655225
+      },
+      "escalation": {
+        "sig_rate_A": 93.33333333333333,
+        "mean_odi_B": 0.12598788444497364,
+        "mean_odi_A": 0.009216988754768642
+      }
+    },
+    "by_window_sig_rate_A": {
+      "12": 60.0,
+      "6": 70.0,
+      "3": 76.66666666666667,
+      "18": 83.33333333333334,
+      "24": 90.0
+    }
+  }
+}

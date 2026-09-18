@@ -1,0 +1,12 @@
+{
+  "sepsis_deterioration": {
+    "mimic_gap": -0.01773643696639915,
+    "eicu_gap": 0.06699855366772267,
+    "gap_change_on_transfer": 0.08473499063412182
+  },
+  "escalation": {
+    "mimic_gap": 0.018012720292007844,
+    "eicu_gap": -0.01626699985771618,
+    "gap_change_on_transfer": -0.034279720149724024
+  }
+}

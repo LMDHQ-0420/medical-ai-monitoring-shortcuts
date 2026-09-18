@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.205630362033844,
+  "auroc": 0.8045662945027351,
+  "auroc_ci_lower": 0.7947725611106056,
+  "auroc_ci_upper": 0.8143945253332835,
+  "auprc": 0.5388097149944806,
+  "brier": 0.12736137330947495,
+  "calib_slope": 0.14194872975349426,
+  "calib_intercept": 0.4600599408149719,
+  "fnr": 0.6884920634920635,
+  "fpr": 0.04763739085772984,
+  "task": "escalation",
+  "feature_group": "disease",
+  "model_type": "gru",
+  "window_h": 12
+}

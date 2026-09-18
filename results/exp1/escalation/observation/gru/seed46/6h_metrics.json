@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.24979600310325623,
+  "auroc": 0.8313391694996696,
+  "auroc_ci_lower": 0.8221831617400669,
+  "auroc_ci_upper": 0.8408588284878696,
+  "auprc": 0.6522076650196037,
+  "brier": 0.13236858334620036,
+  "calib_slope": 0.15214362740516663,
+  "calib_intercept": 0.4775959253311157,
+  "fnr": 0.5332788893425888,
+  "fpr": 0.07573079537729435,
+  "task": "escalation",
+  "feature_group": "observation",
+  "model_type": "gru",
+  "window_h": 6
+}

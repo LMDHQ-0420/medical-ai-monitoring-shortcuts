@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.14208486676216125,
+  "auroc": 0.8105456712712467,
+  "auroc_ci_lower": 0.7987461801390232,
+  "auroc_ci_upper": 0.8225643627951086,
+  "auprc": 0.42872103099570563,
+  "brier": 0.15528861718092474,
+  "calib_slope": 0.1019259906651735,
+  "calib_intercept": 0.22675570424514713,
+  "fnr": 0.3180186647523331,
+  "fpr": 0.2147188205920818,
+  "task": "aki",
+  "feature_group": "disease",
+  "model_type": "lgbm",
+  "window_h": 6
+}

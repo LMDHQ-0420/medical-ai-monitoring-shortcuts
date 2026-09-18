@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.2103223204612732,
+  "auroc": 0.8100765321782681,
+  "auroc_ci_lower": 0.7996054357358889,
+  "auroc_ci_upper": 0.8198665013504612,
+  "auprc": 0.5485443288453042,
+  "brier": 0.16914494243103254,
+  "calib_slope": 0.12912281482579518,
+  "calib_intercept": 0.28740744382091993,
+  "fnr": 0.28031037827352084,
+  "fpr": 0.25071041074657713,
+  "task": "escalation",
+  "feature_group": "disease",
+  "model_type": "lgbm",
+  "window_h": 12
+}

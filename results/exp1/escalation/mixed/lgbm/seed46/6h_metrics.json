@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.24979600310325623,
+  "auroc": 0.9612200931636241,
+  "auroc_ci_lower": 0.9569457480874256,
+  "auroc_ci_upper": 0.9653175124563518,
+  "auprc": 0.8872423810605993,
+  "brier": 0.06772771358707938,
+  "calib_slope": 0.1158570086865647,
+  "calib_intercept": 0.4411921616444332,
+  "fnr": 0.04695794201714986,
+  "fpr": 0.0991162474507138,
+  "task": "escalation",
+  "feature_group": "mixed",
+  "model_type": "lgbm",
+  "window_h": 6
+}

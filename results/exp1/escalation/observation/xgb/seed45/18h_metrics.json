@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.1759485900402069,
+  "auroc": 0.8340395478705752,
+  "auroc_ci_lower": 0.8241477865947446,
+  "auroc_ci_upper": 0.8440072966449835,
+  "auprc": 0.5465376502002643,
+  "brier": 0.10845590748119376,
+  "calib_slope": 0.12007387727499008,
+  "calib_intercept": 0.42683079838752747,
+  "fnr": 0.6944927536231884,
+  "fpr": 0.03242975615794034,
+  "task": "escalation",
+  "feature_group": "observation",
+  "model_type": "xgb",
+  "window_h": 18
+}

@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.09557323902845383,
+  "auroc": 0.8635614720994312,
+  "auroc_ci_lower": 0.8524919787301124,
+  "auroc_ci_upper": 0.8749150464243625,
+  "auprc": 0.4358305568355334,
+  "brier": 0.0674780050834028,
+  "calib_slope": 0.08401177078485489,
+  "calib_intercept": 0.3547317087650299,
+  "fnr": 0.8196371398078975,
+  "fpr": 0.012631104093831058,
+  "task": "inhosp_mortality",
+  "feature_group": "disease",
+  "model_type": "xgb",
+  "window_h": 18
+}

@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.1565687507390976,
+  "auroc": 0.7043209932470202,
+  "auroc_ci_lower": 0.6897578771407609,
+  "auroc_ci_upper": 0.7191856475088939,
+  "auprc": 0.31561311116683083,
+  "brier": 0.19408644594282207,
+  "calib_slope": 0.08705340505990593,
+  "calib_intercept": 0.19986773178654174,
+  "fnr": 0.4364820846905538,
+  "fpr": 0.2687144757528117,
+  "task": "aki",
+  "feature_group": "observation",
+  "model_type": "lgbm",
+  "window_h": 18
+}

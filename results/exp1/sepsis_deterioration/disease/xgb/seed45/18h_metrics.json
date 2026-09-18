@@ -1,0 +1,17 @@
+{
+  "n": 9804,
+  "positive_rate": 0.3022235929965973,
+  "auroc": 0.6030213395903666,
+  "auroc_ci_lower": 0.59047132899073,
+  "auroc_ci_upper": 0.6148302192959516,
+  "auprc": 0.3805192939239588,
+  "brier": 0.20502299376228816,
+  "calib_slope": 0.21546310186386108,
+  "calib_intercept": 0.48890435695648193,
+  "fnr": 0.9952750590617617,
+  "fpr": 0.002485016810407835,
+  "task": "sepsis_deterioration",
+  "feature_group": "disease",
+  "model_type": "xgb",
+  "window_h": 18
+}
