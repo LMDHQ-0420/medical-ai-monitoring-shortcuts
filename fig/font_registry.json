@@ -1,0 +1,26 @@
+{
+  "preferred_family": "Arial",
+  "fallback_families": [
+    "Liberation Sans",
+    "DejaVu Sans"
+  ],
+  "roles_pt": {
+    "tick": 5.8,
+    "legend": 5.8,
+    "data": 5.8,
+    "annotation": 5.8,
+    "category": 7.0,
+    "emphasis": 7.0,
+    "axis": 8.5,
+    "compact": 5.65,
+    "milestone": 6.3
+  },
+  "rules": {
+    "axis_labels": "8.5 pt bold",
+    "tick_and_legend": "5.8 pt regular",
+    "all_figure_text": "black",
+    "titles": "forbidden",
+    "panel_letters": "forbidden",
+    "small_footnote_annotations": "forbidden"
+  }
+}

@@ -1,0 +1,22 @@
+id: fig3b
+canvas:
+  width_mm: 190
+  height_mm: 80
+formats:
+- pdf
+- svg
+- png
+png_dpi: 500
+title: none
+panel_label: none
+kind: task-faceted model boxplots with prediction-window medians
+legend: separate frameless files
+heatmap: false
+data_policy: stored result files only; five seeds averaged only where explicitly stated;
+  missing values preserved
+legend_frame: none
+tick_guide_lines: forbidden
+all_text_color: black
+x_axis: 六种模型；五种颜色的圆点表示五个预测时间窗。
+y_axis: 控制时间汇总特征之后剩余的残余ODI；每个任务独立缩放纵轴。
+aggregation: 每个箱体保留5个时间窗×5个seed的25个结果；圆点是固定模型和时间窗下5个seed的中位数。纵轴按箱线须的可见范围缩放，避免极端值造成无效留白。

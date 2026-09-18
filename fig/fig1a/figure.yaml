@@ -1,0 +1,22 @@
+id: fig1a
+canvas:
+  width_mm: 80
+  height_mm: 64
+formats:
+- pdf
+- svg
+- png
+png_dpi: 500
+title: none
+panel_label: none
+kind: hand-drawn conceptual illustration
+legend: none
+heatmap: false
+data_policy: stored result files only; five seeds averaged only where explicitly stated;
+  missing values preserved
+legend_frame: none
+tick_guide_lines: forbidden
+all_text_color: black
+x_axis: 无数值横轴。图从左到右依次表示患者信息、两种模型输入视野和ODI计算。
+y_axis: 无数值纵轴。上方是疾病信号，下方是临床观察轨迹。
+aggregation: 概念示意图，不读取实验数值，也不进行平均。

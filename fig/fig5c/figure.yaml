@@ -1,0 +1,22 @@
+id: fig5c
+canvas:
+  width_mm: 106
+  height_mm: 84
+formats:
+- pdf
+- svg
+- png
+png_dpi: 500
+title: none
+panel_label: none
+kind: task-wise hospital reversal ridge distributions
+legend: separate frameless files
+heatmap: false
+data_policy: stored result files only; five seeds averaged only where explicitly stated;
+  missing values preserved
+legend_frame: none
+tick_guide_lines: forbidden
+all_text_color: black
+x_axis: 一家医院中发生方向反转的模型—时间窗配置比例，范围0%到100%。
+y_axis: 五个预测任务；每条山脊是一项任务。
+aggregation: 先在固定任务—模型—时间窗—医院内对5个seed取平均，再判断外部ODI是否由正变负。山脊按医院汇总最多6个模型×5个时间窗的配置比例；模型圆点是该模型在全部可用医院×五个时间窗中的总体反转率，因此不再被限制在20%的倍数。

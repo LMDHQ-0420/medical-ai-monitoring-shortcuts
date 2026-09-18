@@ -17,8 +17,8 @@ Five experiments (exp1–exp5) test this metric's magnitude, robustness, and fai
 ## Environment Setup
 
 ```bash
-conda create -n "zw@PNAS" python=3.10 -y
-conda activate "zw@PNAS"
+conda create -n medical-ai-monitoring-shortcuts python=3.10 -y
+conda activate medical-ai-monitoring-shortcuts
 
 # Install PyTorch (adjust CUDA version as needed)
 # CUDA 11.8:
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 Both datasets require PhysioNet CITI training certification.
 Apply at: https://physionet.org/settings/credentialing/
 
-Place downloaded files at the following paths (relative to `code/`):
+Place downloaded files at the following paths (relative to the repository root):
 
 ```
 data/
@@ -172,9 +172,38 @@ python scripts/exp5_external_validation.py --config configs/default.yaml --model
 
 ---
 
+## Figures
+
+The five main figures follow experiment order: Fig1 shows baseline ODI, Fig2
+severity and diagnosis robustness, Fig3 feature grouping robustness, Fig4 age
+patterns, and Fig5 cross-hospital transfer. Each has three standalone panels.
+
+```bash
+# Render all 15 panels and their separate legends
+python fig/build_delivery.py
+
+# Regenerate the panel affected by a PSM-only rerun
+python fig/fig2b/plot_fig2b.py
+```
+
+Each `fig/figXa/` directory contains its plotting entry point, `figure.yaml`,
+and PDF, SVG, and 500 dpi PNG exports. Eleven panels have separate legend files.
+`layout-plan.yaml` records how to assemble the panels into five main figures.
+
+The plotting code reads existing files under `results/`. Regenerate affected
+panels after rerunning an experiment. A PSM-only rerun affects Fig2b; the diagnosis
+panels Fig2a and Fig2c use unchanged stratification results.
+
+`figures.py` implements the panels, `result_data.py` loads their results, and
+`style.py` defines the shared style. Arial is preferred, with Liberation Sans and
+DejaVu Sans as fallbacks when Arial is unavailable.
+
+---
+
 ## Repository Contents
 
-The repository includes experiment results (including per-patient prediction CSVs).
+The repository includes experiment results (including per-patient prediction CSVs),
+figure code, and current panel and legend exports.
 Datasets under `data/`, runtime logs, and Python caches are excluded by `.gitignore`.
 No model weights are currently saved on disk. Future checkpoints should be placed
 outside `data/` (for example, under `checkpoints/`) so they can be tracked.
@@ -227,6 +256,15 @@ medical-ai-monitoring-shortcuts/
 ├── configs/
 │   └── default.yaml   # All hyperparameters
 ├── data/              # gitignored
+├── fig/
+│   ├── build_delivery.py # Render all panels and legends
+│   ├── figures.py        # Panel implementations
+│   ├── result_data.py    # Read stored experiment results
+│   ├── style.py          # Shared plotting style
+│   ├── layout-plan.yaml  # Main figure composition
+│   ├── color_registry.json
+│   ├── font_registry.json
+│   └── fig1a/ … fig5c/   # 15 panels, configs, plotting entries, and exports
 ├── results/           # Experiment results included in the repository
 ├── logs/              # gitignored
 └── requirements.txt

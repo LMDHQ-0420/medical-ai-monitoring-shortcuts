@@ -1,0 +1,78 @@
+canvas_width_mm: 190
+interpanel_gap_mm: 0
+panels:
+  fig1a:
+    width_mm: 80
+    height_mm: 64
+  fig1b:
+    width_mm: 190
+    height_mm: 80
+  fig1c:
+    width_mm: 110
+    height_mm: 64
+  fig2a:
+    width_mm: 190
+    height_mm: 80
+  fig2b:
+    width_mm: 96
+    height_mm: 110
+  fig2c:
+    width_mm: 94
+    height_mm: 110
+  fig3a:
+    width_mm: 106
+    height_mm: 58
+  fig3b:
+    width_mm: 190
+    height_mm: 80
+  fig3c:
+    width_mm: 84
+    height_mm: 58
+  fig4a:
+    width_mm: 102
+    height_mm: 86
+  fig4b:
+    width_mm: 88
+    height_mm: 86
+  fig4c:
+    width_mm: 190
+    height_mm: 72
+  fig5a:
+    width_mm: 84
+    height_mm: 84
+  fig5b:
+    width_mm: 190
+    height_mm: 82
+  fig5c:
+    width_mm: 106
+    height_mm: 84
+composition:
+  fig1:
+  - - fig1a
+    - fig1c
+  - - fig1b
+  fig2:
+  - - fig2a
+  - - fig2b
+    - fig2c
+  fig3:
+  - - fig3a
+    - fig3c
+  - - fig3b
+  fig4:
+  - - fig4a
+    - fig4b
+  - - fig4c
+  fig5:
+  - - fig5a
+    - fig5c
+  - - fig5b
+row_width_checks_mm:
+  fig1_row1: 80 + 110 = 190
+  fig2_row2: 96 + 94 = 190
+  fig3_row1: 106 + 84 = 190
+  fig4_row1: 102 + 88 = 190
+  fig5_row1: 84 + 106 = 190
+  full_width_rows: '190'
+heatmap_panels: []
+legend_policy: all legends exported separately from data panels

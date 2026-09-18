@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="175.748031pt" height="22.677165pt" viewBox="0 0 175.748031 22.677165" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-17T01:06:26.488493</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.9, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 22.677165 
+L 175.748031 22.677165 
+L 175.748031 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="legend_1">
+   <g id="patch_2">
+    <path d="M 36.260359 12.841145 
+L 47.860359 12.841145 
+L 47.860359 8.781145 
+L 36.260359 8.781145 
+z
+" style="fill: #e17c76"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 5.8px; font-family: 'Arial'; text-anchor: start; fill: #111111" x="51.050359" y="12.841145" transform="rotate(-0 51.050359 12.841145)">Original ODI</text>
+   </g>
+   <g id="patch_3">
+    <path d="M 90.207609 12.841145 
+L 101.807609 12.841145 
+L 101.807609 8.781145 
+L 90.207609 8.781145 
+z
+" style="fill: #5f86c1"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 5.8px; font-family: 'Arial'; text-anchor: start; fill: #111111" x="104.997609" y="12.841145" transform="rotate(-0 104.997609 12.841145)">Residual ODI</text>
+   </g>
+  </g>
+ </g>
+</svg>

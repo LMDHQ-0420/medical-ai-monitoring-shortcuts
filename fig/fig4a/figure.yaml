@@ -1,0 +1,22 @@
+id: fig4a
+canvas:
+  width_mm: 102
+  height_mm: 86
+formats:
+- pdf
+- svg
+- png
+png_dpi: 500
+title: none
+panel_label: none
+kind: stacked age-stratified split violins
+legend: separate frameless files
+heatmap: false
+data_policy: stored result files only; five seeds averaged only where explicitly stated;
+  missing values preserved
+legend_frame: none
+tick_guide_lines: forbidden
+all_text_color: black
+x_axis: 四个年龄组：≤45、45–65、65–80和>80岁。
+y_axis: ODI；五行分别是五个预测任务，每行独立缩放纵轴。
+aggregation: 每个半小提琴保留6个模型×5个时间窗×5个seed的150个结果。时间窗和seed均不预先求平均；左半边来自MIMIC，右半边来自eICU。十字纵线表示四分位范围，横线表示中位数。

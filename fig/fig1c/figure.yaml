@@ -1,0 +1,22 @@
+id: fig1c
+canvas:
+  width_mm: 110
+  height_mm: 64
+formats:
+- pdf
+- svg
+- png
+png_dpi: 500
+title: none
+panel_label: none
+kind: grouped feature-view AUROC violins
+legend: separate frameless files
+heatmap: false
+data_policy: stored result files only; five seeds averaged only where explicitly stated;
+  missing values preserved
+legend_frame: none
+tick_guide_lines: forbidden
+all_text_color: black
+x_axis: 五个预测任务；每个任务内并列三种输入视野。
+y_axis: 原始AUROC，越高表示区分阳性与阴性患者的能力越强。
+aggregation: 每把小提琴保留6个模型×5个时间窗×5个seed的150个AUROC。时间窗和seed均不预先求平均；贯穿全宽的黑线是中位数，两条较细灰线分别是第25%和第75%分位。

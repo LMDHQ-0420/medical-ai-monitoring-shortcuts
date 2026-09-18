@@ -1,0 +1,38 @@
+{
+  "palette": {
+    "ink": "#111111",
+    "charcoal": "#4F5660",
+    "white": "#FFFFFF",
+    "pale_grey": "#ECEFF2",
+    "band_grey": "#F5F6F7",
+    "grid": "#C9CED4",
+    "gray": "#7B818A",
+    "gray_dark": "#4F5660",
+    "gray_light": "#D2D6DB",
+    "blue": "#3264B0",
+    "blue_dark": "#1F4788",
+    "blue_light": "#7FA6D8",
+    "slate": "#65758B",
+    "teal": "#178C8C",
+    "teal_light": "#75BDB7",
+    "coral": "#D9574F",
+    "coral_dark": "#A83C3A",
+    "coral_light": "#EA9487",
+    "orange": "#E08B2C",
+    "purple": "#7651B5",
+    "rose": "#B54878",
+    "green": "#3E8B5B"
+  },
+  "task_order": {
+    "ICU Death": "#3264B0",
+    "Hospital Death": "#D9574F",
+    "AKI": "#178C8C",
+    "Sepsis": "#E08B2C",
+    "Escalation": "#7651B5"
+  },
+  "rules": {
+    "all_text": "#111111",
+    "zero_reference": "#D2D6DB",
+    "missing": "#ECEFF2"
+  }
+}

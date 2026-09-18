@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="226.771654pt" height="22.677165pt" viewBox="0 0 226.771654 22.677165" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-18T23:47:51.041941</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.9, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 22.677165 
+L 226.771654 22.677165 
+L 226.771654 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="legend_1">
+   <g id="patch_2">
+    <path d="M 45.654967 12.838426 
+L 57.254967 12.838426 
+L 57.254967 8.778426 
+L 45.654967 8.778426 
+z
+" style="fill: #4aa5a5"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #111111" x="60.444967" y="12.838426" transform="rotate(-0 60.444967 12.838426)">Original</text>
+   </g>
+   <g id="patch_3">
+    <path d="M 87.679592 12.838426 
+L 99.279592 12.838426 
+L 99.279592 8.778426 
+L 87.679592 8.778426 
+z
+" style="fill: #e7a55a"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #111111" x="102.469592" y="12.838426" transform="rotate(-0 102.469592 12.838426)">Severity Matched (Provisional)</text>
+   </g>
+  </g>
+ </g>
+</svg>
