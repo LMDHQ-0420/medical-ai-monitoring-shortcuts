@@ -1,4 +1,4 @@
-"""Render the current 15 panels and their separate legends."""
+"""Render the available tracked panels and their separate legends."""
 
 from pathlib import Path
 
@@ -14,6 +14,8 @@ ROOT = Path(__file__).resolve().parent
 def main():
     for panel, builder in BUILDERS.items():
         outdir = ROOT / panel
+        if not outdir.is_dir():
+            continue
         spec = yaml.safe_load((outdir / "figure.yaml").read_text())
         print(f"render {panel}", flush=True)
         export(builder(), outdir, panel, dpi=spec["png_dpi"])

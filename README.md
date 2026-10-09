@@ -176,17 +176,18 @@ python scripts/exp5_external_validation.py --config configs/default.yaml --model
 
 The five main figures follow experiment order: Fig1 shows baseline ODI, Fig2
 severity and diagnosis robustness, Fig3 feature grouping robustness, Fig4 age
-patterns, and Fig5 cross-hospital transfer. Each has three standalone panels.
+patterns, and Fig5 cross-hospital transfer. The repository tracks 14 standalone panels;
+Fig1a is intentionally kept local and is not distributed.
 
 ```bash
-# Render all 15 panels and their separate legends
+# Render all tracked panels and their separate legends
 python fig/build_delivery.py
 
 # Regenerate the panel affected by a PSM-only rerun
 python fig/fig2b/plot_fig2b.py
 ```
 
-Each `fig/figXa/` directory contains its plotting entry point, `figure.yaml`,
+Each tracked `fig/figXa/` directory contains its plotting entry point, `figure.yaml`,
 and PDF, SVG, and 500 dpi PNG exports. Eleven panels have separate legend files.
 `layout-plan.yaml` records how to assemble the panels into five main figures.
 
@@ -264,7 +265,7 @@ medical-ai-monitoring-shortcuts/
 │   ├── layout-plan.yaml  # Main figure composition
 │   ├── color_registry.json
 │   ├── font_registry.json
-│   └── fig1a/ … fig5c/   # 15 panels, configs, plotting entries, and exports
+│   └── fig1b/ … fig5c/   # 14 tracked panels; Fig1a remains local
 ├── results/           # Experiment results included in the repository
 ├── logs/              # gitignored
 └── requirements.txt
