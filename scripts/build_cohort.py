@@ -24,12 +24,13 @@ def main() -> None:
         help="Process first 500 stays only, print 10 rows"
     )
     parser.add_argument("--dataset", choices=["mimic", "eicu", "both"], default="both")
+    parser.add_argument("--output-dir", default=None, help="处理后数据的新版本目录")
     args = parser.parse_args()
 
     with open(args.config) as f:
         cfg = yaml.safe_load(f)
 
-    output_dir = Path("data/processed")
+    output_dir = Path(args.output_dir or ("outputs/smoke_cohort" if args.smoke_test else "data/processed"))
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if args.dataset in ("mimic", "both"):

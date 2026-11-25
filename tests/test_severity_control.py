@@ -89,9 +89,12 @@ class MatchingTests(unittest.TestCase):
                 Path("config.json").write_text(json.dumps(config))
                 Path("data/processed").mkdir(parents=True)
                 Path("data/processed/mimic_iv_6h.parquet").touch()
-                output = Path("results/exp2/icu_mortality/mixed/lr/seed43/6h_severity_control.json")
+                output = Path("outputs/legacy_exp2/icu_mortality/mixed/lr/seed43/6h_severity_control.json")
                 output.parent.mkdir(parents=True)
                 output.write_text(json.dumps(original))
+                historical = Path("results/exp2/icu_mortality/mixed/lr/seed43/6h_severity_control.json")
+                historical.parent.mkdir(parents=True)
+                historical.write_text(json.dumps(original))
                 with patch.object(sys, "argv", ["exp2", "--config", "config.json", "--model", "lr", "--seed", "43", "--psm-only"]), \
                      patch.object(entry.pd, "read_parquet", return_value=df), \
                      patch.object(entry, "compute_oii", return_value=(pd.Series(np.arange(100), index=df.index), None)), \
@@ -104,6 +107,7 @@ class MatchingTests(unittest.TestCase):
                     stratification.assert_not_called()
                     sofa.assert_not_called()
                 actual = json.loads(output.read_text())
+                self.assertEqual(json.loads(historical.read_text()), original)
                 self.assertEqual(actual["psm"]["odi"], 0.1)
                 self.assertEqual(actual["stratification"], original["stratification"])
                 self.assertEqual(actual["sofa_adjusted"], original["sofa_adjusted"])

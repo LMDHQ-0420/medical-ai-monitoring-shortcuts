@@ -19,7 +19,7 @@ TC = dict(zip(rd.TASKS, TASK_COLORS))
 ML = dict(zip(rd.MODEL_KEYS, rd.MODEL_LABELS))
 INK = COLORS["ink"]
 ZERO = COLORS["gray_light"]
-MODEL_COLORS = [COLORS[x] for x in ("blue", "coral", "teal", "orange", "purple", "gray_dark")]
+MODEL_COLORS = [COLORS[x] for x in ("blue", "coral", "teal", "orange", "purple")]
 MC = dict(zip(rd.MODEL_KEYS, MODEL_COLORS))
 
 
@@ -156,7 +156,7 @@ def fig1a():
 
 
 def fig1b():
-    d=rd.exp1(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.32); axes=[]; xs=np.arange(6)
+    d=rd.exp1(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.32); axes=[]; xs=np.arange(len(rd.MODEL_KEYS))
     for i,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].odi.to_numpy() for m in rd.MODEL_KEYS]
         bp=ax.boxplot(data,positions=xs,widths=.56,patch_artist=True,showfliers=False,whis=(10,90),medianprops=dict(color=INK,lw=1.0),whiskerprops=dict(color=INK,lw=.65),capprops=dict(color=INK,lw=.65))
@@ -164,7 +164,7 @@ def fig1b():
         for mi,model in enumerate(rd.MODEL_KEYS):
             for wi,w in enumerate(rd.WINDOWS):
                 med=np.median(st[(st.window==w)&(st.model==model)].odi); ax.plot(mi+(wi-2)*.075,med,marker="o",ls="",ms=2.7,mfc=TASK_COLORS[wi],mec=COLORS["white"],mew=.3,zorder=4)
-        local=st.odi.to_numpy(); pad=max((local.max()-local.min())*.08,.004); ax.set_xlim(-.45,5.45); ax.set_ylim(local.min()-pad,local.max()+pad); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right")
+        local=st.odi.to_numpy(); pad=max((local.max()-local.min())*.08,.004); ax.set_xlim(-.45,len(rd.MODEL_KEYS)-.55); ax.set_ylim(local.min()-pad,local.max()+pad); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right")
         ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
     axes[0].set_ylabel("ODI",fontweight="bold"); fig.text(.53,.045,"Model",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
     return fig
@@ -185,7 +185,7 @@ def fig1c():
 
 
 def fig2a():
-    _,d=rd.exp2(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); xs=np.arange(6); axes=[]
+    _,d=rd.exp2(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); xs=np.arange(len(rd.MODEL_KEYS)); axes=[]
     for i,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].odi.to_numpy() for m in rd.MODEL_KEYS]
         bp=ax.boxplot(data,positions=xs,widths=.56,patch_artist=True,showfliers=False,whis=(10,90),medianprops=dict(color=INK,lw=1.0),whiskerprops=dict(color=INK,lw=.65),capprops=dict(color=INK,lw=.65))
@@ -197,7 +197,7 @@ def fig2a():
         for values in data:
             p10,_,_,_,p90=_summary(values); bounds.extend([p10,p90])
         pad=max((max(bounds)-min(bounds))*.10,.003)
-        ax.set_xlim(-.45,5.45); ax.set_ylim(min(bounds)-pad,max(bounds)+pad*2.6); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right"); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
+        ax.set_xlim(-.45,len(rd.MODEL_KEYS)-.55); ax.set_ylim(min(bounds)-pad,max(bounds)+pad*2.6); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right"); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
     _zero_if_all(axes,"horizontal",.65)
     axes[0].set_ylabel("Diagnosis-Stratified ODI",fontweight="bold"); fig.text(.53,.045,"Model",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
     return fig
@@ -230,6 +230,7 @@ def fig2c():
 
 
 def fig3c():
+    raise RuntimeError('旧 exp3 完整模型差值无效；运行 fig/pnas_plots.py')
     d=rd.exp3(); fig=figure(84,58); ax=fig.add_axes([.20,.18,.77,.80]); ys=np.arange(5)[::-1]
     allv=d.mixed_change.dropna().to_numpy(); lo,hi=np.quantile(allv,[.01,.99]); lim=max(abs(lo),abs(hi),.0025)*1.10
     for y,task in zip(ys,rd.TASKS):
@@ -250,20 +251,21 @@ def fig3a():
 
 
 def fig3b():
-    d=rd.exp3(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); axes=[]; xs=np.arange(6)
+    raise RuntimeError('Fig. 3B 必须由共享 F 的正式预测计算 reference_gain；运行 fig/pnas_plots.py')
+    d=rd.exp3(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); axes=[]; xs=np.arange(len(rd.MODEL_KEYS))
     for ti,task in enumerate(rd.TASKS):
-        ax=fig.add_subplot(gs[0,ti]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].residual.to_numpy() for m in rd.MODEL_KEYS]
+        ax=fig.add_subplot(gs[0,ti]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].mixed_change.to_numpy() for m in rd.MODEL_KEYS]
         bp=ax.boxplot(data,positions=xs,widths=.56,patch_artist=True,showfliers=False,medianprops=dict(color=INK,lw=1.0),whiskerprops=dict(color=INK,lw=.65),capprops=dict(color=INK,lw=.65))
         for box in bp["boxes"]: box.set(fc=_light(TC[task],.38),ec=COLORS["gray"],lw=.6)
         for mi,model in enumerate(rd.MODEL_KEYS):
             for wi,w in enumerate(rd.WINDOWS):
-                med=np.median(st[(st.model==model)&(st.window==w)].residual); ax.plot(mi+(wi-2)*.075,med,marker="o",ls="",ms=2.7,mfc=TASK_COLORS[wi],mec=COLORS["white"],mew=.3,zorder=4)
+                med=np.median(st[(st.model==model)&(st.window==w)].mixed_change); ax.plot(mi+(wi-2)*.075,med,marker="o",ls="",ms=2.7,mfc=TASK_COLORS[wi],mec=COLORS["white"],mew=.3,zorder=4)
         bounds=[]
         for values in data:
             p10,_,_,_,p90=_summary(values); bounds.extend([p10,p90])
-        span=max(bounds)-min(bounds); lower=max(span*.08,.002); upper=max(span*.34,.005); ax.set_xlim(-.45,5.45); ax.set_ylim(min(bounds)-lower,max(bounds)+upper); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right"); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
+        span=max(bounds)-min(bounds); lower=max(span*.08,.002); upper=max(span*.34,.005); ax.set_xlim(-.45,len(rd.MODEL_KEYS)-.55); ax.set_ylim(min(bounds)-lower,max(bounds)+upper); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right"); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
     _zero_if_all(axes,"horizontal",.65)
-    axes[0].set_ylabel("Residual ODI",fontweight="bold"); fig.text(.53,.045,"Model",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    axes[0].set_ylabel("AUROC(D+T) − AUROC(D)",fontweight="bold"); fig.text(.53,.045,"Model",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
     return fig
 
 
@@ -304,7 +306,7 @@ def fig4c():
         for x,w in zip(xs,rd.WINDOWS):
             v=s[s.window==w].change.dropna().to_numpy(); local.extend(v); _box_v(ax,x,v,_light(TC[task],.32),.52)
             for mi,model in enumerate(rd.MODEL_KEYS):
-                med=np.median(s[(s.window==w)&(s.model==model)].change.dropna()); ax.plot(x+(mi-2.5)*.065,med,marker="o",ls="",ms=2.4,mfc=MC[model],mec=COLORS["white"],mew=.3,zorder=7)
+                med=np.median(s[(s.window==w)&(s.model==model)].change.dropna()); ax.plot(x+(mi-(len(rd.MODEL_KEYS)-1)/2)*.065,med,marker="o",ls="",ms=2.4,mfc=MC[model],mec=COLORS["white"],mew=.3,zorder=7)
         lo,hi=np.quantile(local,[.005,.995]); pad=max((hi-lo)*.07,.008)
         ax.set_ylim(lo-pad,hi+pad); ax.set_xlim(-.45,4.45); ax.set_xticks(xs,[f"{w} h" for w in rd.WINDOWS],rotation=25,ha="right")
         ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
@@ -331,7 +333,7 @@ def fig5b():
         for x,w in zip(xs,rd.WINDOWS):
             v=s[s.window==w].odi_shrinkage.dropna().to_numpy(); local.extend(v); _box_v(ax,x,v,_light(TC[task],.30),.52)
             for mi,model in enumerate(rd.MODEL_KEYS):
-                med=np.median(s[(s.model==model)&(s.window==w)].odi_shrinkage.dropna()); ax.plot(x+(mi-2.5)*.065,med,marker="o",ls="",ms=2.6,mfc=MC[model],mec=COLORS["white"],mew=.3,zorder=7)
+                med=np.median(s[(s.model==model)&(s.window==w)].odi_shrinkage.dropna()); ax.plot(x+(mi-(len(rd.MODEL_KEYS)-1)/2)*.065,med,marker="o",ls="",ms=2.6,mfc=MC[model],mec=COLORS["white"],mew=.3,zorder=7)
         lo,hi=np.quantile(local,[.01,.99]); span=hi-lo; lower=max(span*.06,.01); upper=max(span*.25,.025)
         ax.set_xlim(-.45,4.45); ax.set_ylim(lo-lower,hi+upper); ax.set_xticks(xs,[f"{w} h" for w in rd.WINDOWS],rotation=28,ha="right")
         ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
@@ -365,21 +367,21 @@ def _point_handles(labels, colors):
 
 
 _fig5b_handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS)
-_fig5b_handles=[_fig5b_handles[i] for i in (0,3,1,4,2,5)]
+_fig5b_handles=[_fig5b_handles[i] for i in (0,3,1,4,2)]
 
 
 LEGEND_SPECS = {
     "fig1b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
     "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=l) for _,c,l in [("d",COLORS["blue"],"Disease Only"),("o",COLORS["orange"],"Observation Only"),("m",COLORS["teal"],"Disease + Observation")]],ncol=3,width=88,height=8),
     "fig2a": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
-    "fig2b": dict(handles=[Patch(fc=_light(COLORS["teal"],.22),ec="none",label="Original"),Patch(fc=_light(COLORS["orange"],.22),ec="none",label="Severity Matched (Provisional)")],ncol=2,width=80,height=8),
+    "fig2b": dict(handles=[Patch(fc=_light(COLORS["teal"],.22),ec="none",label="Original cohort"),Patch(fc=_light(COLORS["orange"],.22),ec="none",label="Matched cohort")],ncol=2,width=80,height=8),
     "fig3a": dict(handles=[Patch(fc=_light(COLORS["coral"],.22),ec="none",label="Original ODI"),Patch(fc=_light(COLORS["blue"],.22),ec="none",label="Residual ODI")],ncol=2,width=62,height=8),
     "fig3b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
     "fig4a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External")],ncol=2,width=62,height=8),
-    "fig4c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=6,width=92,height=8),
+    "fig4c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=len(rd.MODEL_KEYS),width=92,height=8),
     "fig5a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU Hospital Median")],ncol=2,width=76,height=8),
     "fig5b": dict(handles=_fig5b_handles,ncol=3,width=62,height=13),
-    "fig5c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=6,width=92,height=8),
+    "fig5c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=len(rd.MODEL_KEYS),width=92,height=8),
 }
 
 

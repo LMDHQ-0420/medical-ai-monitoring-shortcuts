@@ -23,13 +23,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--task", default=None, help="Run single task only")
-    parser.add_argument("--model", default=None, choices=["lr", "xgb", "gru", "rf", "lgbm", "mlp"],
+    parser.add_argument("--model", default=None, choices=["lr", "xgb", "rf", "lgbm", "mlp"],
                         help="Run single model only")
     parser.add_argument("--window", type=int, default=None, help="Run single window only")
     parser.add_argument("--seed", type=int, default=None,
                         help="Override config training.seed; also selects the seedN/ output subdir")
     parser.add_argument("--smoke-test", action="store_true",
                         help="Single task/model/window with 500 samples")
+    parser.add_argument("--output-root", default="outputs/legacy_exp1",
+                        help="新运行的结果根目录；历史 results/ 保持只读")
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -39,9 +41,10 @@ def main() -> None:
     seed_dir = f"seed{cfg['training']['seed']}"
 
     processed_dir = Path("data/processed")
+    output_root = Path(args.output_root) / ("smoke" if args.smoke_test else "formal")
 
     tasks = [args.task] if args.task else cfg["tasks"]
-    model_types = [args.model] if args.model else ["lr", "rf", "xgb", "lgbm", "gru", "mlp"]
+    model_types = [args.model] if args.model else ["lr", "rf", "xgb", "lgbm", "mlp"]
     windows = [args.window] if args.window else cfg["time_windows"]
     feature_groups = ["disease", "observation", "mixed"]
 
@@ -65,7 +68,7 @@ def main() -> None:
                 continue
             for fg in feature_groups:
                 for mt in model_types:
-                    out_path = Path("results") / "exp1" / task / fg / mt / seed_dir / f"{window_h}h_metrics.json"
+                    out_path = output_root / task / fg / mt / seed_dir / f"{window_h}h_metrics.json"
                     if out_path.exists():
                         print(f"[SKIP] {out_path} already exists.")
                         continue
@@ -76,7 +79,7 @@ def main() -> None:
                         feature_group=fg,
                         window_h=window_h,
                         config=cfg,
-                        output_base="results/exp1",
+                        output_base=str(output_root),
                         seed_dir=seed_dir,
                     )
                     metrics = trainer.run(df)

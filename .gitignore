@@ -14,3 +14,6 @@ __pycache__/
 /scripts/generate_result_report.py
 # Local-only conceptual panel
 /fig/fig1a/
+
+# 本地正式实验产物（患者级预测与模型权重不入 Git）
+/outputs/

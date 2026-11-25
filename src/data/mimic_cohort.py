@@ -411,7 +411,10 @@ def _extract_stay_features(
     ]
     for vital, itemids in VITAL_ITEMIDS.items():
         sub = ce_stay[ce_stay["itemid"].isin(itemids)].sort_values("charttime")
-        row[f"{vital}_first"] = float(sub["valuenum"].iloc[0]) if len(sub) > 0 else np.nan
+        value = float(sub["valuenum"].iloc[0]) if len(sub) > 0 else np.nan
+        if vital == "temp" and 80 <= value <= 115:
+            value = (value - 32) * 5 / 9
+        row[f"{vital}_first"] = value
 
     # Lab first values within window (labevents already filtered to this hadm)
     le_stay = labevents[
@@ -482,6 +485,10 @@ def _extract_stay_features(
     cxr_sub = ce_24[ce_24["itemid"].isin(cxr_items)]
     row["has_cxr_24h"] = int(len(cxr_sub) > 0)
     row["cxr_count_24h"] = int(len(cxr_sub))
+
+    # 24h 命名为历史兼容；短窗口严格截断在当前预测时点。
+    wend24 = min(wend24, window_end)
+    row["orders_count_24h"] = _count_orders(prescriptions, intime, wend24)
 
     # --- Mixed features (24h) ---
     row["vasopressors_24h"] = int(

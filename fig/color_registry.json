@@ -27,7 +27,7 @@
     "ICU Death": "#3264B0",
     "Hospital Death": "#D9574F",
     "AKI": "#178C8C",
-    "Sepsis": "#E08B2C",
+    "Deterioration": "#E08B2C",
     "Escalation": "#7651B5"
   },
   "rules": {

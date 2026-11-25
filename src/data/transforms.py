@@ -63,7 +63,7 @@ def split_cohort(
     """
     assert abs(sum(ratios) - 1.0) < 1e-6
     rng = np.random.default_rng(seed)
-    subjects = df["subject_id"].unique()
+    subjects = np.sort(df["subject_id"].dropna().unique())
     rng.shuffle(subjects)
     n = len(subjects)
     n_train = int(n * ratios[0])

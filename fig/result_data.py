@@ -1,6 +1,7 @@
 """Read existing result files only; never rewrite or fit experiment results."""
 
 import json
+import os
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
@@ -10,9 +11,9 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT.parent / "results"
 TASKS = ["icu_mortality", "inhosp_mortality", "aki", "sepsis_deterioration", "escalation"]
-TASK_LABELS = ["ICU Death", "Hospital Death", "AKI", "Sepsis", "Escalation"]
-MODEL_KEYS = ["lr", "rf", "xgb", "lgbm", "gru", "mlp"]
-MODEL_LABELS = ["LR", "RF", "XGBoost", "LightGBM", "GRU", "MLP"]
+TASK_LABELS = ["ICU mortality", "Hospital mortality", "AKI", "Deterioration", "Escalation"]
+MODEL_KEYS = ["lr", "rf", "xgb", "lgbm", "mlp"]
+MODEL_LABELS = ["LR", "RF", "XGBoost", "LightGBM", "MLP"]
 WINDOWS = [3, 6, 12, 18, 24]
 SEEDS = [42, 43, 44, 45, 46]
 AGES = ["<45", "45-65", "65-80", ">80"]
@@ -21,11 +22,15 @@ KEYS = ["task", "model", "window"]
 
 
 def read_json(path):
+    if os.environ.get('ALLOW_LEGACY_FIGURE_RESULTS') != '1':
+        raise RuntimeError('历史结果已退休；正式图请运行 fig/pnas_plots.py')
     raw = path.read_bytes()
     return json.loads(raw)
 
 
 def read_csv(path):
+    if os.environ.get('ALLOW_LEGACY_FIGURE_RESULTS') != '1':
+        raise RuntimeError('历史结果已退休；正式图请运行 fig/pnas_plots.py')
     raw = path.read_bytes()
     from io import BytesIO
     return pd.read_csv(BytesIO(raw))

@@ -15,7 +15,7 @@ from scipy.stats import ttest_1samp
 RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
 
 TASKS = ["icu_mortality", "inhosp_mortality", "aki", "sepsis_deterioration", "escalation"]
-MODELS = ["lr", "rf", "xgb", "lgbm", "gru", "mlp"]
+MODELS = ["lr", "rf", "xgb", "lgbm", "mlp"]
 WINDOWS = [3, 6, 12, 18, 24]
 
 

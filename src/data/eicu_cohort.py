@@ -296,7 +296,10 @@ def _extract_stay_features(
     for eicu_col, feat in VITAL_COLS.items():
         if eicu_col in vit_stay.columns:
             sub = vit_stay[eicu_col].dropna()
-            row[f"{feat}_first"] = float(sub.iloc[0]) if len(sub) > 0 else np.nan
+            value = float(sub.iloc[0]) if len(sub) > 0 else np.nan
+            if feat == "temp" and 80 <= value <= 115:
+                value = (value - 32) * 5 / 9
+            row[f"{feat}_first"] = value
         else:
             row[f"{feat}_first"] = np.nan
 
@@ -369,9 +372,10 @@ def _extract_stay_features(
     row["has_cxr_24h"] = 0
     row["cxr_count_24h"] = 0
 
+    # 24h 命名为历史兼容；治疗与处方只使用预测截点之前的信息。
     med_24 = medication[
         (medication["drugstartoffset"] >= 0) &
-        (medication["drugstartoffset"] < 1440)
+        (medication["drugstartoffset"] < min(1440, window_min))
     ] if not medication.empty else medication
     row["orders_count_24h"] = int(len(med_24))
 

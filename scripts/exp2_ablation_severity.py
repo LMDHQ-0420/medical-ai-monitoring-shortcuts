@@ -39,13 +39,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--task", default=None, help="Run single task only")
-    parser.add_argument("--model", default=None, choices=["lr", "xgb", "gru", "rf", "lgbm", "mlp"],
+    parser.add_argument("--model", default=None, choices=["lr", "xgb", "rf", "lgbm", "mlp"],
                         help="Run single model only")
     parser.add_argument("--window", type=int, default=None, help="Run single window only")
     parser.add_argument("--seed", type=int, default=None,
                         help="Override config training.seed; also selects the seedN/ output subdir")
     parser.add_argument("--psm-only", action="store_true",
                         help="Overwrite PSM results only, preserving other existing analyses")
+    parser.add_argument("--output-root", default="outputs/legacy_exp2", help="历史 results/ 只读；旧入口输出到独立目录")
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -57,7 +58,7 @@ def main() -> None:
     processed_dir = Path("data/processed")
 
     tasks = [args.task] if args.task else cfg["tasks"]
-    model_types = [args.model] if args.model else ["lr", "rf", "xgb", "lgbm", "gru", "mlp"]
+    model_types = [args.model] if args.model else ["lr", "rf", "xgb", "lgbm", "mlp"]
     windows = [args.window] if args.window else cfg["time_windows"]
 
     for window_h in windows:
@@ -76,7 +77,7 @@ def main() -> None:
                     print(f"[SKIP] Label column '{task}' not found in parquet.")
                     continue
 
-                out_path = (Path("results") / "exp2" / task / "mixed" / model_type / seed_dir /
+                out_path = (Path(args.output_root) / task / "mixed" / model_type / seed_dir /
                             f"{window_h}h_severity_control.json")
 
                 print(f"\n>>> task={task} | model={model_type} | window={window_h}h")

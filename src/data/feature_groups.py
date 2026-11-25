@@ -9,13 +9,8 @@ DISEASE_FEATURES: list[str] = [
     # Initial lab values (first recorded within window)
     "creatinine_first", "lactate_first", "wbc_first", "hgb_first",
     "sodium_first", "potassium_first", "bilirubin_first", "inr_first",
-    # Demographics and comorbidities
+    # 入科时已知的静态人口学与入院来源。
     "age", "gender", "admission_source",
-    "has_diabetes", "has_ckd", "has_heart_failure", "has_copd", "has_cancer",
-    # Severity
-    "sofa_score",
-    # Admission diagnosis category (one-hot)
-    "dx_infection", "dx_cardiovascular", "dx_respiratory", "dx_renal", "dx_other",
 ]
 
 OBSERVATION_FEATURES: list[str] = [
@@ -42,7 +37,6 @@ MIXED_FEATURES: list[str] = [
     "antibiotics_24h",
     "vasopressors_24h",
     "mechanical_ventilation_24h",
-    "blood_culture_sent_24h",
 ]
 
 ALL_FEATURES: list[str] = DISEASE_FEATURES + OBSERVATION_FEATURES + MIXED_FEATURES

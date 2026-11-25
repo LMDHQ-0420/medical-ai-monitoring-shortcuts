@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from .logistic import LogisticModel
 from .xgboost_model import XGBoostModel
-from .gru_model import GRUModel
 from .random_forest import RandomForestModel
 from .lightgbm_model import LightGBMModel
 from .mlp_model import MLPModel
@@ -14,9 +13,9 @@ def create_model(model_type: str, config: dict, input_size: int | None = None):
     """Create and return a model instance.
 
     Args:
-        model_type: "lr" | "xgb" | "gru" | "rf" | "lgbm" | "mlp"
+        model_type: "lr" | "xgb" | "rf" | "lgbm" | "mlp"
         config: full config dict (reads from config["training"][model_type])
-        input_size: required for GRU (number of input features)
+        input_size: reserved for compatibility; tabular models do not use it
 
     Returns:
         Model instance with fit / predict_proba interface
@@ -41,15 +40,6 @@ def create_model(model_type: str, config: dict, input_size: int | None = None):
             early_stopping_rounds=xgb_cfg.get("early_stopping_rounds", 20),
             seed=config.get("training", {}).get("seed", 42),
             n_jobs=xgb_cfg.get("n_jobs", 1),
-        )
-    elif model_type == "gru":
-        assert input_size is not None, "input_size required for GRU"
-        gru_cfg = config.get("training", {}).get("gru", {})
-        return GRUModel(
-            input_size=input_size,
-            hidden_size=gru_cfg.get("hidden_size", 64),
-            num_layers=gru_cfg.get("num_layers", 2),
-            dropout=gru_cfg.get("dropout", 0.3),
         )
     elif model_type == "rf":
         rf_cfg = config.get("training", {}).get("random_forest", {})
@@ -85,5 +75,5 @@ def create_model(model_type: str, config: dict, input_size: int | None = None):
         )
     else:
         raise ValueError(
-            f"Unknown model_type: {model_type!r}. Choose 'lr', 'xgb', 'gru', 'rf', 'lgbm', or 'mlp'."
+            f"Unknown model_type: {model_type!r}. Choose 'lr', 'xgb', 'rf', 'lgbm', or 'mlp'."
         )
