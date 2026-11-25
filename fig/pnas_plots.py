@@ -100,8 +100,8 @@ def plot4(age,out):
 def plot5(external,out):
  fig,axes=plt.subplots(1,3,figsize=(13.4,3.7))
  e=external.copy();e=e[np.isfinite(e.odi_raw)&np.isfinite(e.internal_odi_raw)]
- ax=axes[0];ax.scatter(e.internal_odi_raw,e.odi_raw,s=4,alpha=.15,color='#3070A8');limits=[min(e.internal_odi_raw.min(),e.odi_raw.min()),max(e.internal_odi_raw.max(),e.odi_raw.max())]
- ax.plot(limits,limits,color='#555555',lw=.8);ax.set_xlabel('Internal raw ODI');ax.set_ylabel('External hospital raw ODI');label(ax,'A')
+ ax=axes[0];ax.scatter(e.internal_odi_raw,e.odi_raw,s=4,alpha=.15,color='#3070A8');xlo=float(e.internal_odi_raw.min());xhi=float(e.internal_odi_raw.max());pad=.04*(xhi-xlo)
+ ax.plot([xlo,xhi],[xlo,xhi],color='#555555',lw=.8);ax.set_xlim(xlo-pad,xhi+pad);ax.set_xlabel('Internal raw ODI');ax.set_ylabel('External hospital raw ODI');label(ax,'A')
  ax=axes[1];data=[e[e.task==task].odi_shrinkage.to_numpy() for task in TASKS];ax.boxplot(data,showfliers=False);ax.axhline(0,color='#888888',lw=.7);ax.set_xticks(range(1,6),LABELS,rotation=35,ha='right',fontsize=7);ax.set_ylabel('Internal − external ODI');label(ax,'B')
  ax=axes[2];rates=[]
  for task in TASKS:
