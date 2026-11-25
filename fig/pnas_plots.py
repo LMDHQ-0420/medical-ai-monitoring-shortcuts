@@ -22,21 +22,25 @@ def save(fig,out,name):
 def label(ax,letter):ax.text(-.08,1.08,letter,transform=ax.transAxes,fontsize=12,fontweight='bold')
 
 def plot1(main,out):
- fig,axes=plt.subplots(1,3,figsize=(13.4,3.6),gridspec_kw={'width_ratios':[.9,1.5,1.4]})
+ fig,axes=plt.subplots(1,3,figsize=(15.2,3.7),gridspec_kw={'width_ratios':[1.1,1.45,1.45]})
+ fig.subplots_adjust(wspace=.66)
  ax=axes[0];ax.set_xlim(0,1);ax.set_ylim(0,1);ax.axis('off')
- ax.add_patch(Circle((.18,.65),.09,facecolor='#dceaf5',edgecolor='#3070A8'))
- ax.plot([.10,.14,.17,.19,.21,.25],[.65,.65,.73,.55,.66,.66],color='#3070A8',lw=1.5)
- ax.text(.18,.42,'Clinical state\nD',ha='center',va='center')
- for x,y,t,c in [(.55,.78,'Observation\nO','#40A58E'),(.55,.50,'Treatment\nT','#D68A36'),(.82,.64,'Full\nD+O+T','#9E67A7')]:
-  ax.add_patch(Circle((x,y),.085,facecolor=c,alpha=.2,edgecolor=c));ax.text(x,y,t,ha='center',va='center',fontsize=8)
- ax.annotate('',(.72,.64),(.65,.64),arrowprops={'arrowstyle':'->','color':'#333333'})
- ax.text(.5,.18,'ODI = AUROC(F) − AUROC(D)',ha='center',fontsize=8)
+ ax.add_patch(Circle((.13,.53),.08,facecolor='#dceaf5',edgecolor='#3070A8'))
+ ax.plot([.07,.10,.12,.14,.16,.19],[.53,.53,.60,.46,.53,.53],color='#3070A8',lw=1.4)
+ for x,y,letter,title,color in [(.45,.75,'O','Observation','#40A58E'),(.45,.31,'T','Treatment','#D68A36'),(.83,.53,'F','Full model','#9E67A7')]:
+  ax.add_patch(Circle((x,y),.08,facecolor=color,alpha=.2,edgecolor=color))
+  ax.text(x,y,letter,ha='center',va='center',fontsize=10,fontweight='bold')
+  ax.text(x,y-.13,title,ha='center',va='top',fontsize=8)
+ ax.text(.13,.40,'Clinical state (D)',ha='center',fontsize=8)
+ for start,end in [((.22,.53),(.73,.53)),((.53,.72),(.75,.58)),((.53,.34),(.75,.48))]:
+  ax.annotate('',end,start,arrowprops={'arrowstyle':'->','color':'#666666','lw':.8})
+ ax.text(.5,.08,'ODI = AUROC(F) − AUROC(D)',ha='center',fontsize=8)
  label(ax,'A')
  config=main.groupby(['task','model','window_h'],as_index=False).odi_raw.mean()
  mat=config.groupby(['task','model']).odi_raw.mean().unstack().reindex(index=TASKS,columns=MODELS)
- ax=axes[1];im=ax.imshow(mat.to_numpy(),cmap='BrBG',aspect='auto',vmin=-max(abs(mat.min().min()),abs(mat.max().max())),vmax=max(abs(mat.min().min()),abs(mat.max().max())))
+ ax=axes[1];im=ax.imshow(mat.to_numpy(),cmap='YlGnBu',aspect='auto',vmin=0,vmax=mat.max().max())
  ax.set_xticks(range(5),MODEL_LABELS,rotation=25,ha='right');ax.set_yticks(range(5),LABELS)
- fig.colorbar(im,ax=ax,fraction=.04,pad=.02,label='Mean raw ODI');label(ax,'B')
+ ax.set_title('Mean raw ODI',fontsize=9);fig.colorbar(im,ax=ax,fraction=.04,pad=.04);label(ax,'B')
  ax=axes[2]
  for i,model in enumerate(MODELS):
   g=config[config.model==model].groupby('window_h').odi_raw.mean().reindex([3,6,12,18,24])
