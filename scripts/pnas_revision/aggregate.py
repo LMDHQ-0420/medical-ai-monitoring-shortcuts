@@ -5,8 +5,8 @@ from pathlib import Path
 import numpy as np,pandas as pd
 from sklearn.metrics import roc_auc_score
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
-from scripts.pnas_revision.run_tabular import TASKS,MODELS,WINDOWS,SEEDS,GROUPS,digest_file
-GROUPS=('D','O','DT','F')
+from scripts.pnas_revision.run_tabular import TASKS,MODELS,WINDOWS,SEEDS,GROUPS as FEATURE_COLUMNS,digest_file
+PRED_GROUPS=('D','O','DT','F')
 
 
 def read_cell(cell,protocol_hash=None,data_hash=None,feature_groups=None,sequence_hash=None):
@@ -19,17 +19,17 @@ def read_cell(cell,protocol_hash=None,data_hash=None,feature_groups=None,sequenc
     if feature_groups is not None and m.get('feature_columns')!=feature_groups:return None,'stale_feature_columns'
     if sequence_hash is not None and m.get('sequence_sha256')!=sequence_hash:return None,'stale_sequence'
     pred=pd.read_csv(q)
-    if not {'pair_id','stay_id','y_true',*(f'pred_{x}' for x in GROUPS)}.issubset(pred):return None,'missing_paired_column'
+    if not {'pair_id','stay_id','y_true',*(f'pred_{x}' for x in PRED_GROUPS)}.issubset(pred):return None,'missing_paired_column'
     if pred.pair_id.duplicated().any() or pred.stay_id.duplicated().any():return None,'duplicate_pair_key'
     if len(pred)!=m.get('split_counts',{}).get('test',{}).get('n',m.get('n_test')):return None,'sample_count_mismatch'
     y=pred.y_true.to_numpy()
     if int(y.sum())!=m.get('split_counts',{}).get('test',{}).get('positive',m.get('positive_test')):return None,'event_count_mismatch'
     if len(np.unique(y))!=2:return None,'one_class_test'
-    auc={g:float(roc_auc_score(y,pred[f'pred_{g}'])) for g in GROUPS}
-    for g in GROUPS:
+    auc={g:float(roc_auc_score(y,pred[f'pred_{g}'])) for g in PRED_GROUPS}
+    for g in PRED_GROUPS:
         if abs(auc[g]-m[f'auc_{g}'])>1e-8:return None,f'auc_{g}_mismatch'
     metric={'n_test':len(pred),'n_positive':int(y.sum()),'n_negative':int(len(pred)-y.sum()),
-            **{f'auc_{g}':auc[g] for g in GROUPS},'odi_raw':auc['F']-auc['D'],
+            **{f'auc_{g}':auc[g] for g in PRED_GROUPS},'odi_raw':auc['F']-auc['D'],
             'odi_residual':auc['F']-auc['DT'],'reference_gain':auc['DT']-auc['D'],
             'split_id':m['split_id'],'run_id':m.get('run_id',cell.parents[4].name),
             'prediction_file':str(q.relative_to(ROOT))}
@@ -46,7 +46,7 @@ def main():
     for task,model,window,seed in itertools.product(TASKS,MODELS,WINDOWS,SEEDS):
         key={'task':task,'model':model,'window_h':window,'seed':seed}
         cell=run/'formal/tabular'/task/model/f'seed{seed}'/f'{window}h'
-        metric,reason=read_cell(cell,protocol_hash=protocol_hash,data_hash=data_hashes[window],feature_groups=GROUPS)
+        metric,reason=read_cell(cell,protocol_hash=protocol_hash,data_hash=data_hashes[window],feature_groups=FEATURE_COLUMNS)
         if metric:rows.append({**key,**metric});allman.append({**key,'status':'complete','manifest':str((cell/'manifest.json').relative_to(ROOT))})
         else:missing.append({**key,'reason':reason});allman.append({**key,'status':reason})
     frame=pd.DataFrame(rows)

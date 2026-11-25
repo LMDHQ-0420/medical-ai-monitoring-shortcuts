@@ -97,3 +97,11 @@ def test_smoke_and_formal_paths_and_wrong_sample_cache():
     assert not paired_cache_matches(saved.iloc[::-1],expected,manifest,'icu_mortality')
     wrong=saved.copy();wrong.loc[1,'y_true']=0
     assert not paired_cache_matches(wrong,expected,manifest,'icu_mortality')
+
+
+def test_aggregate_uses_feature_mapping_and_prediction_keys_separately():
+    from scripts.pnas_revision.aggregate import FEATURE_COLUMNS,PRED_GROUPS
+    from scripts.pnas_revision.run_tabular import GROUPS
+    assert FEATURE_COLUMNS==GROUPS
+    assert tuple(FEATURE_COLUMNS)==PRED_GROUPS
+    assert isinstance(FEATURE_COLUMNS['F'],list)
