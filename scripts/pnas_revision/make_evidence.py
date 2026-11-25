@@ -7,7 +7,7 @@ from sklearn.metrics import roc_auc_score
 ROOT=Path(__file__).resolve().parents[2]
 CORE=['analysis_protocol.json','revision_status.json','input_inventory.csv','cohort_counts.csv','split_counts.csv',
       'age_counts.csv','hospital_counts.csv','field_time_rules.csv','sequence_feasibility.json',
-      'data_audit_report.md','treatment_repair_manifest.json','historical_grid_comparison.csv',
+      'data_audit_report.md','revision_report_zh.md','final_statistics_report_zh.md','manifest_finalization.json','experiments_manifest.json','treatment_repair_manifest.json','historical_grid_comparison.csv',
       'main_seed_metrics.csv.gz','main_configuration_metrics.csv','missing_grid.csv',
       'age_seed_metrics.csv.gz','external_seed_metrics.csv.gz','subgroup_missing_grid.csv','subgroup_status.json',
       'gru_seq_seed_metrics.csv.gz','gru_seq_missing_grid.csv','manuscript_numbers.json','data_dictionary.json',
@@ -45,6 +45,10 @@ def main():
   path=run/name
   if path.exists():payload[f'core/{name}']=path.read_bytes()
   else:omitted.append({'path':name,'reason':'not yet produced'})
+ for dataset in ['mimic_iv','eicu']:
+  source_manifest=ROOT/'data/processed'/f'{dataset}_manifest.json'
+  if source_manifest.exists():payload[f'core/{dataset}_sequence_manifest.json']=source_manifest.read_bytes()
+  else:omitted.append({'path':str(source_manifest.relative_to(ROOT)),'reason':'sequence manifest missing'})
  for task,model,window,seed in [('icu_mortality','lr',24,42),('icu_mortality','lr',3,42),('icu_mortality','xgb',12,42)]:
   cell=run/'formal/tabular'/task/model/f'seed{seed}'/f'{window}h'
   man=cell/'manifest.json';pred=cell/'predictions.csv.gz'
