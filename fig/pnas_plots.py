@@ -48,23 +48,74 @@ def plot1(main,out):
  ax.axhline(0,color='#888888',lw=.7);ax.set_xticks([3,6,12,18,24]);ax.set_xlabel('Prediction window (h)');ax.set_ylabel('Mean raw ODI');ax.legend(frameon=False,ncol=2,fontsize=7);label(ax,'C')
  save(fig,out,'fig1')
 
-def plot2(matched,diagnosis,out):
- required={'task','model','window_h','seed','odi_raw','matched_odi_raw'}
- if not required.issubset(matched) or not {'task','diagnosis','odi_raw'}.issubset(diagnosis):
-  raise ValueError('匹配或诊断正式表缺少必要字段')
- fig,axes=plt.subplots(1,3,figsize=(13.4,3.7))
- ax=axes[0];orig=[matched.loc[matched.task==t,'odi_raw'].to_numpy() for t in TASKS]
- ax.boxplot(orig,showfliers=False);ax.axhline(0,color='#888888',lw=.7)
- ax.set_xticks(range(1,6),LABELS,rotation=35,ha='right',fontsize=7);ax.set_ylabel('Original cohort ODI');label(ax,'A')
- ax=axes[1];x=np.arange(5);width=.36
- g=matched.groupby('task')[['odi_raw','matched_odi_raw']].mean().reindex(TASKS)
- ax.bar(x-width/2,g.odi_raw,width,label='Original cohort',color='#40A58E')
- ax.bar(x+width/2,g.matched_odi_raw,width,label='Matched cohort',color='#D68A36')
- ax.set_xticks(x,LABELS,rotation=35,ha='right',fontsize=7);ax.set_ylabel('Mean raw ODI');ax.legend(frameon=False,fontsize=7);label(ax,'B')
- ax=axes[2];d=diagnosis.groupby(['task','diagnosis']).odi_raw.mean().unstack().reindex(TASKS)
- im=ax.imshow(d.to_numpy(),aspect='auto',cmap='BrBG');ax.set_yticks(range(5),LABELS,fontsize=7)
- ax.set_xticks(range(len(d.columns)),d.columns,rotation=45,ha='right',fontsize=7);fig.colorbar(im,ax=ax,fraction=.05,pad=.02,label='Mean raw ODI');label(ax,'C')
- save(fig,out,'fig2')
+def plot2(balance, matched, context, out):
+    """A 为匹配平衡，B 为固定模型测试集增益，C 为入院情境分层。"""
+    required = {'task','model','window_h','seed','odi_raw_original','odi_raw_matched',
+                'odi_residual_original','odi_residual_matched'}
+    if len(matched) != 625 or not required.issubset(matched) or context.empty or balance.empty:
+        raise ValueError('Fig. 2 正式匹配、平衡或入院情境结果缺失')
+    fig = plt.figure(figsize=(9.0, 7.2))
+    grid = fig.add_gridspec(2, 2, left=.18, right=.96, bottom=.15, top=.91,
+                            width_ratios=[1.0, 1.25], hspace=.60, wspace=.52)
+    axes = [fig.add_subplot(grid[:, 0]), fig.add_subplot(grid[0, 1]),
+            fig.add_subplot(grid[1, 1])]
+    ax = axes[0]
+    b = (balance.assign(abs_smd=lambda d:d.smd.abs())
+         .groupby(['covariate','stage']).abs_smd.median().unstack().sort_values('before'))
+    y = np.arange(len(b))
+    ax.plot(b.before,y,'o',ms=3.5,label='Before matching',color='#3070A8')
+    ax.plot(b.after,y,'s',ms=3.5,label='After matching',color='#D68A36')
+    for i,(before,after) in enumerate(zip(b.before,b.after)):
+        ax.plot([before,after],[i,i],color='#cccccc',lw=.7,zorder=0)
+    ax.axvline(.1,color='#888888',ls='--',lw=.8)
+    ax.set_yticks(y,b.index,fontsize=7)
+    ax.set_xlabel('Median absolute standardized difference')
+    ax.legend(frameon=False,fontsize=7,loc='lower right')
+    label(ax,'A')
+    ax = axes[1];x = np.arange(5)
+    columns = ['odi_raw_original','odi_raw_matched','odi_residual_original','odi_residual_matched']
+    g = matched.groupby('task')[columns].mean().reindex(TASKS)
+    for col,offset,color,marker,name in [
+        ('odi_raw_original',-.18,'#3070A8','o','Raw, original cohort'),
+        ('odi_raw_matched',-.06,'#D68A36','s','Raw, matched cohort'),
+        ('odi_residual_original',.06,'#40A58E','o','Treatment-adjusted, original'),
+        ('odi_residual_matched',.18,'#9E67A7','s','Treatment-adjusted, matched')]:
+        ax.scatter(x+offset,g[col],color=color,marker=marker,s=26,label=name)
+    ax.axhline(0,color='#888888',lw=.7)
+    ax.set_xticks(x,LABELS,rotation=32,ha='right',fontsize=7)
+    ax.set_ylabel('Mean AUROC gain')
+    ax.legend(frameon=False,fontsize=6.5,ncol=1,loc='upper left')
+    label(ax,'B')
+    ax = axes[2]
+    order = ['Emergency','Transfer','Elective/procedure','Other/unknown']
+    d = context.groupby(['task','stratum']).odi_residual.mean().unstack().reindex(index=TASKS,columns=order)
+    lim = max(abs(float(d.min().min())),abs(float(d.max().max())),.01)
+    im = ax.imshow(d.to_numpy(),aspect='auto',cmap='BrBG',vmin=-lim,vmax=lim)
+    ax.set_yticks(range(5),LABELS,fontsize=7)
+    ax.set_xticks(range(4),order,rotation=36,ha='right',fontsize=7)
+    fig.colorbar(im,ax=ax,fraction=.05,pad=.02,label='Treatment-adjusted AUROC gain')
+    label(ax,'C')
+    save(fig,out,'fig2')
+
+def plot_eicu_diagnosis(diagnosis, out):
+    """另报 eICU 截点前已录入诊断的探索性残余增益。"""
+    required = {'task','diagnosis','odi_residual','status'}
+    if not required.issubset(diagnosis) or diagnosis.empty:
+        raise ValueError('eICU 截点前诊断分层输入缺失')
+    order = ['infection','cardiovascular','respiratory','renal','other_recorded','not_recorded']
+    d = (diagnosis.loc[diagnosis.status.eq('complete')]
+         .groupby(['task','diagnosis']).odi_residual.mean().unstack()
+         .reindex(index=TASKS,columns=order))
+    fig,ax = plt.subplots(figsize=(8.5,4.2))
+    lim=max(abs(float(d.min().min())),abs(float(d.max().max())),.01)
+    image=ax.imshow(d.to_numpy(),aspect='auto',cmap='BrBG',vmin=-lim,vmax=lim)
+    ax.set_yticks(range(5),LABELS)
+    ax.set_xticks(range(len(order)),['Infection','Cardiovascular','Respiratory','Renal','Other recorded','Not recorded'],rotation=30,ha='right')
+    fig.colorbar(image,ax=ax,fraction=.035,pad=.03,label='Treatment-adjusted AUROC gain')
+    ax.set_title('eICU diagnoses entered before prediction cutoff',fontsize=10)
+    fig.subplots_adjust(left=.20,right=.87,bottom=.31,top=.88)
+    fig.text(.5,.035,'Exploratory external comparison; diagnosis categories may overlap',ha='center',fontsize=8)
+    save(fig,out,'extended_eicu_diagnosis')
 
 def plot3(main,out):
  config=main.groupby(['task','model','window_h'],as_index=False)[['odi_raw','odi_residual','reference_gain']].mean()
@@ -134,9 +185,14 @@ def main():
  plot1(main,out);plot3(main,out);plot4(age,out);plot5(external,out)
  seq=pd.read_csv(run/'gru_seq_seed_metrics.csv.gz')
  if len(seq)==125:plot_extended(seq,out)
- matched=pd.read_csv(run/'matched_seed_metrics.csv.gz');diagnosis=pd.read_csv(run/'diagnosis_seed_metrics.csv.gz')
- if matched.empty or diagnosis.empty:
-  (out/'fig2_status.json').write_text(json.dumps({'status':'blocked','reason':'landmark-available severity and diagnosis definitions unresolved; no formal matched or diagnosis metrics'},indent=2)+'\n')
- else:plot2(matched,diagnosis,out)
+ matched=pd.read_csv(run/'matched_seed_metrics.csv.gz')
+ context_path=run/'context_seed_metrics.csv.gz'
+ balance_path=run/'fig2_matching/balance_diagnostics.csv'
+ if matched.empty or not context_path.exists() or not balance_path.exists():
+  (out/'fig2_status.json').write_text(json.dumps({'status':'incomplete','reason':'test-only clinical-state matching or admission-context analysis not complete'},indent=2)+'\n')
+ else:
+  plot2(pd.read_csv(balance_path),matched,pd.read_csv(context_path),out)
+  (out/'fig2_status.json').write_text(json.dumps({'status':'complete','analysis':'frozen models evaluated on test-only matched pairs; eICU diagnosis reported separately'},indent=2)+'\n')
+  plot_eicu_diagnosis(pd.read_csv(run/'diagnosis_seed_metrics.csv.gz'),out)
  print('Rendered fig1, fig3, fig4, fig5 from complete formal inputs; Fig2 status explicit')
 if __name__=='__main__':main()

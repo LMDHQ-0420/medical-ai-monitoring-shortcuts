@@ -185,48 +185,15 @@ def fig1c():
 
 
 def fig2a():
-    _,d=rd.exp2(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); xs=np.arange(len(rd.MODEL_KEYS)); axes=[]
-    for i,task in enumerate(rd.TASKS):
-        ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].odi.to_numpy() for m in rd.MODEL_KEYS]
-        bp=ax.boxplot(data,positions=xs,widths=.56,patch_artist=True,showfliers=False,whis=(10,90),medianprops=dict(color=INK,lw=1.0),whiskerprops=dict(color=INK,lw=.65),capprops=dict(color=INK,lw=.65))
-        for box in bp["boxes"]: box.set(fc=_light(TC[task],.38),ec=COLORS["gray"],lw=.6)
-        for mi,model in enumerate(rd.MODEL_KEYS):
-            for wi,w in enumerate(rd.WINDOWS):
-                med=np.median(st[(st.model==model)&(st.window==w)].odi); ax.plot(mi+(wi-2)*.075,med,"o",ms=2.7,mfc=TASK_COLORS[wi],mec=COLORS["white"],mew=.3,zorder=4)
-        bounds=[]
-        for values in data:
-            p10,_,_,_,p90=_summary(values); bounds.extend([p10,p90])
-        pad=max((max(bounds)-min(bounds))*.10,.003)
-        ax.set_xlim(-.45,len(rd.MODEL_KEYS)-.55); ax.set_ylim(min(bounds)-pad,max(bounds)+pad*2.6); ax.set_xticks(xs,rd.MODEL_LABELS,rotation=35,ha="right"); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["category"],weight="bold",color=INK); clean_axis(ax)
-    _zero_if_all(axes,"horizontal",.65)
-    axes[0].set_ylabel("Diagnosis-Stratified ODI",fontweight="bold"); fig.text(.53,.045,"Model",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
-    return fig
+    raise RuntimeError('正式 Fig. 2A 从匹配前后临床状态平衡生成；运行 fig/pnas_plots.py')
 
 
 def fig2b():
-    raw=rd.exp1()[rd.KEYS+["seed","odi"]]; psm,_=rd.exp2(); d=raw.merge(psm[rd.KEYS+["seed","odi"]],on=rd.KEYS+["seed"],suffixes=("_raw","_psm"))
-    fig=figure(96,110); gs=fig.add_gridspec(5,1,left=.13,right=.98,bottom=.11,top=.98,hspace=.15); axes=[]; xs=np.arange(5)
-    for i,task in enumerate(rd.TASKS):
-        ax=fig.add_subplot(gs[i]); axes.append(ax); st=d[d.task==task]; local=[]
-        for x,w in enumerate(rd.WINDOWS):
-            vr=st[st.window==w].odi_raw.to_numpy(); vp=st[st.window==w].odi_psm.to_numpy(); local.extend(vr); local.extend(vp); _violin_v(ax,x,vr,COLORS["teal"],.34,"left",summary="cross"); _violin_v(ax,x,vp,COLORS["orange"],.34,"right",summary="cross")
-        pad=max((max(local)-min(local))*.08,.003); ax.set_xlim(-.45,4.45); ax.set_ylim(min(local)-pad,max(local)+pad*1.7); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["milestone"],weight="bold",color=INK); clean_axis(ax); ax.tick_params(axis="x",labelbottom=i==4,length=0)
-    _zero_if_all(axes,"horizontal",.55)
-    axes[-1].set_xticks(xs,[f"{w} h" for w in rd.WINDOWS]); fig.text(.55,.025,"Prediction Window",ha="center",fontsize=FONT["axis"],weight="bold",color=INK); fig.text(.015,.51,"ODI",rotation=90,ha="center",va="center",fontsize=FONT["axis"],weight="bold",color=INK)
-    return fig
+    raise RuntimeError('正式 Fig. 2B 使用固定模型的原测试与匹配测试预测；运行 fig/pnas_plots.py')
 
 
 def fig2c():
-    _,s=rd.exp2(); diags=["cardiovascular","infection","other","renal","respiratory"]; dl=["Cardio","Infection","Other","Renal","Resp."]
-    fig=figure(94,110); gs=fig.add_gridspec(5,1,left=.15,right=.98,bottom=.11,top=.98,hspace=.40); axes=[]
-    for j,task in enumerate(rd.TASKS):
-        ax=fig.add_subplot(gs[j]); axes.append(ax); st=s[s.task==task]; allv=st.odi.to_numpy(); lo=min(-.012,allv.min()-.006); hi=allv.max()+.012
-        for i,diag in enumerate(diags):
-            y=4-i; v=st[st.diagnosis==diag].odi.to_numpy(); _ridge_h(ax,y,v,TC[task],.54)
-        ax.set_xlim(lo,hi); ax.set_ylim(-.5,5.05); ax.set_yticks(range(4,-1,-1),dl); ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",fontsize=FONT["milestone"],weight="bold",color=INK); clean_axis(ax); ax.tick_params(axis="x",labelbottom=True,length=2)
-    _zero_if_all(axes,"vertical",.6)
-    fig.text(.54,.025,"ODI",ha="center",fontsize=FONT["axis"],weight="bold",color=INK); fig.text(.025,.53,"Diagnosis Stratum",rotation=90,ha="center",va="center",fontsize=FONT["axis"],weight="bold",color=INK)
-    return fig
+    raise RuntimeError('正式 Fig. 2C 使用入院情境分层；运行 fig/pnas_plots.py')
 
 
 def fig3c():

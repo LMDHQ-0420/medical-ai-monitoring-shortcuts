@@ -14,7 +14,12 @@ CORE=['analysis_protocol.json','revision_status.json','input_inventory.csv','coh
       'manuscript_before_after.md','temperature_repair_manifest.json','feature_schema.csv.gz','rerun_plan.csv',
       'rerun_summary.json','figure_data_map.csv','figure_captions_en.md','figure_revision_report_zh.md',
       'main_paired_intervals.csv.gz','gru_seq_paired_intervals.csv.gz','gru_seq_age_seed_metrics.csv.gz',
-      'gru_seq_external_seed_metrics.csv.gz','gru_seq_subgroup_missing_grid.csv']
+      'gru_seq_external_seed_metrics.csv.gz','gru_seq_subgroup_missing_grid.csv',
+      'fig2_field_impact_scope.csv','fig2_field_impact_summary.json',
+      'fig2_matching/matching_protocol.json','fig2_matching/balance_diagnostics.csv',
+      'matched_seed_metrics.csv.gz','context_seed_metrics.csv.gz','diagnosis_seed_metrics.csv.gz',
+      'matched_refit_sensitivity.csv.gz','fig2_statistics.json','fig2_revision_report_zh.md',
+      'fig2_manuscript_before_after.md','fig2_sources.json','fig2_extension_feasibility.json','fig2_validation.json']
 
 def sha_bytes(data):return hashlib.sha256(data).hexdigest()
 
@@ -59,6 +64,16 @@ def main():
   payload[name]=csv_bytes(d)
   examples.append({'path':name,'complete_test_set':True,'n':len(d),'positive':int(d.y_true.sum()),'fields':list(d),'source_manifest':str(man.relative_to(run))})
   payload[f'cell_manifests/{task}_{model}_{window}h_seed{seed}.json']=man.read_bytes()
+ matched_path=run/'fig2_matching/predictions/icu_mortality/lr/seed42/24h.csv.gz'
+ if matched_path.exists():
+  matched=pd.read_csv(matched_path,usecols=['pair_index','pair_id','arm','y_true','pred_D','pred_DT','pred_F'])
+  matched['pair_id']=[hmac.new(salt,str(x).encode(),hashlib.sha256).hexdigest()[:20] for x in matched.pair_id]
+  name='predictions/matched_icu_mortality_lr_24h_seed42.csv'
+  payload[name]=csv_bytes(matched)
+  examples.append({'path':name,'complete_test_set':False,'complete_matched_test_subset':True,
+                   'n':len(matched),'positive':int(matched.y_true.sum()),'fields':list(matched),
+                   'resampling_unit':'matched_pair','note':'测试集内全部匹配患者；不代表原测试集全部患者'})
+ else:omitted.append({'path':str(matched_path.relative_to(run)),'reason':'matched prediction missing'})
  old=old_prediction(salt);payload['predictions/historical_100_sample_lr_24h.csv']=csv_bytes(old)
  examples.append({'path':'predictions/historical_100_sample_lr_24h.csv','complete_test_set':False,'n':len(old),
                   'positive':int(old.y_true.sum()),'fields':list(old),'note':'完整历史 smoke 子集；非完整正式测试集；缺少 D+T 预测'})
@@ -70,10 +85,10 @@ def main():
   else:omitted.append({'path':str(cell.relative_to(run)),'reason':'GRU-seq cell incomplete'})
  recompute='''from pathlib import Path\nimport pandas as pd\nfrom sklearn.metrics import roc_auc_score\nroot=Path(__file__).resolve().parent\nfor p in sorted((root/'predictions').glob('*.csv')):\n d=pd.read_csv(p);y=d.y_true\n print(p.name,'n=',len(d),'positive=',int(y.sum()))\n for group in ['D','O','DT','F']:\n  if 'pred_'+group in d:print(' ',group,roc_auc_score(y,d['pred_'+group]))\n'''
  payload['recompute.py']=recompute.encode()
- for script in ['audit.py','aggregate.py','aggregate_subgroups.py','aggregate_gru_subgroups.py','bootstrap_intervals.py','feature_schema.py','rerun_plan.py','make_evidence.py']:
+ for script in ['audit.py','aggregate.py','aggregate_subgroups.py','aggregate_gru_subgroups.py','bootstrap_intervals.py','feature_schema.py','rerun_plan.py','make_evidence.py','fig2_input_audit.py','build_fig2_state.py','fig2_eicu_diagnosis.py','fig2_eicu_strata.py','fig2_match.py','fig2_evaluate.py','fig2_combine.py','fig2_refit_sensitivity.py','fig2_finalize.py','fig2_validate.py']:
   path=ROOT/'scripts/pnas_revision'/script
   payload[f'scripts/{script}']=path.read_bytes()
- readme=f'''# PNAS 数据与实验证据包\n\n运行标识：{run.name}。数据来源为本地 MIMIC-IV 2.2、eICU-CRD 2.0，处理队列已在 `data/processed/` 覆盖式修复，原始数据不入包。\n\n`core/` 保存输入清单、队列和划分审计、时间规则、协议、异常对照及已完成的正式指标；`predictions/` 是少量完整测试集或明确标注的历史 100 人子集。`cell_manifests/` 记录对应模型来源，`scripts/` 保存主要查询、导出和复算脚本。所有预测的患者键为包内一致的 HMAC 替代编号，密钥与原始映射均不入包。\n\n正式主分析只有五种表格模型；GRU-seq 单独统计。`missing_grid.csv` 和 `subgroup_status.json` 说明未完成项。科学定义待决项见审查报告，不可将跨库差异解释为因果效应。\n\n在包根目录运行 `python recompute.py` 可从完整预测复算 AUROC。历史 100 人文件只能复算该子集的 D、O、F 指标，不能视为完整正式测试集。\n'''
+ readme=f'''# PNAS 数据与实验证据包\n\n运行标识：{run.name}。数据来源为本地 MIMIC-IV 2.2、eICU-CRD 2.0，处理队列已在 `data/processed/` 覆盖式修复，原始数据不入包。\n\n`core/` 保存输入清单、队列和划分审计、时间规则、协议、异常对照及已完成的正式指标；`predictions/` 是少量完整测试集或明确标注的历史 100 人子集。`cell_manifests/` 记录对应模型来源，`scripts/` 保存主要查询、导出和复算脚本。所有预测的患者键为包内一致的 HMAC 替代编号，密钥与原始映射均不入包。\n\n正式主分析只有五种表格模型；GRU-seq 单独统计。`missing_grid.csv` 和 `subgroup_status.json` 说明未完成项。Fig. 2 的匹配平衡、固定模型重评估、入院情境分层、eICU 截点前诊断和独立匹配训练敏感性分析分别列于新增核心文件；一份完整匹配测试子集预测用于复算，`pair_index` 标明匹配对。科学定义待决项见审查报告，不可将跨库差异解释为因果效应。\n\n在包根目录运行 `python recompute.py` 可从完整预测复算 AUROC。历史 100 人文件只能复算该子集的 D、O、F 指标，不能视为完整正式测试集。\n'''
  payload['README_中文.md']=readme.encode()
  meta={'run_id':run.name,'predictions':examples,'omitted':omitted,'files':{name:{'bytes':len(data),'sha256':sha_bytes(data)} for name,data in payload.items()}}
  payload['manifest.json']=json.dumps(meta,ensure_ascii=False,indent=2).encode()
