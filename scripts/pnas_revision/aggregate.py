@@ -51,7 +51,7 @@ def main():
         else:missing.append({**key,'reason':reason});allman.append({**key,'status':reason})
     frame=pd.DataFrame(rows)
     frame.to_csv(run/'main_seed_metrics.csv.gz',index=False,compression='gzip',float_format='%.17g')
-    pd.DataFrame(missing).to_csv(run/'missing_grid.csv',index=False)
+    pd.DataFrame(missing,columns=['task','model','window_h','seed','reason']).to_csv(run/'missing_grid.csv',index=False)
     if len(frame):
         summary=frame.groupby(['task','model','window_h'],as_index=False).agg(
             seeds=('seed','nunique'),n_test_mean=('n_test','mean'),n_positive_mean=('n_positive','mean'),
@@ -66,7 +66,7 @@ def main():
         if metric:seq.append({**key,**metric})
         else:seq_missing.append({**key,'reason':reason})
     pd.DataFrame(seq).to_csv(run/'gru_seq_seed_metrics.csv.gz',index=False,compression='gzip')
-    pd.DataFrame(seq_missing).to_csv(run/'gru_seq_missing_grid.csv',index=False)
+    pd.DataFrame(seq_missing,columns=['task','model','window_h','seed','reason']).to_csv(run/'gru_seq_missing_grid.csv',index=False)
     numbers={'run_id':run.name,'tabular_seed_cells_complete':len(frame),'tabular_seed_cells_expected':625,
              'tabular_configuration_cells_complete_5_seeds':int((summary.seeds==5).sum()) if len(summary) else 0,
              'tabular_configuration_cells_expected':125,'gru_seq_seed_cells_complete':len(seq),'gru_seq_seed_cells_expected':125,

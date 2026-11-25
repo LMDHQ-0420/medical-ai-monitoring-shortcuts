@@ -20,6 +20,6 @@ def main():
   ext.extend([{**key,**r} for r in pd.read_csv(cell/'external_hospital_metrics.csv').to_dict('records')])
  pd.DataFrame(age).to_csv(run/'gru_seq_age_seed_metrics.csv.gz',index=False,compression='gzip')
  pd.DataFrame(ext).to_csv(run/'gru_seq_external_seed_metrics.csv.gz',index=False,compression='gzip')
- pd.DataFrame(missing).to_csv(run/'gru_seq_subgroup_missing_grid.csv',index=False)
+ pd.DataFrame(missing,columns=['task','model','window_h','seed','run_id','reason']).to_csv(run/'gru_seq_subgroup_missing_grid.csv',index=False)
  print('GRU postprocess complete cells',125-len(missing),'age rows',len(age),'hospital rows',len(ext))
 if __name__=='__main__':main()

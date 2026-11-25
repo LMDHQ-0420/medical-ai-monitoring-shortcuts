@@ -26,7 +26,7 @@ def main():
   external.extend([{**key,**r} for r in pd.read_csv(ep).to_dict('records')])
  pd.DataFrame(age).to_csv(run/'age_seed_metrics.csv.gz',index=False,compression='gzip')
  pd.DataFrame(external).to_csv(run/'external_seed_metrics.csv.gz',index=False,compression='gzip')
- pd.DataFrame(missing).to_csv(run/'subgroup_missing_grid.csv',index=False)
+ pd.DataFrame(missing,columns=['task','model','window_h','seed','run_id','reason']).to_csv(run/'subgroup_missing_grid.csv',index=False)
  pd.DataFrame(columns=['task','model','window_h','seed','matched_odi_raw','n_matched','reason']).to_csv(run/'matched_seed_metrics.csv.gz',index=False,compression='gzip')
  pd.DataFrame(columns=['task','model','window_h','seed','diagnosis','odi_raw','n','reason']).to_csv(run/'diagnosis_seed_metrics.csv.gz',index=False,compression='gzip')
  reasons={'matched':'not rerun: landmark-available severity and matching protocol require scientific definition',
