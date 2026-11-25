@@ -1,6 +1,6 @@
 """在同一患者重采样索引上复算三项 AUROC 差值的分层百分位区间。"""
 from __future__ import annotations
-import argparse,itertools,json,sys,time
+import argparse,itertools,json,sys,time,os
 from concurrent.futures import ProcessPoolExecutor,as_completed
 from pathlib import Path
 import numpy as np,pandas as pd
@@ -27,6 +27,11 @@ def one(job):
  if kind=='gru_seq' and m.get('sequence_sha256')!=digest_file(ROOT/'data/processed/mimic_iv_hourly.npz'):return None
  d=pd.read_csv(q,usecols=['pair_id','y_true','pred_D','pred_DT','pred_F']);y=d.y_true.to_numpy(dtype=int)
  if d.pair_id.duplicated().any() or len(np.unique(y))!=2:return None
+ prediction_hash=digest_file(q)
+ cache=run/'interval_cache'/kind/task/model/f'seed{seed}'/f'{window}h.json'
+ if cache.exists():
+  saved=json.loads(cache.read_text())
+  if saved.get('prediction_sha256')==prediction_hash and saved.get('n_bootstrap')==n_boot:return saved['intervals']
  pred={g:d[f'pred_{g}'].to_numpy() for g in ['D','DT','F']}
  pos=np.flatnonzero(y==1);neg=np.flatnonzero(y==0)
  rng=np.random.default_rng(1000+seed+window*100+TASKS.index(task)*1000+(MODELS.index(model) if kind=='tabular' else 5)*10000)
@@ -39,6 +44,10 @@ def one(job):
       'resampling_unit':'patient','resampling_scheme':'stratified_within_outcome','interval_method':'percentile_2.5_97.5'}
  for name,x in samples.items():
   lo,hi=np.quantile(x,[.025,.975]);out[f'{name}_ci_low']=float(lo);out[f'{name}_ci_high']=float(hi)
+ cache.parent.mkdir(parents=True,exist_ok=True)
+ tmp=cache.with_suffix('.tmp')
+ tmp.write_text(json.dumps({'prediction_sha256':prediction_hash,'n_bootstrap':n_boot,'intervals':out},ensure_ascii=False)+'\n')
+ os.replace(tmp,cache)
  return out
 
 def main():
