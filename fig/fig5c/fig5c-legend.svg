@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T12:42:33.892918</dc:date>
+    <dc:date>2026-11-26T15:15:01.109942</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -31,7 +31,7 @@ z
   <g id="legend_1">
    <g id="line2d_1">
     <defs>
-     <path id="m1848342e3a" d="M 0 2.6
+     <path id="mfc88d99aae" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -44,15 +44,15 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m1848342e3a" x="46.684295" y="10.808426" style="fill: #3264b0; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#mfc88d99aae" x="46.684295" y="10.809333" style="fill: #3264b0; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="55.674295" y="12.838426" transform="rotate(-0 55.674295 12.838426)">LR</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="55.674295" y="12.839333" transform="rotate(-0 55.674295 12.839333)">LR</text>
    </g>
    <g id="line2d_2">
     <defs>
-     <path id="mcb91536115" d="M 0 2.6
+     <path id="m8803749477" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -65,15 +65,15 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#mcb91536115" x="76.138326" y="10.808426" style="fill: #d9574f; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m8803749477" x="76.138326" y="10.809333" style="fill: #d9574f; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="85.128326" y="12.838426" transform="rotate(-0 85.128326 12.838426)">RF</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="85.128326" y="12.839333" transform="rotate(-0 85.128326 12.839333)">RF</text>
    </g>
    <g id="line2d_3">
     <defs>
-     <path id="m557b2b9de2" d="M 0 2.6
+     <path id="m65140c1959" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -86,15 +86,15 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m557b2b9de2" x="105.909545" y="10.808426" style="fill: #178c8c; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m65140c1959" x="105.909545" y="10.809333" style="fill: #178c8c; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_3">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="114.899545" y="12.838426" transform="rotate(-0 114.899545 12.838426)">XGBoost</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="114.899545" y="12.839333" transform="rotate(-0 114.899545 12.839333)">XGBoost</text>
    </g>
    <g id="line2d_4">
     <defs>
-     <path id="m10e799420a" d="M 0 2.6
+     <path id="meac38db948" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -107,15 +107,15 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m10e799420a" x="151.16042" y="10.808426" style="fill: #e08b2c; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#meac38db948" x="151.16042" y="10.809333" style="fill: #e08b2c; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_4">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="160.15042" y="12.838426" transform="rotate(-0 160.15042 12.838426)">LightGBM</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="160.15042" y="12.839333" transform="rotate(-0 160.15042 12.839333)">LightGBM</text>
    </g>
    <g id="line2d_5">
     <defs>
-     <path id="m5c60e04f6e" d="M 0 2.6
+     <path id="mb3f8c2c4ba" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -128,11 +128,11 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m5c60e04f6e" x="198.987763" y="10.808426" style="fill: #7651b5; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#mb3f8c2c4ba" x="198.987763" y="10.809333" style="fill: #7651b5; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_5">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="207.977763" y="12.838426" transform="rotate(-0 207.977763 12.838426)">MLP</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="207.977763" y="12.839333" transform="rotate(-0 207.977763 12.839333)">MLP</text>
    </g>
   </g>
  </g>

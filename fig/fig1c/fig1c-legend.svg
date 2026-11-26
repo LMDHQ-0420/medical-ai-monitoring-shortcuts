@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T12:42:08.385725</dc:date>
+    <dc:date>2026-11-26T15:14:40.231974</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -30,37 +30,37 @@ z
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 35.551222 12.838426
-L 47.151222 12.838426
-L 47.151222 8.778426
-L 35.551222 8.778426
+    <path d="M 35.551222 12.841145
+L 47.151222 12.841145
+L 47.151222 8.781145
+L 35.551222 8.781145
 z
 " style="fill: #5f86c1"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="50.341222" y="12.838426" transform="rotate(-0 50.341222 12.838426)">Disease Only</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="50.341222" y="12.841145" transform="rotate(-0 50.341222 12.841145)">Disease Only</text>
    </g>
    <g id="patch_3">
-    <path d="M 92.081284 12.838426
-L 103.681284 12.838426
-L 103.681284 8.778426
-L 92.081284 8.778426
+    <path d="M 92.081284 12.841145
+L 103.681284 12.841145
+L 103.681284 8.781145
+L 92.081284 8.781145
 z
 " style="fill: #e7a55a"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="106.871284" y="12.838426" transform="rotate(-0 106.871284 12.838426)">Observation Only</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="106.871284" y="12.841145" transform="rotate(-0 106.871284 12.841145)">Observation Only</text>
    </g>
    <g id="patch_4">
-    <path d="M 158.927191 12.838426
-L 170.527191 12.838426
-L 170.527191 8.778426
-L 158.927191 8.778426
+    <path d="M 158.927191 12.841145
+L 170.527191 12.841145
+L 170.527191 8.781145
+L 158.927191 8.781145
 z
 " style="fill: #4aa5a5"/>
    </g>
    <g id="text_3">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="173.717191" y="12.838426" transform="rotate(-0 173.717191 12.838426)">Full (D + O + T)</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="173.717191" y="12.841145" transform="rotate(-0 173.717191 12.841145)">Full (D + O + T)</text>
    </g>
   </g>
  </g>

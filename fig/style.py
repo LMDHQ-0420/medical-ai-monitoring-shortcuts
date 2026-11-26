@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 import matplotlib as mpl
@@ -30,18 +31,29 @@ FONT = {
 }
 
 
-def configure() -> None:
-    for path in [
-        "/System/Library/Fonts/Supplemental/Arial.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Italic.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold Italic.ttf",
-    ]:
-        if Path(path).is_file():
+@lru_cache(maxsize=1)
+def _register_arial() -> None:
+    # 显式注册字体文件；仅写 Arial 为首选可能在导出 PDF 时悄悄回退。
+    for path in fm.findSystemFonts(fontext="ttf"):
+        if "arial" not in Path(path).stem.lower():
+            continue
+        if fm.FontProperties(fname=path).get_name() == "Arial":
             fm.fontManager.addfont(path)
+    for weight in ("normal", "bold"):
+        prop = fm.FontProperties(family="Arial", weight=weight)
+        try:
+            path = fm.findfont(prop, fallback_to_default=False)
+        except ValueError as exc:
+            raise RuntimeError("缺少 Arial 字体，已停止导出图件；请安装 Arial 后重试。") from exc
+        if fm.FontProperties(fname=path).get_name() != "Arial":
+            raise RuntimeError(f"{weight} 字体不是 Arial：{path}")
+
+
+def configure() -> None:
+    _register_arial()
     mpl.rcParams.update({
-        "font.family": "sans-serif",
-        "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
+        "font.family": "Arial",
+        "font.sans-serif": ["Arial"],
         "font.size": FONT["tick"], "axes.labelsize": FONT["axis"],
         "axes.labelweight": "bold", "axes.titlesize": FONT["axis"],
         "xtick.labelsize": FONT["tick"], "ytick.labelsize": FONT["tick"],

@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T12:42:21.102782</dc:date>
+    <dc:date>2026-11-26T15:14:51.514480</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -30,26 +30,26 @@ z
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 32.393844 12.838426
-L 43.993844 12.838426
-L 43.993844 8.778426
-L 32.393844 8.778426
+    <path d="M 32.393844 12.837973
+L 43.993844 12.837973
+L 43.993844 8.777973
+L 32.393844 8.777973
 z
 " style="fill: #5f86c1"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="47.183844" y="12.838426" transform="rotate(-0 47.183844 12.838426)">MIMIC Internal</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="47.183844" y="12.837973" transform="rotate(-0 47.183844 12.837973)">MIMIC Internal</text>
    </g>
    <g id="patch_3">
-    <path d="M 92.462813 12.838426
-L 104.062813 12.838426
-L 104.062813 8.778426
-L 92.462813 8.778426
+    <path d="M 92.462813 12.837973
+L 104.062813 12.837973
+L 104.062813 8.777973
+L 92.462813 8.777973
 z
 " style="fill: #e17c76"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial', 'Liberation Sans', 'DejaVu Sans', sans-serif; text-anchor: start" x="107.252813" y="12.838426" transform="rotate(-0 107.252813 12.838426)">eICU External</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="107.252813" y="12.837973" transform="rotate(-0 107.252813 12.837973)">eICU External</text>
    </g>
   </g>
  </g>
