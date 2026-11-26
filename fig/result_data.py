@@ -13,8 +13,8 @@ OUTCOME_LABELS = {item["key"]: item["figure"] for item in LABEL_STANDARD["outcom
 FIGURE_TERMS = {item["id"]: item["figure"] for section in
                 ("metrics", "populations", "axes_and_strata", "contrasts")
                 for item in LABEL_STANDARD[section]}
-MODEL_CONFIGURATION_LINES = {item["id"]: "\n".join(item["figure_lines"])
-                             for item in LABEL_STANDARD["model_configurations"]}
+MODEL_CONFIGURATION_LABELS = {item["id"]: item["figure"]
+                              for item in LABEL_STANDARD["model_configurations"]}
 TASKS = ["icu_mortality", "inhosp_mortality", "aki", "sepsis_deterioration", "escalation"]
 TASK_LABELS = [OUTCOME_LABELS[task] for task in TASKS]
 MODEL_KEYS = ["lr", "rf", "xgb", "lgbm", "mlp"]

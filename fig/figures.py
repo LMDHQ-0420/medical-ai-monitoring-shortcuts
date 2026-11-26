@@ -21,7 +21,7 @@ ZERO = COLORS["gray_light"]
 MODEL_COLORS = [COLORS[x] for x in ("blue", "coral", "teal", "orange", "purple")]
 MC = dict(zip(rd.MODEL_KEYS, MODEL_COLORS))
 TERMS = rd.FIGURE_TERMS
-CONFIG_LINES = rd.MODEL_CONFIGURATION_LINES
+CONFIG_LABELS = rd.MODEL_CONFIGURATION_LABELS
 
 # 图中使用完整协变量名称，不显示数据表的列名。
 BALANCE_LABELS = {
@@ -386,14 +386,14 @@ _fig5b_handles=[_fig5b_handles[i] for i in (0,3,1,4,2)]
 
 LEGEND_SPECS = {
     "fig1b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
-    "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=CONFIG_LINES[k]) for c,k in [(COLORS["blue"],"clinical_state_model"),(COLORS["orange"],"observation_model"),(COLORS["teal"],"full_model")]],ncol=3,width=88,height=12),
+    "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=CONFIG_LABELS[k]) for c,k in [(COLORS["blue"],"clinical_state_model"),(COLORS["orange"],"observation_model"),(COLORS["teal"],"full_model")]],ncol=3,width=140,height=8),
     "fig2a": dict(handles=[Line2D([],[],marker="o",ls="",ms=5.2,color=COLORS["blue"],label="Before Matching"),Line2D([],[],marker="s",ls="",ms=5.2,color=COLORS["orange"],label="After Matching")],ncol=2,width=80,height=8),
     "fig2b": dict(handles=[Patch(fc=_light(COLORS["coral"],.35),ec="none",label=TERMS["raw_odi"]),Patch(fc=_light(COLORS["blue"],.35),ec="none",label=TERMS["residual_odi"])],ncol=2,width=80,height=8),
     "fig3a": dict(handles=[Patch(fc=_light(COLORS["coral"],.22),ec="none",label=TERMS["raw_odi"]),Patch(fc=_light(COLORS["blue"],.22),ec="none",label=TERMS["residual_odi"])],ncol=2,width=62,height=8),
     "fig3b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
     "fig4a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC-IV Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External")],ncol=2,width=62,height=8),
     "fig4c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=len(rd.MODEL_KEYS),width=92,height=8),
-    "fig5a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC-IV Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External\n(Hospital Median)")],ncol=2,width=76,height=12),
+    "fig5a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC-IV Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External (Hospital Median)")],ncol=2,width=120,height=8),
     "fig5b": dict(handles=_fig5b_handles,ncol=3,width=62,height=13),
     "fig5c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=len(rd.MODEL_KEYS),width=92,height=8),
 }

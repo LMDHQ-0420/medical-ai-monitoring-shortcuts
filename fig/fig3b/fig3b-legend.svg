@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="164.409449pt" height="22.677165pt" viewBox="0 0 164.409449 22.677165" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="149.28053400000002pt" height="5.219999999999999pt" viewBox="8.975461 8.205165 149.28053400000002 5.219999999999999" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T15:14:48.900230</dc:date>
+    <dc:date>2026-11-26T21:07:25.304896</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -25,13 +25,14 @@
 L 164.409449 22.677165
 L 164.409449 0
 L 0 0
+L 0 22.677165
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="legend_1">
    <g id="line2d_1">
     <defs>
-     <path id="m6af1d7fb5f" d="M 0 2.6
+     <path id="mbf92087314" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -44,7 +45,7 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m6af1d7fb5f" x="11.536709" y="10.807973" style="fill: #3264b0; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#mbf92087314" x="11.536709" y="10.807973" style="fill: #3264b0; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_1">
@@ -52,7 +53,7 @@ z
    </g>
    <g id="line2d_2">
     <defs>
-     <path id="m653f28c165" d="M 0 2.6
+     <path id="m677061fdbd" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -65,7 +66,7 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m653f28c165" x="41.638709" y="10.807973" style="fill: #d9574f; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m677061fdbd" x="41.638709" y="10.807973" style="fill: #d9574f; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_2">
@@ -73,7 +74,7 @@ z
    </g>
    <g id="line2d_3">
     <defs>
-     <path id="m579037b619" d="M 0 2.6
+     <path id="m7d23818a84" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -86,7 +87,7 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m579037b619" x="71.740709" y="10.807973" style="fill: #178c8c; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m7d23818a84" x="71.740709" y="10.807973" style="fill: #178c8c; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_3">
@@ -94,7 +95,7 @@ z
    </g>
    <g id="line2d_4">
     <defs>
-     <path id="m28740c202e" d="M 0 2.6
+     <path id="m2733f5a7bc" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -107,7 +108,7 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m28740c202e" x="105.068053" y="10.807973" style="fill: #e08b2c; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m2733f5a7bc" x="105.068053" y="10.807973" style="fill: #e08b2c; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_4">
@@ -115,7 +116,7 @@ z
    </g>
    <g id="line2d_5">
     <defs>
-     <path id="m7854c1bf12" d="M 0 2.6
+     <path id="m1ea73177ed" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -128,7 +129,7 @@ z
 " style="stroke: #ffffff; stroke-width: 0.45"/>
     </defs>
     <g>
-     <use xlink:href="#m7854c1bf12" x="138.395396" y="10.807973" style="fill: #7651b5; stroke: #ffffff; stroke-width: 0.45"/>
+     <use xlink:href="#m1ea73177ed" x="138.395396" y="10.807973" style="fill: #7651b5; stroke: #ffffff; stroke-width: 0.45"/>
     </g>
    </g>
    <g id="text_5">

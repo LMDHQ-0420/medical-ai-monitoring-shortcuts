@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="215.433071pt" height="34.015748pt" viewBox="0 0 215.433071 34.015748" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="157.463995pt" height="5.454000000000001pt" viewBox="91.277997 8.601164999999998 157.463995 5.454000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T17:15:42.924355</dc:date>
+    <dc:date>2026-11-26T21:07:27.029906</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,36 +21,36 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 34.015748
-L 215.433071 34.015748
-L 215.433071 0
+   <path d="M 0 22.677165
+L 340.15748 22.677165
+L 340.15748 0
 L 0 0
+L 0 22.677165
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 43.857176 19.08364
-L 55.457176 19.08364
-L 55.457176 15.02364
-L 43.857176 15.02364
+    <path d="M 91.229704 12.839333
+L 98.963037 12.839333
+L 98.963037 8.779333
+L 91.229704 8.779333
 z
 " style="fill: #5f86c1"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="58.647176" y="19.08364" transform="rotate(-0 58.647176 19.08364)">MIMIC-IV Internal</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="102.153037" y="12.839333" transform="rotate(-0 102.153037 12.839333)">MIMIC-IV Internal</text>
    </g>
    <g id="patch_3">
-    <path d="M 111.337457 19.08364
-L 122.937457 19.08364
-L 122.937457 15.02364
-L 111.337457 15.02364
+    <path d="M 154.843318 12.839333
+L 162.576652 12.839333
+L 162.576652 8.779333
+L 154.843318 8.779333
 z
 " style="fill: #e17c76"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(126.127457 15.363574)">eICU External</text>
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(126.127457 21.582987)">(Hospital Median)</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="165.766652" y="12.839333" transform="rotate(-0 165.766652 12.839333)">eICU External (Hospital Median)</text>
    </g>
   </g>
  </g>

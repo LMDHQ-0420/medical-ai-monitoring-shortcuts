@@ -8,6 +8,7 @@ PyYAML
 pyarrow
 tqdm
 matplotlib
+Pillow
 seaborn
 statsmodels
 

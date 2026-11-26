@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="249.448819pt" height="34.015748pt" viewBox="0 0 249.448819 34.015748" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="173.429994pt" height="4.302000000000001pt" viewBox="111.527997 8.601164999999998 173.429994 4.302000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T17:14:11.148661</dc:date>
+    <dc:date>2026-11-26T21:07:22.599447</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,48 +21,47 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 34.015748
-L 249.448819 34.015748
-L 249.448819 0
+   <path d="M 0 22.677165
+L 396.850394 22.677165
+L 396.850394 0
 L 0 0
+L 0 22.677165
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 49.354769 19.08364
-L 60.954769 19.08364
-L 60.954769 15.02364
-L 49.354769 15.02364
+    <path d="M 111.448306 12.837973
+L 119.18164 12.837973
+L 119.18164 8.777973
+L 111.448306 8.777973
 z
 " style="fill: #5f86c1"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(64.144769 15.439971)">Clinical State</text>
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(64.144769 21.574558)">Model</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="122.37164" y="12.837973" transform="rotate(-0 122.37164 12.837973)">Clinical State Model</text>
    </g>
    <g id="patch_3">
-    <path d="M 105.2423 19.08364
-L 116.8423 19.08364
-L 116.8423 15.02364
-L 105.2423 15.02364
+    <path d="M 180.876421 12.837973
+L 188.609754 12.837973
+L 188.609754 8.777973
+L 180.876421 8.777973
 z
 " style="fill: #e7a55a"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(120.0323 15.439971)">Observation</text>
-    <text style="fill: #111111; font: 5.8px 'Arial'" transform="translate(120.0323 21.574558)">Model</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="191.799754" y="12.837973" transform="rotate(-0 191.799754 12.837973)">Observation Model</text>
    </g>
    <g id="patch_4">
-    <path d="M 158.55155 19.08364
-L 170.15155 19.08364
-L 170.15155 15.02364
-L 158.55155 15.02364
+    <path d="M 247.726254 12.837973
+L 255.459587 12.837973
+L 255.459587 8.777973
+L 247.726254 8.777973
 z
 " style="fill: #4aa5a5"/>
    </g>
    <g id="text_3">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="173.34155" y="19.08364" transform="rotate(-0 173.34155 19.08364)">Full Model</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="258.649587" y="12.837973" transform="rotate(-0 258.649587 12.837973)">Full Model</text>
    </g>
   </g>
  </g>

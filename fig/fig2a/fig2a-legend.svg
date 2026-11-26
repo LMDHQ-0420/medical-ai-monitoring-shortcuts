@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="226.771654pt" height="22.677165pt" viewBox="0 0 226.771654 22.677165" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="113.32799699999998pt" height="6.354000000000001pt" viewBox="57.887998 7.701164999999998 113.32799699999998 6.354000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T17:14:12.347041</dc:date>
+    <dc:date>2026-11-26T21:07:23.349051</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -25,13 +25,14 @@
 L 226.771654 22.677165
 L 226.771654 0
 L 0 0
+L 0 22.677165
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="legend_1">
    <g id="line2d_1">
     <defs>
-     <path id="m86fe1b125b" d="M 0 2.6
+     <path id="mdd83b8f0b6" d="M 0 2.6
 C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
 C 2.326048 1.350908 2.6 0.689528 2.6 0
 C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
@@ -44,7 +45,7 @@ z
 " style="stroke: #3264b0"/>
     </defs>
     <g>
-     <use xlink:href="#m86fe1b125b" x="60.959264" y="10.809333" style="fill: #3264b0; stroke: #3264b0"/>
+     <use xlink:href="#mdd83b8f0b6" x="60.959264" y="10.809333" style="fill: #3264b0; stroke: #3264b0"/>
     </g>
    </g>
    <g id="text_1">
@@ -52,7 +53,7 @@ z
    </g>
    <g id="line2d_2">
     <defs>
-     <path id="m25be3458ea" d="M -2.6 2.6
+     <path id="m9c95d5f3c7" d="M -2.6 2.6
 L 2.6 2.6
 L 2.6 -2.6
 L -2.6 -2.6
@@ -60,7 +61,7 @@ z
 " style="stroke: #e08b2c; stroke-linejoin: miter"/>
     </defs>
     <g>
-     <use xlink:href="#m25be3458ea" x="125.230514" y="10.809333" style="fill: #e08b2c; stroke: #e08b2c; stroke-linejoin: miter"/>
+     <use xlink:href="#m9c95d5f3c7" x="125.230514" y="10.809333" style="fill: #e08b2c; stroke: #e08b2c; stroke-linejoin: miter"/>
     </g>
    </g>
    <g id="text_2">

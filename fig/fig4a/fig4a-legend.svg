@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="175.748031pt" height="22.677165pt" viewBox="0 0 175.748031 22.677165" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="110.201411pt" height="4.302000000000001pt" viewBox="32.574585 8.601164999999998 110.201411 4.302000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T17:14:20.149253</dc:date>
+    <dc:date>2026-11-26T21:07:25.865630</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -25,15 +25,16 @@
 L 175.748031 22.677165
 L 175.748031 0
 L 0 0
+L 0 22.677165
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 28.688188 12.837973
+    <path d="M 32.554854 12.837973
 L 40.288188 12.837973
 L 40.288188 8.777973
-L 28.688188 8.777973
+L 32.554854 8.777973
 z
 " style="fill: #5f86c1"/>
    </g>
@@ -42,14 +43,14 @@ z
    </g>
    <g id="patch_3">
     <path d="M 96.168469 12.837973
-L 107.768469 12.837973
-L 107.768469 8.777973
+L 103.901802 12.837973
+L 103.901802 8.777973
 L 96.168469 8.777973
 z
 " style="fill: #e17c76"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="110.958469" y="12.837973" transform="rotate(-0 110.958469 12.837973)">eICU External</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="107.091802" y="12.837973" transform="rotate(-0 107.091802 12.837973)">eICU External</text>
    </g>
   </g>
  </g>

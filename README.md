@@ -117,6 +117,8 @@ python scripts/exp4_age_odi_transfer.py
 python fig/build_delivery.py  # 14 个独立面板与图例，PDF/SVG/PNG
 ```
 
+独立图例导出需要 Ghostscript（`gs`），用于裁剪 PDF/SVG 的画布边界。
+
 绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，最终图件保存在 `fig/fig1b/`、`fig/fig1c/` 至 `fig/fig5c/` 等分面板目录中。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
 ---
