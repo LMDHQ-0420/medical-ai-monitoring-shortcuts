@@ -1,9 +1,9 @@
 """扫描原始治疗事件，按预测截点重算 T 和处方数，覆盖现有处理数据。"""
 from __future__ import annotations
-import argparse,hashlib,json,sys
+import hashlib
 from pathlib import Path
 import numpy as np,pandas as pd
-ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[2]
 from src.data.mimic_cohort import VASOPRESSOR_ITEMIDS,MV_ITEMIDS,ANTIBIOTIC_KEYWORDS
 from src.data.eicu_cohort import VASOPRESSOR_KEYWORDS
 WINDOWS=(3,6,12,18,24)
@@ -76,6 +76,7 @@ def sha256(path):
         for chunk in iter(lambda:f.read(2**20),b''):h.update(chunk)
     return h.hexdigest()
 
+
 def output_rows(ids,hourly,window):
     result=pd.DataFrame({'stay_id':ids})
     for source,target in [('count','orders_count_24h'),('antibiotic','antibiotics_24h'),('vaso','vasopressors_24h'),('vent','mechanical_ventilation_24h')]:
@@ -84,22 +85,3 @@ def output_rows(ids,hourly,window):
         value=wide.cumsum(axis=1)[window-1].to_numpy()
         result[target]=(value if source=='count' else value>0).astype('int32')
     return result
-
-def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--run-dir',type=Path,required=True);ap.add_argument('--dataset',choices=['mimic_iv','eicu','both'],default='both');args=ap.parse_args()
-    out=ROOT/'data/processed';out.mkdir(parents=True,exist_ok=True)
-    datasets=('mimic_iv','eicu') if args.dataset=='both' else (args.dataset,)
-    manifest=[]
-    for dataset in datasets:
-        ids,hourly=mimic_hourly() if dataset=='mimic_iv' else eicu_hourly()
-        for window in WINDOWS:
-            old_path=ROOT/f'data/processed/{dataset}_{window}h.parquet';old=pd.read_parquet(old_path)
-            fix=output_rows(ids,hourly,window)
-            merged=old.drop(columns=list(FEATURES)).merge(fix,on='stay_id',how='left',validate='one_to_one',sort=False)
-            if len(merged)!=len(old) or merged[list(FEATURES)].isna().any().any():raise ValueError(f'队列键不匹配 {dataset} {window}h')
-            path=out/f'{dataset}_{window}h.parquet';temp=path.with_suffix('.tmp.parquet');merged.to_parquet(temp,index=False);temp.replace(path)
-            changes={name:int((old[name].to_numpy()!=merged[name].to_numpy()).sum()) for name in FEATURES}
-            manifest.append(dict(dataset=dataset,window_h=window,rows=len(merged),source=str(old_path.relative_to(ROOT)),output=str(path.relative_to(ROOT)),sha256=sha256(path),changed=changes))
-            print(dataset,window,changes,flush=True)
-    (args.run_dir.resolve()/'treatment_repair_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
-if __name__=='__main__':main()

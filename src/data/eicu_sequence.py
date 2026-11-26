@@ -1,12 +1,13 @@
 """从 eICU 原始偏移时间构建与 MIMIC 同 schema 的逐小时外部序列。"""
 from __future__ import annotations
-import argparse,json,os,sys
+import json,os
 from pathlib import Path
 import numpy as np,pandas as pd
-ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[2]
 from src.data.eicu_cohort import VITAL_COLS,LAB_NAMES
-from scripts.pnas_revision.repair_cutoff_treatment import eicu_hourly,sha256
-VARS=json.loads((ROOT/'data/processed/mimic_iv_manifest.json').read_text())['variables'];VID={x:i for i,x in enumerate(VARS)}
+from src.data.treatment_events import eicu_hourly,sha256
+from src.data.mimic_sequence import VARS
+VID={x:i for i,x in enumerate(VARS)}
 LAB={x:y for x,y in LAB_NAMES.items() if y in VID}
 
 def scan(path,cols,kind,ids):
@@ -42,8 +43,7 @@ def scan(path,cols,kind,ids):
  last=allrows.sort_values('minute').groupby(['patientunitstayid','hour','var'],sort=False).tail(1).drop(columns='count')
  return last.merge(counts,on=['patientunitstayid','hour','var'],validate='one_to_one')
 
-def main():
- ap=argparse.ArgumentParser();ap.add_argument('--run-dir',type=Path,required=True);a=ap.parse_args()
+def build_sequence():
  raw=ROOT/'data/raw/eicu/eicu-collaborative-research-database-2.0';out=ROOT/'data/processed'
  tab=pd.read_parquet(out/'eicu_24h.parquet',columns=['stay_id','subject_id','age','gender','hospital_id'])
  ids=tab.stay_id.to_numpy();idset=set(ids)
@@ -76,4 +76,3 @@ def main():
   'path':str(path.relative_to(ROOT)),'sha256':sha256(path)}
  (out/'eicu_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
  print('eICU sequence complete',n,len(VARS),flush=True)
-if __name__=='__main__':main()

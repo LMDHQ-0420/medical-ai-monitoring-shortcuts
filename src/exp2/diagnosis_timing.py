@@ -1,7 +1,6 @@
 """按 eICU 诊断实际录入偏移时间构造截点前诊断分层。"""
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -79,8 +78,3 @@ def build() -> None:
     (ROOT / "data/processed/eicu_fig2_diagnosis_manifest.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print("complete", len(out), flush=True)
-
-
-if __name__ == "__main__":
-    argparse.ArgumentParser().parse_args()
-    build()

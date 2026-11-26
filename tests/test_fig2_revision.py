@@ -4,11 +4,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from scripts.pnas_revision import build_fig2_state, fig2_evaluate, fig2_match
+from src.exp2 import clinical_state, evaluate, matching
 
 
 def test_latest_available_vital_ignores_late_entry(tmp_path, monkeypatch):
-    monkeypatch.setattr(build_fig2_state, 'ROOT', tmp_path)
+    monkeypatch.setattr(clinical_state, 'ROOT', tmp_path)
     directory = tmp_path / 'data/processed/cache/chartevents'
     directory.mkdir(parents=True)
     events = pd.DataFrame({
@@ -18,7 +18,7 @@ def test_latest_available_vital_ignores_late_entry(tmp_path, monkeypatch):
         'valuenum': [99, 80, 70],
     })
     events.to_parquet(directory / '1.parquet', index=False)
-    rows = {r['window_h']: r for r in build_fig2_state.extract_one((1, pd.Timestamp('2020-01-01')))}
+    rows = {r['window_h']: r for r in clinical_state.extract_one((1, pd.Timestamp('2020-01-01')))}
     assert rows[3]['hr_value'] == 80
     assert rows[3]['hr_charttime'] == pd.Timestamp('2020-01-01 02:00:00')
     assert rows[3]['hr_available_time'] == pd.Timestamp('2020-01-01 02:05:00')
@@ -34,11 +34,11 @@ def test_matching_uses_exact_context_and_unique_patients():
                         'gender': [0, 1], 'admission_source': [1, 2]})
     frame = pd.concat([high, low], ignore_index=True)
     frame['oii'] = [.8, .9, .2, .1]
-    for name in fig2_match.VITALS:
+    for name in matching.VITALS:
         frame[name+'_value'] = 1.
         frame[name+'_observed'] = True
-    result = fig2_match.pair(frame, .2, 5, 1., np.zeros(len(fig2_match.CONT)),
-                             np.ones(len(fig2_match.CONT)))
+    result = matching.pair(frame, .2, 5, 1., np.zeros(len(matching.CONT)),
+                             np.ones(len(matching.CONT)))
     assert len(result) == 2
     assert set(result.high_stay_id) == {1, 2}
     assert set(result.low_stay_id) == {3, 4}
@@ -53,6 +53,6 @@ def test_bootstrap_resamples_matched_pairs():
         'pred_DT': [.8, .2, .7, .3, .6, .4],
         'pred_F': [.9, .1, .8, .2, .7, .3],
     })
-    out = fig2_evaluate.pair_interval(frame, 42, 30)
+    out = evaluate.pair_interval(frame, 42, 30)
     assert out['bootstrap_unit'] == 'matched_pair'
     assert out['odi_residual_ci_low'] <= out['odi_residual_ci_high']

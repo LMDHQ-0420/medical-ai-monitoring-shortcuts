@@ -201,72 +201,23 @@ DejaVu Sans as fallbacks when Arial is unavailable.
 
 ---
 
-## Repository Contents
+## 项目目录
 
-The repository includes experiment results (including per-patient prediction CSVs),
-figure code, and current panel and legend exports.
-Datasets under `data/`, runtime logs, and Python caches are excluded by `.gitignore`.
-No model weights are currently saved on disk. Future checkpoints should be placed
-outside `data/` (for example, under `checkpoints/`) so they can be tracked.
+`src/data/` 负责队列与真实逐小时序列，`src/models/` 保存模型实现，`src/exp1/` 至 `src/exp5/` 分别保存五个实验的方法。原有 `scripts/build_cohort.py` 与 `scripts/exp1_train_grid.py` 至 `scripts/exp5_external_validation.py` 是正式入口。五个实验复用实验 1 保存的模型；D、O、D+T、F 四组权重只保存一份。GRU-seq 单独运行和汇总。
 
-## Output Structure
+`data/raw/` 与 `data/processed/` 保存输入及处理数据。`results/exp1` 至 `results/exp5` 为历史结果，保留供对照。当前正式结果直接在 `outputs/`：
 
-`multiseed_summary.json` uses the keys `exp1` through `exp5`, matching the experiment order.
-
-Each experiment's results live under `results/exp{1-5}/`, structured as
-`{task}/{feature_group}/{model}/{window}h_*`. exp1 has three feature groups
-(disease/observation/mixed); exp2-5 only train disease and mixed models to
-compute ODI as a difference, so they only have `disease/` and `mixed/`.
-
-```
-results/
-├── exp1/
-│   └── {task}/{disease,observation,mixed}/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_{metrics,predictions}.{json,csv}
-├── exp2/
-│   └── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_severity_control.json
-├── exp3/
-│   └── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_grouping_ablation.json
-├── exp4/
-│   ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_by_age_transfer.csv
-│   └── summary/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_odi_age_transfer_summary.json  # mimic_gap per task
-└── exp5/
-    ├── {task}/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv
-    └── pooled/mixed/{lr,rf,xgb,lgbm,gru,mlp}/{window}h_by_hospital.csv   # pooled across tasks
+```text
+outputs/
+├── analysis_protocol.json
+├── models/
+│   ├── tabular/{task}/{model}/seed{seed}/{window}h/
+│   └── gru_seq/{task}/seed{seed}/{window}h/
+├── exp1/    # 主模型比较
+├── exp2/    # 截点前临床状态匹配与情境分层
+├── exp3/    # 共享完整模型的治疗重分组
+├── exp4/    # 年龄分层
+└── exp5/    # 外部医院验证
 ```
 
----
-
-## Project Structure
-
-```
-medical-ai-monitoring-shortcuts/
-├── .gitignore
-├── src/
-│   ├── data/          # Cohort builders, feature definitions, transforms
-│   ├── models/        # LR, XGBoost, GRU, RF, LightGBM, MLP wrappers + shared fit dispatch
-│   ├── odi.py         # compute_odi() (bootstrap CI), shared by exp1/exp2/exp3
-│   ├── exp1/           # trainer.py — EHRTrainer for the main ODI grid
-│   ├── exp2/           # oii.py, severity_control.py — PSM / diagnosis stratification / SOFA covariate
-│   ├── exp3/           # grouping.py — variable grouping variants (original/variant_A/variant_B)
-│   ├── exp4/           # age_transfer.py — age-stratified ODI + transfer to eICU
-│   ├── exp5/           # external_validation.py — MIMIC->eICU odi_shrinkage
-│   └── utils/          # metrics, bootstrap CI, logger
-├── scripts/            # build_cohort.py + exp1-5_*.py entry points
-├── run_exp{1-5}_grid.sh # GPU-aware grid dispatchers for each experiment
-├── tests/              # PSM matching and overwrite regression tests
-├── configs/
-│   └── default.yaml   # All hyperparameters
-├── data/              # gitignored
-├── fig/
-│   ├── build_delivery.py # Render all panels and legends
-│   ├── figures.py        # Panel implementations
-│   ├── result_data.py    # Read stored experiment results
-│   ├── style.py          # Shared plotting style
-│   ├── layout-plan.yaml  # Main figure composition
-│   ├── color_registry.json
-│   ├── font_registry.json
-│   └── fig1b/ … fig5c/   # 14 tracked panels; Fig1a remains local
-├── results/           # Experiment results included in the repository
-├── logs/              # gitignored
-└── requirements.txt
-```
+每个正式格点保留四组权重、必要预处理、完整内部测试预测及 `manifest.json`。`outputs/` 不保存绘图代码、生成图件、ZIP、日志或中间 bootstrap 缓存。原有 `fig/` 与论文 `docs/manuscripts/` 在本轮整理中没有修改。详细文件用途见 `outputs/README.md`。

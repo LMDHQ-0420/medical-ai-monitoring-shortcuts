@@ -4,8 +4,8 @@ import pandas as pd
 import pytest
 import torch
 
-from scripts.pnas_revision.repair_cutoff_treatment import output_rows
-from scripts.pnas_revision.run_gru_seq import channels
+from src.data.treatment_events import output_rows
+from src.exp1.sequence_trainer import channels
 from src.data.transforms import split_cohort
 from src.models.gru_seq_model import GRUSequenceModel
 
@@ -84,11 +84,11 @@ def test_old_single_step_gru_is_retired():
 
 def test_smoke_and_formal_paths_and_wrong_sample_cache():
     from pathlib import Path
-    from scripts.pnas_revision.run_tabular import cell_path,paired_cache_matches
+    from src.exp1.trainer import cell_path,paired_cache_matches
     root=Path('/tmp/pnas_test')
     smoke=cell_path(root,'icu_mortality','lr',3,42,True)
     formal=cell_path(root,'icu_mortality','lr',3,42,False)
-    assert smoke!=formal and '/smoke/' in str(smoke) and '/formal/' in str(formal)
+    assert smoke!=formal and '/smoke/' in str(smoke) and '/models/' in str(formal)
     expected=pd.DataFrame({'subject_id':[1,2,3],'stay_id':[11,12,13],'icu_mortality':[0,1,0]})
     saved=pd.DataFrame({'pair_id':[1,2,3],'stay_id':[11,12,13],'y_true':[0,1,0]})
     manifest={'split_counts':{'test':{'n':3,'positive':1}}}
@@ -97,11 +97,3 @@ def test_smoke_and_formal_paths_and_wrong_sample_cache():
     assert not paired_cache_matches(saved.iloc[::-1],expected,manifest,'icu_mortality')
     wrong=saved.copy();wrong.loc[1,'y_true']=0
     assert not paired_cache_matches(wrong,expected,manifest,'icu_mortality')
-
-
-def test_aggregate_uses_feature_mapping_and_prediction_keys_separately():
-    from scripts.pnas_revision.aggregate import FEATURE_COLUMNS,PRED_GROUPS
-    from scripts.pnas_revision.run_tabular import GROUPS
-    assert FEATURE_COLUMNS==GROUPS
-    assert tuple(FEATURE_COLUMNS)==PRED_GROUPS
-    assert isinstance(FEATURE_COLUMNS['F'],list)

@@ -1,11 +1,9 @@
 """在冻结模型的测试集内，按截点前临床状态匹配高低观察强度患者。"""
 from __future__ import annotations
 
-import argparse
 import bisect
 import hashlib
 import json
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -16,7 +14,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
 from src.data.transforms import split_cohort
 from src.data.feature_groups import OBSERVATION_FEATURES
 from src.exp2.oii import OIIScaler
@@ -181,7 +178,7 @@ def run(run_dir: Path) -> None:
                                "training_quantile_clip_1_99": clipping,
                                "selection_rule": "highest retained pairs among candidates with max |SMD|<=0.1; otherwise smallest max |SMD|; no outcomes or ODI used"})
             print("matched", window, seed, n_pairs, "max SMD", round(max_smd, 3), flush=True)
-    out = run_dir / "fig2_matching"
+    out = run_dir / "exp2"
     out.mkdir(parents=True, exist_ok=True)
     pairs = pd.concat(all_pairs, ignore_index=True)
     if pairs.duplicated(["window_h", "seed", "high_stay_id"]).any() or pairs.duplicated(["window_h", "seed", "low_stay_id"]).any():
@@ -190,9 +187,3 @@ def run(run_dir: Path) -> None:
     pd.DataFrame(diagnostics).to_csv(out / "balance_diagnostics.csv", index=False)
     pd.DataFrame(thresholds).to_json(out / "matching_protocol.json", orient="records", indent=2)
     print("total pairs", len(pairs), flush=True)
-
-
-if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--run-dir", type=Path, required=True)
-    run(ap.parse_args().run_dir.resolve())

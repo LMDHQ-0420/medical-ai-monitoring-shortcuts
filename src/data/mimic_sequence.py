@@ -1,11 +1,11 @@
 """从 MIMIC 原始时间戳构建逐小时真实测量序列；不拼接窗口汇总表。"""
 from __future__ import annotations
-import argparse,json,os,sys
+import json,os
 from pathlib import Path
 import numpy as np,pandas as pd
-ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[2]
 from src.data.mimic_cohort import VITAL_ITEMIDS,LAB_ITEMIDS
-from scripts.pnas_revision.repair_cutoff_treatment import mimic_hourly
+from src.data.treatment_events import mimic_hourly
 VARS=list(VITAL_ITEMIDS)+[x for x in LAB_ITEMIDS if x in ('creatinine','lactate','wbc','hgb','sodium','potassium','bilirubin','inr')]
 VID={name:i for i,name in enumerate(VARS)}
 MIMIC_VITAL={item:name for name,items in VITAL_ITEMIDS.items() for item in items}
@@ -42,8 +42,7 @@ def scan(path,columns,id_col,lookup,item_map,chunk_size=400_000):
     last=allrows.sort_values('time').groupby(['stay_id','hour','var'],sort=False).tail(1).drop(columns='count')
     return last.merge(totals,on=['stay_id','hour','var'],validate='one_to_one')
 
-def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--run-dir',type=Path,required=True);a=ap.parse_args()
+def build_sequence():
     out=ROOT/'data/processed';out.mkdir(parents=True,exist_ok=True)
     tab=pd.read_parquet(ROOT/'data/processed/mimic_iv_24h.parquet',columns=['stay_id','hadm_id','subject_id','age','gender'])
     stay=pd.read_csv(ROOT/'data/raw/mimic_iv/mimic-iv-2.2/icu/icustays.csv.gz',usecols=['stay_id','intime']);stay.intime=pd.to_datetime(stay.intime)
@@ -88,4 +87,3 @@ def main():
               'path':str((out/'mimic_iv_hourly.npz').relative_to(ROOT))}
     (out/'mimic_iv_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     print('sequence complete',n,len(VARS),flush=True)
-if __name__=='__main__':main()

@@ -1,7 +1,6 @@
 """从截点前生命体征事件提取最后可用值及精确测量、可用时间。"""
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -116,8 +115,3 @@ def build() -> None:
         json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     )
     print("complete", len(result), out, flush=True)
-
-
-if __name__ == "__main__":
-    argparse.ArgumentParser().parse_args()
-    build()

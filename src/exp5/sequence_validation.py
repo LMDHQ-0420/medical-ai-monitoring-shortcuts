@@ -1,12 +1,12 @@
 """以训练集统计量复用 MIMIC GRU-seq 权重作年龄和 eICU 外部评估。"""
 from __future__ import annotations
-import argparse,json,os,sys,hashlib
+import json,os,hashlib
 from pathlib import Path
 import numpy as np,pandas as pd,torch
 from sklearn.metrics import roc_auc_score
-ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[2]
 from src.models.gru_seq_model import GRUSequenceModel,FittedGRUSequence
-from scripts.pnas_revision.postprocess_tabular import age_label,contrasts
+from src.exp4.age_transfer import age_label,contrasts
 GROUPS=('D','O','DT','F')
 
 def digest(path):
@@ -30,7 +30,7 @@ def input_channels(seq,window,stats):
  return {'D':d,'O':o,'DT':np.concatenate([d,state],axis=2),'F':np.concatenate([d,o,state],axis=2)}
 
 def run(run_dir,task,window,seed):
- cell=run_dir/'formal/gru_seq'/task/f'seed{seed}'/f'{window}h';m=json.loads((cell/'manifest.json').read_text())
+ cell=run_dir/'models/gru_seq'/task/f'seed{seed}'/f'{window}h';m=json.loads((cell/'manifest.json').read_text())
  if m.get('status')!='complete' or m.get('run_type')!='formal':raise ValueError('GRU-seq 正式格点未完成')
  source=ROOT/'data/processed/eicu_hourly.npz';eicu=ROOT/'data/processed'/f'eicu_{window}h.parquet'
  if not source.exists():raise FileNotFoundError(source)
@@ -73,7 +73,3 @@ def run(run_dir,task,window,seed):
     'eicu_data_sha256':digest(eicu),'valid_hospitals':len(hospital),'external_rows':len(pred),
     'label_compatibility':'unresolved; external comparison exploratory'},ensure_ascii=False,indent=2)+'\n')
   print(task,window,seed,'GRU external hospitals',len(hospital),flush=True)
-
-def main():
- p=argparse.ArgumentParser();p.add_argument('--run-dir',type=Path,required=True);p.add_argument('--task',required=True);p.add_argument('--window',type=int,required=True);p.add_argument('--seed',type=int,required=True);a=p.parse_args();run(a.run_dir.resolve(),a.task,a.window,a.seed)
-if __name__=='__main__':main()

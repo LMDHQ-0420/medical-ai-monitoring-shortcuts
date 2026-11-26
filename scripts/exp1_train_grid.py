@@ -1,92 +1,42 @@
-"""Train EHR models for experiment 1: D-Model vs O-Model vs M-Model.
-
-Iterates over all tasks x feature_groups x model_types x time_windows.
-
-Usage:
-    python scripts/exp1_train_grid.py --config configs/default.yaml [--smoke-test]
-    python scripts/exp1_train_grid.py --task icu_mortality --model xgb --window 24
-"""
-
+"""统一正式训练入口：五种表格模型和独立 GRU-seq 共用患者划分与输出目录。"""
+from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 import yaml
-import pandas as pd
 
-from src.exp1.trainer import EHRTrainer
+ROOT=Path(__file__).resolve().parent.parent
+sys.path.insert(0,str(ROOT))
+from src.exp1.trainer import MODELS,TASKS,WINDOWS,SEEDS,run_cell
+from src.exp1.sequence_trainer import run as run_sequence
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/default.yaml")
-    parser.add_argument("--task", default=None, help="Run single task only")
-    parser.add_argument("--model", default=None, choices=["lr", "xgb", "rf", "lgbm", "mlp"],
-                        help="Run single model only")
-    parser.add_argument("--window", type=int, default=None, help="Run single window only")
-    parser.add_argument("--seed", type=int, default=None,
-                        help="Override config training.seed; also selects the seedN/ output subdir")
-    parser.add_argument("--smoke-test", action="store_true",
-                        help="Single task/model/window with 500 samples")
-    parser.add_argument("--output-root", default="outputs/legacy_exp1",
-                        help="新运行的结果根目录；历史 results/ 保持只读")
-    args = parser.parse_args()
-
-    with open(args.config) as f:
-        cfg = yaml.safe_load(f)
-    if args.seed is not None:
-        cfg["training"]["seed"] = args.seed
-    seed_dir = f"seed{cfg['training']['seed']}"
-
-    processed_dir = Path("data/processed")
-    output_root = Path(args.output_root) / ("smoke" if args.smoke_test else "formal")
-
-    tasks = [args.task] if args.task else cfg["tasks"]
-    model_types = [args.model] if args.model else ["lr", "rf", "xgb", "lgbm", "mlp"]
-    windows = [args.window] if args.window else cfg["time_windows"]
-    feature_groups = ["disease", "observation", "mixed"]
-
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--config',default='configs/default.yaml')
+    parser.add_argument('--task',choices=TASKS)
+    parser.add_argument('--model',choices=(*MODELS,'gru_seq'))
+    parser.add_argument('--window',type=int,choices=WINDOWS)
+    parser.add_argument('--seed',type=int,choices=SEEDS)
+    parser.add_argument('--output-root',type=Path,default=ROOT/'outputs')
+    parser.add_argument('--smoke-test',action='store_true')
+    args=parser.parse_args()
+    if args.smoke_test and args.model=='gru_seq':
+        parser.error('smoke-test 仅用于表格模型')
+    cfg=yaml.safe_load(Path(args.config).read_text())
+    tasks=[args.task] if args.task else cfg['tasks']
+    models=[args.model] if args.model else [*MODELS,'gru_seq']
+    windows=[args.window] if args.window else cfg['time_windows']
+    seeds=[args.seed] if args.seed is not None else SEEDS
     if args.smoke_test:
-        tasks = [tasks[0]]
-        model_types = ["lr"]
-        windows = [windows[-1]]
-
-    for window_h in windows:
-        mimic_path = processed_dir / f"mimic_iv_{window_h}h.parquet"
-        if not mimic_path.exists():
-            print(f"[SKIP] {mimic_path} not found.")
-            continue
-        df = pd.read_parquet(mimic_path)
-        if args.smoke_test:
-            df = df.head(500)
-
-        for task in tasks:
-            if task not in df.columns:
-                print(f"[SKIP] Label column '{task}' not found in parquet.")
-                continue
-            for fg in feature_groups:
-                for mt in model_types:
-                    out_path = output_root / task / fg / mt / seed_dir / f"{window_h}h_metrics.json"
-                    if out_path.exists():
-                        print(f"[SKIP] {out_path} already exists.")
-                        continue
-                    print(f"\n>>> task={task} | group={fg} | model={mt} | window={window_h}h")
-                    trainer = EHRTrainer(
-                        model_type=mt,
-                        task=task,
-                        feature_group=fg,
-                        window_h=window_h,
-                        config=cfg,
-                        output_base=str(output_root),
-                        seed_dir=seed_dir,
-                    )
-                    metrics = trainer.run(df)
-                    print(f"    AUROC={metrics['auroc']:.4f} "
-                          f"[{metrics['auroc_ci_lower']:.4f}, {metrics['auroc_ci_upper']:.4f}] "
-                          f"| Brier={metrics['brier']:.4f}")
+        tasks,models,windows,seeds=tasks[:1],['lr'],windows[-1:],seeds[:1]
+    root=args.output_root.resolve()
+    for task in tasks:
+        for model in models:
+            for window in windows:
+                for seed in seeds:
+                    if model=='gru_seq':run_sequence(root,task,window,seed)
+                    else:run_cell(root,task,model,window,seed,smoke=args.smoke_test)
 
 
-if __name__ == "__main__":
-    main()
+if __name__=='__main__':main()

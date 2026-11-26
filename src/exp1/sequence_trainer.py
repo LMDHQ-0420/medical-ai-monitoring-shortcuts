@@ -1,10 +1,10 @@
 """用真实逐小时事件训练 GRU-seq；四个输入视野共享患者与填补统计量。"""
 from __future__ import annotations
-import argparse,hashlib,json,os,sys,traceback
+import hashlib,json,os,traceback
 from pathlib import Path
 import numpy as np,pandas as pd,torch,yaml
 from sklearn.metrics import roc_auc_score
-ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parents[2]
 from src.data.transforms import split_cohort
 from src.models.gru_seq_model import fit_gru_sequence
 TASKS=('icu_mortality','inhosp_mortality','aki','sepsis_deterioration','escalation')
@@ -57,7 +57,7 @@ def run(run_dir,task,window,seed):
     static=seq['static_D'].copy()
     smean=static[train_idx].mean(axis=0);sstd=static[train_idx].std(axis=0);sstd=np.where(sstd<1e-6,1,sstd)
     static=((static-smean)/sstd).astype(np.float32)
-    out=run_dir/'formal/gru_seq'/task/f'seed{seed}'/f'{window}h';out.mkdir(parents=True,exist_ok=True)
+    out=run_dir/'models/gru_seq'/task/f'seed{seed}'/f'{window}h';out.mkdir(parents=True,exist_ok=True)
     manifest_path=out/'manifest.json';pred_path=out/'predictions.csv.gz'
     if manifest_path.exists() and pred_path.exists():
         prev=json.loads(manifest_path.read_text())
@@ -67,7 +67,7 @@ def run(run_dir,task,window,seed):
     m={'status':'running','run_type':'formal','model':'gru_seq','task':task,'window_h':window,'seed':seed,'sequence_sha256':source_hash,'data_sha256':sha(data),'config_sha256':cfg_hash,
        'split_id':hashlib.sha256('\n'.join(map(str,sorted(test.subject_id))).encode()).hexdigest(),
        'n_train':len(train),'n_val':len(val),'n_test':len(test),'positive_test':int(test[task].sum()),
-       'static_D':['age','gender'],'D_channels':len(stats['median']),'O_channels':len(stats['median'])*3,'T_channels':3,
+       'run_id':json.loads((run_dir/'analysis_protocol.json').read_text()).get('protocol_id','formal'),'static_D':['age','gender'],'D_channels':len(stats['median']),'O_channels':len(stats['median'])*3,'T_channels':3,
        'time_steps':window,'hyperparameters':cfg,'failure_reason':None}
     manifest_path.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
     try:
@@ -87,8 +87,3 @@ def run(run_dir,task,window,seed):
     except Exception as exc:
         m['status']='failed';m['failure_reason']=repr(exc);m['traceback']=traceback.format_exc();raise
     finally:manifest_path.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
-
-def main():
-    p=argparse.ArgumentParser();p.add_argument('--run-dir',type=Path,required=True);p.add_argument('--task',choices=TASKS,required=True);p.add_argument('--window',type=int,choices=WINDOWS,required=True);p.add_argument('--seed',type=int,choices=SEEDS,required=True);a=p.parse_args()
-    run(a.run_dir.resolve(),a.task,a.window,a.seed)
-if __name__=='__main__':main()
