@@ -18,5 +18,5 @@ legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
 x_axis: 四个年龄组：<45、45–64、65–80和>80岁。
-y_axis: ODI；五行分别是五个预测任务，每行独立缩放纵轴。
+y_axis: Raw ODI；五行分别是五个预测任务，每行独立缩放纵轴。
 aggregation: 每个半小提琴保留5个模型×5个时间窗×5个seed的125个结果。时间窗和seed均不预先求平均；左半边来自MIMIC，右半边来自eICU。十字纵线表示四分位范围，横线表示中位数。

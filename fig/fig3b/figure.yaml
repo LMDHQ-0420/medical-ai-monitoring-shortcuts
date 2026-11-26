@@ -18,5 +18,6 @@ legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
 x_axis: 五种表格模型；五种颜色的圆点表示五个预测时间窗。
-y_axis: 加入治疗指标后参考模型的AUROC增益，即AUROC(D+T)−AUROC(D)；每个任务独立缩放纵轴。
+y_axis: Reference Gain，即AUROC(Clinical State And Treatment Model)−AUROC(Clinical State Model)；每个任务独立缩放纵轴。
 aggregation: 每个箱体保留5个时间窗×5个seed的25个结果；圆点是固定模型和时间窗下5个seed的中位数。纵轴按箱线须的可见范围缩放，避免极端值造成无效留白。
+caption_en: Reference Gain = AUROC(Clinical State And Treatment Model) − AUROC(Clinical State Model).

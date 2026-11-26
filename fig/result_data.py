@@ -2,15 +2,24 @@
 
 from functools import lru_cache
 from pathlib import Path
+import json
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = ROOT.parent / "outputs"
+LABEL_STANDARD = json.loads((ROOT / "label_standard.json").read_text(encoding="utf-8"))
+OUTCOME_LABELS = {item["key"]: item["figure"] for item in LABEL_STANDARD["outcomes"]}
+FIGURE_TERMS = {item["id"]: item["figure"] for section in
+                ("metrics", "populations", "axes_and_strata", "contrasts")
+                for item in LABEL_STANDARD[section]}
+MODEL_CONFIGURATION_LINES = {item["id"]: "\n".join(item["figure_lines"])
+                             for item in LABEL_STANDARD["model_configurations"]}
 TASKS = ["icu_mortality", "inhosp_mortality", "aki", "sepsis_deterioration", "escalation"]
-TASK_LABELS = ["ICU mortality", "Hospital mortality", "AKI", "Deterioration", "Escalation"]
+TASK_LABELS = [OUTCOME_LABELS[task] for task in TASKS]
 MODEL_KEYS = ["lr", "rf", "xgb", "lgbm", "mlp"]
-MODEL_LABELS = ["LR", "RF", "XGBoost", "LightGBM", "MLP"]
+MODEL_LABELS = [next(item["figure"] for item in LABEL_STANDARD["models"]["main"]
+                     if item["key"] == model) for model in MODEL_KEYS]
 WINDOWS = [3, 6, 12, 18, 24]
 SEEDS = [42, 43, 44, 45, 46]
 AGES = ["<45", "45-64", "65-80", ">80"]

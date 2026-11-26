@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 原测试队列和在测试集内完成临床状态匹配后的队列；每组左侧为原始ODI，右侧为治疗调整后ODI。
-y_axis: AUROC增益；五个任务各自使用独立纵轴范围。
+x_axis: Original Set（原测试集）与Matched Set（匹配测试子集）；每组左侧为Raw ODI，右侧为Residual ODI。
+y_axis: ODI；五个任务各自使用独立纵轴范围。
 aggregation: 每个箱体保留5个模型×5个时间窗×5个seed的125个固定模型结果；箱线表示10%和90%分位，中心线为中位数。

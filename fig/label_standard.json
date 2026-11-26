@@ -1,0 +1,461 @@
+{
+  "version": "1.1",
+  "date": "2026-11-26",
+  "scope_zh": "本论文及图件的统一显示术语；用于绘图和写作，不修改内部数据键或实验定义。",
+  "rules_zh": [
+    "同一研究概念只使用一个固定名称。图内普通标签各词首字母大写；正文按句式调整大小写，不另换近义词。",
+    "ICU、AKI、ODI、AUROC、LR、RF、MLP、GRU等缩写保持全大写；XGBoost、LightGBM、MIMIC-IV、eICU保留专有拼写。",
+    "缩写第一次出现时可解释全称；deterioration和escalation第一次出现时给出研究中的操作性定义，随后统一用固定名称。",
+    "名称统一只针对本研究的任务和对象，不全局替换引用文献标题或介绍他人研究时的原始术语。",
+    "Raw只用于原始ODI的计算口径；Original Set只用于原测试集。二者不是同义标签。",
+    "映射显示标签时保留原始任务键与文件路径，尤其是sepsis_deterioration；图与正文显示Deterioration。",
+    "指标名称不得替代其定义。差值方向应在轴标题第二行或图注中明确，所有相减项使用同一ODI口径。",
+    "平衡诊断的单位是实际匹配集合，不因算法或任务数量而复制成更多独立证据。",
+    "均值、中位数、四分位距、分位数须线与置信区间分别按实际统计含义标注。",
+    "特征与模型使用完整名称，不使用自定义单字母代号或由此组合的模型标签。",
+    "完整模型同时纳入临床状态、观察和治疗信息；各指标比较复用同一组完整模型预测。"
+  ],
+  "outcomes": [
+    {
+      "key": "icu_mortality",
+      "figure": "ICU Death",
+      "prose": "ICU death",
+      "zh": "ICU内死亡",
+      "avoid_as_own_task_aliases": [
+        "ICU Mortality",
+        "ICU mortality"
+      ]
+    },
+    {
+      "key": "inhosp_mortality",
+      "figure": "Hospital Death",
+      "prose": "hospital death",
+      "zh": "院内死亡",
+      "avoid_as_own_task_aliases": [
+        "Hospital Mortality",
+        "In-Hospital Mortality",
+        "in-hospital mortality"
+      ]
+    },
+    {
+      "key": "aki",
+      "figure": "AKI",
+      "prose": "AKI",
+      "zh": "急性肾损伤",
+      "first_mention": "acute kidney injury (AKI)"
+    },
+    {
+      "key": "sepsis_deterioration",
+      "figure": "Deterioration",
+      "prose": "deterioration",
+      "zh": "生理恶化",
+      "definition_note_zh": "在方法首次出现处说明意识水平或血压变化的实际结局规则；数据库差异按正式规则分别说明。",
+      "avoid_as_own_task_aliases": [
+        "Sepsis",
+        "Sepsis Deterioration",
+        "Clinical Decline",
+        "DET",
+        "PD"
+      ]
+    },
+    {
+      "key": "escalation",
+      "figure": "Escalation",
+      "prose": "escalation",
+      "zh": "处置升级",
+      "definition_note_zh": "首次出现处说明本研究采用的升压药或通气相关处置事件定义。",
+      "avoid_as_own_task_aliases": [
+        "Care Escalation",
+        "Treatment Escalation",
+        "Therapy Escalation"
+      ]
+    }
+  ],
+  "feature_groups": [
+    {
+      "id": "clinical_state",
+      "figure": "Clinical State",
+      "prose": "clinical state",
+      "zh": "临床状态"
+    },
+    {
+      "id": "observation",
+      "figure": "Observation",
+      "prose": "observation",
+      "zh": "观察过程"
+    },
+    {
+      "id": "treatment",
+      "figure": "Treatment",
+      "prose": "treatment",
+      "zh": "治疗信息"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "auroc",
+      "figure": "AUROC",
+      "prose": "AUROC",
+      "zh": "ROC曲线下面积",
+      "first_mention": "area under the receiver operating characteristic curve (AUROC)"
+    },
+    {
+      "id": "raw_odi",
+      "figure": "Raw ODI",
+      "prose": "raw ODI",
+      "zh": "原始ODI",
+      "definition": "AUROC(Full Model) - AUROC(Clinical State Model)",
+      "avoid": [
+        "Original ODI",
+        "Unadjusted ODI"
+      ]
+    },
+    {
+      "id": "residual_odi",
+      "figure": "Residual ODI",
+      "prose": "residual ODI",
+      "zh": "残余ODI",
+      "definition": "AUROC(Full Model) - AUROC(Clinical State And Treatment Model)",
+      "avoid": [
+        "Adjusted ODI",
+        "Treatment-Adjusted ODI"
+      ]
+    },
+    {
+      "id": "reference_gain",
+      "figure": "Reference Gain",
+      "prose": "reference gain",
+      "zh": "参照增益",
+      "definition": "AUROC(Clinical State And Treatment Model) - AUROC(Clinical State Model)",
+      "avoid": [
+        "Treatment Effect",
+        "Full-Model AUROC Change"
+      ],
+      "identity": "Raw ODI - Residual ODI"
+    },
+    {
+      "id": "absolute_smd",
+      "figure": "Absolute SMD",
+      "prose": "absolute SMD",
+      "zh": "绝对标准化均值差",
+      "first_mention": "absolute standardized mean difference (absolute SMD)"
+    }
+  ],
+  "populations": [
+    {
+      "id": "original",
+      "figure": "Original Set",
+      "prose": "original set",
+      "zh": "原测试集",
+      "definition_zh": "本次模型划分中的原始留出测试集，不是训练和测试的合并队列。"
+    },
+    {
+      "id": "matched",
+      "figure": "Matched Set",
+      "prose": "matched set",
+      "zh": "匹配测试子集",
+      "definition_zh": "在对应original set内部构建的匹配子集，使用同一批冻结模型评价。"
+    },
+    {
+      "id": "internal",
+      "figure": "Internal",
+      "prose": "internal",
+      "zh": "内部评估",
+      "dataset": "MIMIC-IV"
+    },
+    {
+      "id": "external",
+      "figure": "External",
+      "prose": "external",
+      "zh": "外部评估",
+      "dataset": "eICU",
+      "definition_zh": "对应数据库的外部评价；结局未统一的比较仍按探索性分析解释。"
+    },
+    {
+      "id": "high_intensity",
+      "figure": "High Intensity",
+      "prose": "high intensity",
+      "zh": "高观察强度",
+      "definition_zh": "这里的强度指观察强度。"
+    },
+    {
+      "id": "low_intensity",
+      "figure": "Low Intensity",
+      "prose": "low intensity",
+      "zh": "低观察强度",
+      "definition_zh": "这里的强度指观察强度。"
+    }
+  ],
+  "models": {
+    "main": [
+      {
+        "key": "lr",
+        "figure": "LR",
+        "prose": "LR",
+        "first_mention": "logistic regression (LR)"
+      },
+      {
+        "key": "rf",
+        "figure": "RF",
+        "prose": "RF",
+        "first_mention": "random forest (RF)"
+      },
+      {
+        "key": "xgb",
+        "figure": "XGBoost",
+        "prose": "XGBoost"
+      },
+      {
+        "key": "lgbm",
+        "figure": "LightGBM",
+        "prose": "LightGBM"
+      },
+      {
+        "key": "mlp",
+        "figure": "MLP",
+        "prose": "MLP",
+        "first_mention": "multilayer perceptron (MLP)"
+      }
+    ],
+    "extension": [
+      {
+        "key": "gru_seq",
+        "figure": "GRU",
+        "prose": "GRU",
+        "first_mention": "gated recurrent unit (GRU)",
+        "note_zh": "真实小时序列扩展，单列呈现，不混入五模型主汇总。"
+      }
+    ],
+    "excluded_legacy_keys": [
+      "gru"
+    ]
+  },
+  "axes_and_strata": [
+    {
+      "id": "outcome",
+      "figure": "Outcome",
+      "prose": "outcome",
+      "zh": "预测结局"
+    },
+    {
+      "id": "model",
+      "figure": "Model",
+      "prose": "model",
+      "zh": "模型"
+    },
+    {
+      "id": "window",
+      "figure": "Window (h)",
+      "prose": "window",
+      "zh": "观察窗口",
+      "definition_zh": "从入ICU至特征截点的观察范围，区别于截点之后的结局预测区间。",
+      "ticks": [
+        3,
+        6,
+        12,
+        18,
+        24
+      ],
+      "legend_labels": [
+        "3 h",
+        "6 h",
+        "12 h",
+        "18 h",
+        "24 h"
+      ]
+    },
+    {
+      "id": "age_group",
+      "figure": "Age Group",
+      "prose": "age group",
+      "zh": "年龄组"
+    },
+    {
+      "id": "admission_context",
+      "figure": "Admission Context",
+      "prose": "admission context",
+      "zh": "入院情境",
+      "note_zh": "MIMIC新版分层；具体类别从当前正式分层表读取，不预设类别名称。"
+    },
+    {
+      "id": "diagnosis_group",
+      "figure": "Diagnosis Group",
+      "prose": "diagnosis group",
+      "zh": "诊断分组",
+      "note_zh": "仅用于实际进行的诊断分层扩展；不可替代Admission Context。"
+    },
+    {
+      "id": "hospital",
+      "figure": "Hospital",
+      "prose": "hospital",
+      "zh": "医院"
+    },
+    {
+      "id": "patients",
+      "figure": "Patients",
+      "prose": "patients",
+      "zh": "患者数"
+    },
+    {
+      "id": "events",
+      "figure": "Events",
+      "prose": "events",
+      "zh": "事件数"
+    },
+    {
+      "id": "matched_pairs",
+      "figure": "Matched Pairs",
+      "prose": "matched pairs",
+      "zh": "匹配对数"
+    }
+  ],
+  "contrasts": [
+    {
+      "id": "age_gap",
+      "figure": "Age Gap",
+      "prose": "age gap",
+      "zh": "年龄差值",
+      "definition": "ODI(oldest group) - ODI(youngest group)",
+      "axis_second_line": ">80 - ≤45",
+      "note_zh": "轴第二行使用现有年龄组边界；若实际分析边界改变，必须同步更新。"
+    },
+    {
+      "id": "gap_change",
+      "figure": "Gap Change",
+      "prose": "gap change",
+      "zh": "年龄差值的外部变化",
+      "definition": "Age Gap(external) - Age Gap(internal)",
+      "axis_second_line": "External - Internal"
+    },
+    {
+      "id": "odi_contraction",
+      "figure": "ODI Contraction",
+      "prose": "ODI contraction",
+      "zh": "ODI收缩",
+      "definition": "ODI(internal) - ODI(external)",
+      "axis_second_line": "Internal - External",
+      "positive_meaning_zh": "外部增益比内部小。",
+      "negative_meaning_zh": "外部增益比内部大。"
+    },
+    {
+      "id": "reversal_rate",
+      "figure": "Reversal Rate (%)",
+      "prose": "reversal rate",
+      "zh": "增益反转比例",
+      "definition_zh": "在内部ODI为正且有有效外部估计的配置中，外部ODI为负的比例。",
+      "aggregation_note_zh": "沿用正式分析的种子汇总与医院汇总顺序，并在图注明确。",
+      "format_note_zh": "若源数据为0到1的比例，百分比显示仅转换一次。"
+    }
+  ],
+  "diagnosis_display_labels_if_used": [
+    {
+      "key": "cardiovascular",
+      "figure": "Cardiovascular",
+      "prose": "cardiovascular",
+      "zh": "心血管相关诊断"
+    },
+    {
+      "key": "infection",
+      "figure": "Infection",
+      "prose": "infection",
+      "zh": "感染相关诊断"
+    },
+    {
+      "key": "renal",
+      "figure": "Renal",
+      "prose": "renal",
+      "zh": "肾脏相关诊断"
+    },
+    {
+      "key": "respiratory",
+      "figure": "Respiratory",
+      "prose": "respiratory",
+      "zh": "呼吸系统相关诊断"
+    },
+    {
+      "key": "other",
+      "figure": "Other",
+      "prose": "other",
+      "zh": "其他诊断"
+    },
+    {
+      "key": "unrecorded",
+      "figure": "Unrecorded",
+      "prose": "unrecorded",
+      "zh": "截点前未记录诊断",
+      "note_zh": "不表示没有疾病，不与Other互换。"
+    }
+  ],
+  "rendering_zh": [
+    "空间不足时换行；不临时新增缩写或改成另一种名称。",
+    "图中标题式大小写只改变普通词首字母；专业缩写和专有名称遵循已列固定写法。",
+    "原始ODI与残余ODI出现在同一图时，轴可写ODI并由图例明确Raw ODI与Residual ODI；单独画某一种时直接标其固定名称。",
+    "Fig.2A的箱线加散点可保留；平衡图位置属于图件设计选择，本规范不强制改变面板布局。",
+    "正文和图注已按完整模型名称修订；最终图片由当前绘图流程使用本规范生成。较长名称按figure_lines换行，不压缩为新造代号。"
+  ],
+  "abbreviation_policy_zh": {
+    "专业缩写": "使用该领域已有的通用专业缩写，保留其惯用字母数和拼写，例如LR、RF、ICU、AKI、AUROC、MLP和GRU。",
+    "无通用缩写": "使用完整名称，不为压缩版面而另造缩写。",
+    "必须自定义": "仅在确有必要时使用三个字母，首次出现解释全称；本轮不新增模型或特征组缩写。",
+    "本研究指标": "ODI是本研究定义的三字母指标，首次出现写observation dependence index (ODI)，不称其为通行专业缩写。",
+    "适用范围": "正文、摘要、图中标签、图注、表格、数学表达及交付说明。图面板编号、计量单位、作者姓名首字母和文献的原方法名按各自规范处理。"
+  },
+  "model_configurations": [
+    {
+      "id": "clinical_state_model",
+      "figure": "Clinical State Model",
+      "prose": "clinical state model",
+      "figure_lines": [
+        "Clinical State",
+        "Model"
+      ],
+      "inputs": [
+        "Clinical State"
+      ],
+      "zh": "临床状态模型"
+    },
+    {
+      "id": "observation_model",
+      "figure": "Observation Model",
+      "prose": "observation model",
+      "figure_lines": [
+        "Observation",
+        "Model"
+      ],
+      "inputs": [
+        "Observation"
+      ],
+      "zh": "观察模型",
+      "note_zh": "只在实际包含仅观察信息模型的分析中使用。"
+    },
+    {
+      "id": "clinical_state_treatment_model",
+      "figure": "Clinical State And Treatment Model",
+      "prose": "clinical state and treatment model",
+      "figure_lines": [
+        "Clinical State",
+        "And Treatment",
+        "Model"
+      ],
+      "inputs": [
+        "Clinical State",
+        "Treatment"
+      ],
+      "zh": "临床状态与治疗模型"
+    },
+    {
+      "id": "full_model",
+      "figure": "Full Model",
+      "prose": "full model",
+      "figure_lines": [
+        "Full Model"
+      ],
+      "inputs": [
+        "Clinical State",
+        "Observation",
+        "Treatment"
+      ],
+      "zh": "完整模型"
+    }
+  ]
+}

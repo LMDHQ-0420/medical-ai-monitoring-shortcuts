@@ -20,3 +20,4 @@ all_text_color: black
 x_axis: 截点前临床状态协变量的标准化差异绝对值中位数；虚线标记0.1。
 y_axis: 年龄、性别、入院背景、常规生命体征及缺失指示。
 aggregation: 每项协变量在五个窗口和五个种子上的匹配前、匹配后绝对标准化差异分别取中位数。
+caption_en: Points show median Absolute SMD across 25 window-by-seed matching sets; the dashed line marks 0.1.

@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T15:14:45.937758</dc:date>
+    <dc:date>2026-11-26T17:14:15.872003</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -30,26 +30,26 @@ z
   </g>
   <g id="legend_1">
    <g id="patch_2">
-    <path d="M 36.260359 12.841145
-L 47.860359 12.841145
-L 47.860359 8.781145
-L 36.260359 8.781145
+    <path d="M 40.451313 12.837973
+L 52.051313 12.837973
+L 52.051313 8.777973
+L 40.451313 8.777973
 z
 " style="fill: #e17c76"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="51.050359" y="12.841145" transform="rotate(-0 51.050359 12.841145)">Original ODI</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="55.241313" y="12.837973" transform="rotate(-0 55.241313 12.837973)">Raw ODI</text>
    </g>
    <g id="patch_3">
-    <path d="M 90.207609 12.841145
-L 101.807609 12.841145
-L 101.807609 8.781145
-L 90.207609 8.781145
+    <path d="M 86.016656 12.837973
+L 97.616656 12.837973
+L 97.616656 8.777973
+L 86.016656 8.777973
 z
 " style="fill: #5f86c1"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="104.997609" y="12.841145" transform="rotate(-0 104.997609 12.841145)">Residual ODI</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="100.806656" y="12.837973" transform="rotate(-0 100.806656 12.837973)">Residual ODI</text>
    </g>
   </g>
  </g>

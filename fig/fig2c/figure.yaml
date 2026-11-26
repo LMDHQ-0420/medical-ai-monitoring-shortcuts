@@ -19,4 +19,5 @@ tick_guide_lines: forbidden
 all_text_color: black
 x_axis: 截点前可知的入院背景或医疗情境，非最终住院诊断。
 y_axis: 五个预测任务。
-aggregation: 对每个任务和入院情境的有效模型、窗口、种子结果计算治疗调整后ODI均值；颜色表示方向，点面积表示绝对值。
+aggregation: 对每个任务和入院情境的有效模型、窗口、种子结果计算Residual ODI均值；颜色表示方向，点面积表示绝对值。
+caption_en: Bubble area represents absolute mean Residual ODI within each Admission Context; color indicates its sign.
