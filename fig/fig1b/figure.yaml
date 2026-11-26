@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 六种模型：LR、RF、XGBoost、LightGBM、GRU和MLP。
+x_axis: 五种表格模型：LR、RF、XGBoost、LightGBM和MLP。
 y_axis: 观察驱动增量ODI，即加入观察信息后AUROC增加了多少。五个任务各自使用独立纵轴范围。
 aggregation: 箱体保留5个时间窗×5个seed的25个原始ODI，不先平均；每个彩色圆点是相应时间窗5个seed的中位数。

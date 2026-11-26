@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 完整模型AUROC相对原实验的变化量；零表示完整模型性能没有变化。
+x_axis: 加入治疗指标后参考模型的AUROC增益，即AUROC(D+T)−AUROC(D)。
 y_axis: 五个预测任务；每行密度抖动圆点对应一项任务，纵向抖动没有数值含义。
-aggregation: 每行保留6个模型×5个时间窗×5个seed的150个结果，不先平均。每个圆点是一个配置结果；灰色横线表示四分位范围，黑色竖线表示中位数。
+aggregation: 每行保留5个模型×5个时间窗×5个seed的125个结果，不先平均。每个圆点是一个配置结果；灰色横线表示四分位范围，黑色竖线表示中位数。

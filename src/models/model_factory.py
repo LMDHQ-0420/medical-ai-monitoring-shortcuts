@@ -5,7 +5,6 @@ from __future__ import annotations
 from .logistic import LogisticModel
 from .xgboost_model import XGBoostModel
 from .random_forest import RandomForestModel
-from .lightgbm_model import LightGBMModel
 from .mlp_model import MLPModel
 
 
@@ -51,6 +50,8 @@ def create_model(model_type: str, config: dict, input_size: int | None = None):
             seed=config.get("training", {}).get("seed", 42),
         )
     elif model_type == "lgbm":
+        # 仅在训练 LightGBM 时加载对应依赖，其他模型可独立使用。
+        from .lightgbm_model import LightGBMModel
         lgbm_cfg = config.get("training", {}).get("lightgbm", {})
         return LightGBMModel(
             n_estimators=lgbm_cfg.get("n_estimators", 500),

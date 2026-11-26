@@ -9,7 +9,7 @@ formats:
 png_dpi: 500
 title: none
 panel_label: none
-kind: task-by-window split violin distributions
+kind: frozen-model original and matched cohort boxplots
 legend: separate frameless files
 heatmap: false
 data_policy: stored result files only; five seeds averaged only where explicitly stated;
@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 3、6、12、18和24小时五个预测时间窗。
-y_axis: ODI；每一行是一个任务，并使用自己的纵轴范围。
-aggregation: 每半把小提琴保留6个模型×5个seed的30个结果，不对seed或模型预先平均。十字的纵线连接第25%和第75%分位，横线标出中位数。
+x_axis: 原测试队列和在测试集内完成临床状态匹配后的队列；每组左侧为原始ODI，右侧为治疗调整后ODI。
+y_axis: AUROC增益；五个任务各自使用独立纵轴范围。
+aggregation: 每个箱体保留5个模型×5个时间窗×5个seed的125个固定模型结果；箱线表示10%和90%分位，中心线为中位数。

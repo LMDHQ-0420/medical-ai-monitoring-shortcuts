@@ -19,4 +19,4 @@ tick_guide_lines: forbidden
 all_text_color: black
 x_axis: 五个预测任务；每组左半边是MIMIC，右半边是eICU医院中位数。
 y_axis: ODI。
-aggregation: MIMIC侧在固定任务—模型—窗口—seed内对重复医院行取均值，eICU侧在同一配置内取医院中位数；每半把最终保留6个模型×5个时间窗×5个seed的150个配置值。十字纵线表示四分位范围，横线表示中位数。
+aggregation: MIMIC侧在固定任务—模型—窗口—seed内对重复医院行取均值，eICU侧在同一配置内取医院中位数；每半把最终保留5个模型×5个时间窗×5个seed的125个配置值。十字纵线表示四分位范围，横线表示中位数。

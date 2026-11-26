@@ -149,9 +149,9 @@ def fig1a():
     times=np.array([.29,.37,.40,.52,.65,.68,.79,.86]); heights=np.array([.10,.06,.14,.08,.13,.05,.11,.07])
     for xx,hh in zip(times,heights): ax.plot([xx,xx],[.58,.58+hh],color=COLORS["coral"],lw=2.6,solid_capstyle="round")
     ax.plot([.27,.89],[.58,.58],color=INK,lw=.7); ax.text(.58,.48,"Observation Trace",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
-    for cx,label,fill in [(.34,"D",COLORS["blue_light"]),(.67,"D + O",COLORS["coral_light"])]: ax.add_patch(Ellipse((cx,.31),.25,.16,fc=_light(fill,.48),ec=INK,lw=.9)); ax.text(cx,.31,label,ha="center",va="center",fontsize=FONT["emphasis"],weight="bold",color=INK)
+    for cx,label,fill in [(.34,"D",COLORS["blue_light"]),(.67,"F",COLORS["coral_light"])]: ax.add_patch(Ellipse((cx,.31),.25,.16,fc=_light(fill,.48),ec=INK,lw=.9)); ax.text(cx,.31,label,ha="center",va="center",fontsize=FONT["emphasis"],weight="bold",color=INK)
     ax.annotate("",xy=(.525,.31),xytext=(.475,.31),arrowprops=dict(arrowstyle="-|>",lw=.9,color=INK))
-    ax.text(.50,.15,"ODI = AUROC(D + O) − AUROC(D)",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
+    ax.text(.50,.15,"ODI = AUROC(F) − AUROC(D)",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
     return fig
 
 
@@ -172,7 +172,7 @@ def fig1b():
 
 def fig1c():
     d=rd.exp1(); fig=figure(110,64); ax=fig.add_axes([.11,.18,.88,.80])
-    groups=[("disease",COLORS["blue"],"Disease Only"),("observation",COLORS["orange"],"Observation Only"),("mixed",COLORS["teal"],"Disease + Observation")]
+    groups=[("disease",COLORS["blue"],"Disease Only"),("observation",COLORS["orange"],"Observation Only"),("mixed",COLORS["teal"],"Full (D + O + T)")]
     offsets=[-.22,0,.22]
     for x,task in enumerate(rd.TASKS):
         st=d[d.task==task]
@@ -185,25 +185,71 @@ def fig1c():
 
 
 def fig2a():
-    raise RuntimeError('正式 Fig. 2A 从匹配前后临床状态平衡生成；运行 fig/pnas_plots.py')
+    # 同一批截点前临床状态协变量，比较匹配前后的标准化差异。
+    b=rd.balance().copy(); b["abs_smd"]=b.smd.abs()
+    summary=b.groupby(["covariate","stage"]).abs_smd.median().unstack()
+    summary=summary.dropna(subset=["before","after"]).sort_values("before")
+    fig=figure(190,80); ax=fig.add_axes([.16,.16,.81,.80]); ys=np.arange(len(summary))
+    ax.plot(summary.before,ys,"o",ms=3.6,color=COLORS["blue"])
+    ax.plot(summary.after,ys,"s",ms=3.6,color=COLORS["orange"])
+    for y,before,after in zip(ys,summary.before,summary.after):
+        ax.plot([before,after],[y,y],color=COLORS["gray_light"],lw=.7,zorder=0)
+    ax.axvline(.1,color=ZERO,ls=(0,(3,2)),lw=.65)
+    ax.set_yticks(ys,summary.index); ax.set_ylim(-.5,len(ys)-.5)
+    ax.set_xlabel("Median absolute standardized difference",fontweight="bold")
+    clean_axis(ax); return fig
 
 
 def fig2b():
-    raise RuntimeError('正式 Fig. 2B 使用固定模型的原测试与匹配测试预测；运行 fig/pnas_plots.py')
+    # D、D+T、F 均为原测试集已冻结模型；箱体汇集五模型、窗口和种子。
+    d,_=rd.exp2(); fig=figure(190,80)
+    gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34)
+    axes=[]; xs=np.arange(2)
+    for i,task in enumerate(rd.TASKS):
+        ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]
+        raw=[st.odi_raw_original.dropna().to_numpy(),st.odi_raw_matched.dropna().to_numpy()]
+        residual=[st.odi_residual_original.dropna().to_numpy(),st.odi_residual_matched.dropna().to_numpy()]
+        for x,(rv,tv) in enumerate(zip(raw,residual)):
+            _box_v(ax,x-.13,rv,_light(COLORS["coral"],.35),.22)
+            _box_v(ax,x+.13,tv,_light(COLORS["blue"],.35),.22)
+        values=np.concatenate(raw+residual); pad=max(np.ptp(values)*.08,.005)
+        ax.set_xlim(-.48,1.48); ax.set_ylim(values.min()-pad,values.max()+pad)
+        ax.set_xticks(xs,["Original","Matched"],rotation=25,ha="right")
+        ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",
+                fontsize=FONT["category"],weight="bold",color=INK)
+        clean_axis(ax)
+    _zero_if_all(axes,"horizontal",.65)
+    axes[0].set_ylabel("AUROC gain",fontweight="bold")
+    fig.text(.53,.045,"Test cohort (left: raw; right: treatment-adjusted)",
+             ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    return fig
 
 
 def fig2c():
-    raise RuntimeError('正式 Fig. 2C 使用入院情境分层；运行 fig/pnas_plots.py')
+    _,d=rd.exp2(); order=["Emergency","Transfer","Elective/procedure","Other/unknown"]
+    values=d.groupby(["task","stratum"]).odi_residual.mean().unstack().reindex(index=rd.TASKS,columns=order)
+    fig=figure(106,84); ax=fig.add_axes([.18,.24,.78,.71]); xs=np.arange(len(order)); ys=np.arange(5)
+    lim=max(abs(np.nanmin(values.to_numpy())),abs(np.nanmax(values.to_numpy())),.01)
+    for yi,task in enumerate(rd.TASKS):
+        for xi,stratum in enumerate(order):
+            value=values.loc[task,stratum]
+            if np.isfinite(value):
+                color=COLORS["teal"] if value>=0 else COLORS["coral"]
+                ax.scatter(xi,yi,s=max(abs(value)/lim*360,12),color=_light(color,.25),
+                           edgecolor=color,lw=.6)
+    ax.set_xlim(-.5,3.5); ax.set_ylim(4.5,-.5)
+    ax.set_xticks(xs,order,rotation=35,ha="right"); ax.set_yticks(ys,rd.TASK_LABELS)
+    ax.set_xlabel("Admission context",fontweight="bold")
+    clean_axis(ax); return fig
 
 
 def fig3c():
-    raise RuntimeError('旧 exp3 完整模型差值无效；运行 fig/pnas_plots.py')
     d=rd.exp3(); fig=figure(84,58); ax=fig.add_axes([.20,.18,.77,.80]); ys=np.arange(5)[::-1]
     allv=d.mixed_change.dropna().to_numpy(); lo,hi=np.quantile(allv,[.01,.99]); lim=max(abs(lo),abs(hi),.0025)*1.10
     for y,task in zip(ys,rd.TASKS):
         values=d.loc[d.task==task,"mixed_change"].to_numpy(); _sina_h(ax,y,values,TC[task],.31)
     ax.axvline(0,color=ZERO,ls=(0,(3,2)),lw=.7); ax.set_xlim(-lim,lim); ax.set_ylim(-.18,4.78); ax.set_yticks(ys,rd.TASK_LABELS); ax.tick_params(axis="both",pad=1.4); clean_axis(ax)
-    fig.text(.595,.012,"Full-Model AUROC Change",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    fig.text(.595,.012,"AUROC(D+T) − AUROC(D)",ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
     return fig
 
 
@@ -218,7 +264,6 @@ def fig3a():
 
 
 def fig3b():
-    raise RuntimeError('Fig. 3B 必须由共享 F 的正式预测计算 reference_gain；运行 fig/pnas_plots.py')
     d=rd.exp3(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); axes=[]; xs=np.arange(len(rd.MODEL_KEYS))
     for ti,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[0,ti]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].mixed_change.to_numpy() for m in rd.MODEL_KEYS]
@@ -237,7 +282,7 @@ def fig3b():
 
 
 def fig4a():
-    a=rd.age(); ages=["<45","45-65","65-80",">80"]
+    a=rd.age(); ages=rd.AGES
     fig=figure(102,86); gs=fig.add_gridspec(5,1,left=.13,right=.99,bottom=.11,top=.99,hspace=.18); axes=[]; xs=np.arange(4)
     for i,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[i]); axes.append(ax); s=a[a.task==task]; local=[]
@@ -339,9 +384,9 @@ _fig5b_handles=[_fig5b_handles[i] for i in (0,3,1,4,2)]
 
 LEGEND_SPECS = {
     "fig1b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
-    "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=l) for _,c,l in [("d",COLORS["blue"],"Disease Only"),("o",COLORS["orange"],"Observation Only"),("m",COLORS["teal"],"Disease + Observation")]],ncol=3,width=88,height=8),
-    "fig2a": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
-    "fig2b": dict(handles=[Patch(fc=_light(COLORS["teal"],.22),ec="none",label="Original cohort"),Patch(fc=_light(COLORS["orange"],.22),ec="none",label="Matched cohort")],ncol=2,width=80,height=8),
+    "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=l) for _,c,l in [("d",COLORS["blue"],"Disease Only"),("o",COLORS["orange"],"Observation Only"),("m",COLORS["teal"],"Full (D + O + T)")]],ncol=3,width=88,height=8),
+    "fig2a": dict(handles=[Line2D([],[],marker="o",ls="",ms=5.2,color=COLORS["blue"],label="Before matching"),Line2D([],[],marker="s",ls="",ms=5.2,color=COLORS["orange"],label="After matching")],ncol=2,width=80,height=8),
+    "fig2b": dict(handles=[Patch(fc=_light(COLORS["coral"],.35),ec="none",label="Raw ODI"),Patch(fc=_light(COLORS["blue"],.35),ec="none",label="Treatment-adjusted ODI")],ncol=2,width=80,height=8),
     "fig3a": dict(handles=[Patch(fc=_light(COLORS["coral"],.22),ec="none",label="Original ODI"),Patch(fc=_light(COLORS["blue"],.22),ec="none",label="Residual ODI")],ncol=2,width=62,height=8),
     "fig3b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
     "fig4a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External")],ncol=2,width=62,height=8),

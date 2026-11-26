@@ -176,23 +176,26 @@ def plot_extended(seq,out):
  save(fig,out,'extended_gru_seq')
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--run-dir',type=Path,required=True);a=p.parse_args();run=a.run_dir.resolve();out=run/'figures';out.mkdir(exist_ok=True);style()
- main=pd.read_csv(run/'main_seed_metrics.csv.gz')
- if len(main)!=625 or main.groupby(['task','model','window_h']).seed.nunique().ne(5).any():raise ValueError('主实验 625 个正式格点未完成，拒绝绘制正式主图')
- age=pd.read_csv(run/'age_seed_metrics.csv.gz');external=pd.read_csv(run/'external_seed_metrics.csv.gz')
- if age.groupby(['task','model','window_h','seed','dataset']).size().unstack(fill_value=0).shape[0]!=625 or not len(external):
+ p=argparse.ArgumentParser()
+ p.add_argument('--run-dir',type=Path,default=Path(__file__).resolve().parent.parent/'outputs')
+ p.add_argument('--output-dir',type=Path,default=Path(__file__).resolve().parent)
+ a=p.parse_args();run=a.run_dir.resolve();out=a.output_dir.resolve();out.mkdir(parents=True,exist_ok=True);style()
+ main=pd.read_csv(run/'exp1/results.csv.gz')
+ keys=['task','model','window_h','seed']
+ expected=pd.MultiIndex.from_product([TASKS,MODELS,[3,6,12,18,24],[42,43,44,45,46]],names=keys)
+ actual=pd.MultiIndex.from_frame(main[keys])
+ if len(main)!=625 or not actual.is_unique or not actual.sort_values().equals(expected.sort_values()):
+  raise ValueError('主实验 625 个正式格点未完成，拒绝绘制正式主图')
+ age=pd.read_csv(run/'exp4/results.csv.gz');external=pd.read_csv(run/'exp5/results.csv.gz')
+ if age.groupby(keys+['dataset']).size().unstack(fill_value=0).shape[0]!=625 or external.empty:
   raise ValueError('年龄和外部正式结果未覆盖全部格点')
  plot1(main,out);plot3(main,out);plot4(age,out);plot5(external,out)
- seq=pd.read_csv(run/'gru_seq_seed_metrics.csv.gz')
+ seq=pd.read_csv(run/'exp1/gru_seq.csv.gz')
  if len(seq)==125:plot_extended(seq,out)
- matched=pd.read_csv(run/'matched_seed_metrics.csv.gz')
- context_path=run/'context_seed_metrics.csv.gz'
- balance_path=run/'fig2_matching/balance_diagnostics.csv'
- if matched.empty or not context_path.exists() or not balance_path.exists():
-  (out/'fig2_status.json').write_text(json.dumps({'status':'incomplete','reason':'test-only clinical-state matching or admission-context analysis not complete'},indent=2)+'\n')
- else:
-  plot2(pd.read_csv(balance_path),matched,pd.read_csv(context_path),out)
-  (out/'fig2_status.json').write_text(json.dumps({'status':'complete','analysis':'frozen models evaluated on test-only matched pairs; eICU diagnosis reported separately'},indent=2)+'\n')
-  plot_eicu_diagnosis(pd.read_csv(run/'diagnosis_seed_metrics.csv.gz'),out)
- print('Rendered fig1, fig3, fig4, fig5 from complete formal inputs; Fig2 status explicit')
+ matched=pd.read_csv(run/'exp2/results.csv.gz')
+ context=pd.read_csv(run/'exp2/context.csv.gz')
+ balance=pd.read_csv(run/'exp2/balance.csv')
+ plot2(balance,matched,context,out)
+ plot_eicu_diagnosis(pd.read_csv(run/'exp2/diagnosis.csv.gz'),out)
+ print('已从 outputs/exp1–exp5 重绘五张主图和可用扩展图')
 if __name__=='__main__':main()

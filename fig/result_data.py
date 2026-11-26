@@ -1,103 +1,89 @@
-"""Read existing result files only; never rewrite or fit experiment results."""
+"""从 outputs/exp1–exp5 读取正式结果，供原有面板样式使用。"""
 
-import json
-import os
 from functools import lru_cache
-from itertools import product
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
-RESULTS = ROOT.parent / "results"
+OUTPUTS = ROOT.parent / "outputs"
 TASKS = ["icu_mortality", "inhosp_mortality", "aki", "sepsis_deterioration", "escalation"]
 TASK_LABELS = ["ICU mortality", "Hospital mortality", "AKI", "Deterioration", "Escalation"]
 MODEL_KEYS = ["lr", "rf", "xgb", "lgbm", "mlp"]
 MODEL_LABELS = ["LR", "RF", "XGBoost", "LightGBM", "MLP"]
 WINDOWS = [3, 6, 12, 18, 24]
 SEEDS = [42, 43, 44, 45, 46]
-AGES = ["<45", "45-65", "65-80", ">80"]
-AGE_LABELS = ["≤45", "45–65", "65–80", ">80"]
+AGES = ["<45", "45-64", "65-80", ">80"]
+AGE_LABELS = ["<45", "45–64", "65–80", ">80"]
 KEYS = ["task", "model", "window"]
 
 
-def read_json(path):
-    if os.environ.get('ALLOW_LEGACY_FIGURE_RESULTS') != '1':
-        raise RuntimeError('历史结果已退休；正式图请运行 fig/pnas_plots.py')
-    raw = path.read_bytes()
-    return json.loads(raw)
+def _read(experiment, name="results.csv.gz"):
+    path = OUTPUTS / experiment / name
+    if not path.is_file():
+        raise FileNotFoundError(f"缺少正式绘图输入：{path}")
+    return pd.read_csv(path)
 
 
-def read_csv(path):
-    if os.environ.get('ALLOW_LEGACY_FIGURE_RESULTS') != '1':
-        raise RuntimeError('历史结果已退休；正式图请运行 fig/pnas_plots.py')
-    raw = path.read_bytes()
-    from io import BytesIO
-    return pd.read_csv(BytesIO(raw))
+def _grid(frame, name):
+    keys = ["task", "model", "window_h", "seed"]
+    expected = pd.MultiIndex.from_product(
+        [TASKS, MODEL_KEYS, WINDOWS, SEEDS], names=keys
+    )
+    actual = pd.MultiIndex.from_frame(frame[keys])
+    if len(frame) != len(expected) or not actual.is_unique or not actual.sort_values().equals(expected.sort_values()):
+        raise ValueError(f"{name} 不是完整的 625 格点五模型正式结果")
+    return frame
 
 
 @lru_cache(None)
 def exp1():
-    records = []
-    for task, model, window, seed in product(TASKS, MODEL_KEYS, WINDOWS, SEEDS):
-        d = {"task": task, "model": model, "window": window, "seed": seed}
-        for group in ["disease", "observation", "mixed"]:
-            p = RESULTS / "exp1" / task / group / model / f"seed{seed}" / f"{window}h_metrics.json"
-            d[group] = read_json(p)["auroc"]
-        d["odi"] = d["mixed"] - d["disease"]
-        records.append(d)
-    return pd.DataFrame(records)
+    d = _grid(_read("exp1"), "exp1")
+    return d.rename(columns={"window_h": "window", "auc_D": "disease",
+                             "auc_O": "observation", "auc_F": "mixed",
+                             "odi_raw": "odi"})
 
 
 @lru_cache(None)
 def exp2():
-    records, strata = [], []
-    for task, model, window, seed in product(TASKS, MODEL_KEYS, WINDOWS, SEEDS):
-        p = RESULTS / "exp2" / task / "mixed" / model / f"seed{seed}" / f"{window}h_severity_control.json"
-        j = read_json(p)
-        key = dict(task=task, model=model, window=window, seed=seed)
-        records.append({**key, **j["psm"]})
-        for diagnosis, odi in j["stratification"].items():
-            strata.append({**key, "diagnosis": diagnosis, "odi": odi})
-    return pd.DataFrame(records), pd.DataFrame(strata)
+    matched = _grid(_read("exp2"), "exp2")
+    context = _read("exp2", "context.csv.gz")
+    return matched.rename(columns={"window_h": "window"}), context.rename(columns={"window_h": "window"})
+
+
+@lru_cache(None)
+def balance():
+    return _read("exp2", "balance.csv")
 
 
 @lru_cache(None)
 def exp3():
-    records = []
-    for task, model, window, seed in product(TASKS, MODEL_KEYS, WINDOWS, SEEDS):
-        p = RESULTS / "exp3" / task / "mixed" / model / f"seed{seed}" / f"{window}h_grouping_ablation.json"
-        j = read_json(p)
-        records.append(dict(task=task, model=model, window=window, seed=seed,
-            original=j["original"]["odi"], residual=j["variant_A"]["odi"],
-            mixed_change=j["variant_A"]["auroc_mixed"]-j["original"]["auroc_mixed"]))
-    return pd.DataFrame(records)
+    d = _grid(_read("exp3"), "exp3")
+    return d.rename(columns={"window_h": "window", "odi_raw": "original",
+                             "odi_residual": "residual", "reference_gain": "mixed_change"})
 
 
 @lru_cache(None)
 def age():
-    frames = []
-    for task, model, window, seed in product(TASKS, MODEL_KEYS, WINDOWS, SEEDS):
-        p = RESULTS / "exp4" / task / "mixed" / model / f"seed{seed}" / f"{window}h_odi_by_age_transfer.csv"
-        frames.append(read_csv(p).assign(task=task, model=model, window=window, seed=seed))
-    return pd.concat(frames, ignore_index=True)
+    d = _read("exp4")
+    return d.rename(columns={"window_h": "window", "dataset": "source",
+                             "odi_raw": "odi"}).assign(source=lambda x: x.source.map(
+                                 {"mimic_iv": "mimic_internal", "eicu": "eicu_external"}))
 
 
 def age_gaps():
-    p = age().pivot(index=KEYS+["seed", "source"], columns="age_group", values="odi")
-    return (p[">80"]-p["<45"]).rename("gap").reset_index().pivot(
-        index=KEYS+["seed"], columns="source", values="gap").reset_index()
+    p = age().pivot(index=KEYS + ["seed", "source"], columns="age_group", values="odi")
+    return (p[">80"] - p["<45"]).rename("gap").reset_index().pivot(
+        index=KEYS + ["seed"], columns="source", values="gap").reset_index()
 
 
 @lru_cache(None)
 def hospitals():
-    frames = []
-    for task, model, window, seed in product(TASKS, MODEL_KEYS, WINDOWS, SEEDS):
-        p = RESULTS / "exp5" / task / "mixed" / model / f"seed{seed}" / f"{window}h_by_hospital.csv"
-        d = read_csv(p).rename(columns={"auroc_external": "auroc_mixed", "auroc_external_disease": "auroc_disease"})
-        d = d[["hospital_id", "n_patients", "auroc_mixed", "auroc_disease", "odi_mimic", "odi_eicu", "odi_shrinkage"]]
-        frames.append(d.assign(task=task, model=model, window=window, seed=seed))
-    return pd.concat(frames, ignore_index=True).replace([np.inf, -np.inf], np.nan)
+    d = _read("exp5").rename(columns={"window_h": "window", "n": "n_patients",
+                                     "auc_F": "auroc_mixed", "auc_D": "auroc_disease",
+                                     "internal_odi_raw": "odi_mimic", "odi_raw": "odi_eicu",
+                                     "odi_shrinkage": "odi_shrinkage"})
+    return d.replace([np.inf, -np.inf], np.nan)
 
 
 def combo(frame):

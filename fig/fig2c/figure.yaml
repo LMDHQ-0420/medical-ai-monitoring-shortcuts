@@ -9,7 +9,7 @@ formats:
 png_dpi: 500
 title: none
 panel_label: none
-kind: stacked diagnosis-stratified ridge distributions
+kind: admission-context treatment-adjusted gain dots
 legend: none
 heatmap: false
 data_policy: stored result files only; five seeds averaged only where explicitly stated;
@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 诊断分层ODI；每个任务分面使用自己的横轴范围。
-y_axis: 五类诊断人群：心血管、感染、其他、肾脏和呼吸系统。
-aggregation: 每条山脊保留6个模型×5个时间窗×5个seed的150个结果。时间窗和seed均不预先求平均；黑线是中位数，两条较细灰线是两个四分位数。
+x_axis: 截点前可知的入院背景或医疗情境，非最终住院诊断。
+y_axis: 五个预测任务。
+aggregation: 对每个任务和入院情境的有效模型、窗口、种子结果计算治疗调整后ODI均值；颜色表示方向，点面积表示绝对值。

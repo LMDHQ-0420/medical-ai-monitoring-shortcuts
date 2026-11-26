@@ -19,4 +19,4 @@ tick_guide_lines: forbidden
 all_text_color: black
 x_axis: 五个预测任务；每个任务左半边为原始ODI，右半边为残余ODI。
 y_axis: ODI。零以上表示观察信息带来正向预测增量。
-aggregation: 每半把小提琴保留6个模型×5个时间窗×5个seed的150个结果。时间窗和seed均不预先求平均；十字纵线表示四分位范围，横线表示中位数。
+aggregation: 每半把小提琴保留5个模型×5个时间窗×5个seed的125个结果。时间窗和seed均不预先求平均；十字纵线表示四分位范围，横线表示中位数。

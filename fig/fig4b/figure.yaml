@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 年龄差ODI＝>80岁组ODI减去≤45岁组ODI；零表示两组没有差异。
+x_axis: 年龄差ODI＝>80岁组ODI减去<45岁组ODI；零表示两组没有差异。
 y_axis: 每个任务内有两行：上方MIMIC、下方eICU。
-aggregation: 每行圆点云保留6个模型×5个时间窗×5个seed的150个年龄差，不先平均。圆点横向位置是实际年龄差，纵向抖动仅用于展示局部密度；灰线是四分位范围，黑线是中位数。
+aggregation: 每行圆点云保留5个模型×5个时间窗×5个seed的125个年龄差，不先平均。圆点横向位置是实际年龄差，纵向抖动仅用于展示局部密度；灰线是四分位范围，黑线是中位数。

@@ -9,7 +9,7 @@ formats:
 png_dpi: 500
 title: none
 panel_label: none
-kind: diagnosis-stratified model boxplots with prediction-window medians
+kind: clinical-state matching balance chart
 legend: separate frameless files
 heatmap: false
 data_policy: stored result files only; five seeds averaged only where explicitly stated;
@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 六种模型。彩色圆点的位置略微左右错开，仅用于区分五个时间窗。
-y_axis: 诊断分层后的ODI；五个任务各自使用独立纵轴范围。
-aggregation: 每个箱体保留5个诊断层×5个时间窗×5个seed的125个结果；彩色圆点是固定模型和时间窗下5个诊断层×5个seed共25个值的中位数。
+x_axis: 截点前临床状态协变量的标准化差异绝对值中位数；虚线标记0.1。
+y_axis: 年龄、性别、入院背景、常规生命体征及缺失指示。
+aggregation: 每项协变量在五个窗口和五个种子上的匹配前、匹配后绝对标准化差异分别取中位数。

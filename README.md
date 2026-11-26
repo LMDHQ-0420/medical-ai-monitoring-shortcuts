@@ -98,106 +98,27 @@ python scripts/build_cohort.py --dataset mimic
 python scripts/build_cohort.py --dataset eicu
 ```
 
-### exp1: Main ODI Grid
+### 正式实验
 
-Trains D-Model / O-Model / M-Model for every task × model × time window.
-
-```bash
-# Full run (all tasks × models × windows) — takes several hours
-python scripts/exp1_train_grid.py --config configs/default.yaml
-
-# Single combination
-python scripts/exp1_train_grid.py --task icu_mortality --model xgb --window 24
-
-# Smoke test (LR, first task, 24h window, 500 samples)
-python scripts/exp1_train_grid.py --smoke-test
-
-# GPU-aware grid dispatcher (all 5 tasks x 5 windows)
-./run_exp1_grid.sh
-```
-
-### exp2: Severity Control Ablation
-
-Tests whether ODI survives PSM on SOFA, diagnosis-category stratification, and SOFA-adjusted O-Models.
+所有命令从 `code/` 运行。五模型主分析与 GRU-seq 在实验 1 拟合 D、O、D+T、F，实验 2–5 复用相同的正式权重。
 
 ```bash
-python scripts/exp2_ablation_severity.py --config configs/default.yaml --model xgb --window 24
-
-# Recompute PSM only and overwrite existing PSM results (preserve other analyses)
-python scripts/exp2_ablation_severity.py --psm-only --seed 42
-
-# GPU-aware grid dispatcher (6 models x 5 windows)
-./run_exp2_grid.sh
-
-# Recompute only PSM for all five seeds, overwriting existing results
-SEEDS="42 43 44 45 46" PSM_ONLY=1 ./run_exp2_grid.sh
+python scripts/exp1_train_grid.py
+python scripts/exp2_ablation_severity.py
+python scripts/exp3_ablation_grouping.py
+python scripts/exp4_age_odi_transfer.py
 ```
 
-Existing exp2 result files are overwritten when rerun. PSM diagnostics include
-matching counts, standardized mean differences, propensity-score summaries, and
-train/validation/test sizes.
+实验 4 与实验 5 共用评估入口；运行最后一条命令会生成两者的汇总表。也可使用 `python scripts/exp5_external_validation.py`。正式结果直接写到 `outputs/exp1/` 至 `outputs/exp5/`，共享权重及完整测试预测保存在 `outputs/models/`。单格续跑可使用实验 1 的 `--task`、`--model`、`--window` 和 `--seed` 参数。
 
-### exp3: Variable Grouping Sensitivity Ablation
-
-Tests whether ODI survives reassigning treatment/medication variables between D-Model and O-Model.
+### 图件
 
 ```bash
-python scripts/exp3_ablation_grouping.py --config configs/default.yaml --model xgb --window 24
-
-# GPU-aware grid dispatcher (6 models x 5 windows)
-./run_exp3_grid.sh
+python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
+python fig/pnas_plots.py      # Fig. 1–5 和扩展图，PDF/PNG
 ```
 
-### exp4: Age-Based ODI Inequity (mimic_gap)
-
-Computes ODI by age group on MIMIC-IV and pooled eICU; core statistic is mimic_gap = ODI(>80) − ODI(<45).
-
-```bash
-python scripts/exp4_age_odi_transfer.py --config configs/default.yaml --model xgb --window 24
-
-# GPU-aware grid dispatcher (6 models x 5 windows)
-./run_exp4_grid.sh
-```
-
-### exp5: Cross-Hospital Transfer Failure (odi_shrinkage)
-
-Trains on MIMIC-IV, evaluates per-hospital ODI shrinkage on eICU.
-
-```bash
-python scripts/exp5_external_validation.py --config configs/default.yaml --model xgb --window 24
-
-# GPU-aware grid dispatcher (6 models x 5 windows)
-./run_exp5_grid.sh
-```
-
----
-
-## Figures
-
-The five main figures follow experiment order: Fig1 shows baseline ODI, Fig2
-severity and diagnosis robustness, Fig3 feature grouping robustness, Fig4 age
-patterns, and Fig5 cross-hospital transfer. The repository tracks 14 standalone panels;
-Fig1a is intentionally kept local and is not distributed.
-
-```bash
-# Render all tracked panels and their separate legends
-python fig/build_delivery.py
-
-# Regenerate the panel affected by a PSM-only rerun
-python fig/fig2b/plot_fig2b.py
-```
-
-Each tracked `fig/figXa/` directory contains its plotting entry point, `figure.yaml`,
-and PDF, SVG, and 500 dpi PNG exports. Eleven panels have separate legend files.
-`layout-plan.yaml` records how to assemble the panels into five main figures.
-
-The plotting code reads existing files under `results/`. Regenerate affected
-panels after rerunning an experiment. A PSM-only rerun affects Fig2b; the diagnosis
-panels Fig2a and Fig2c use unchanged stratification results.
-
-`figures.py` implements the panels, `result_data.py` loads their results, and
-`style.py` defines the shared style. Arial is preferred, with Liberation Sans and
-DejaVu Sans as fallbacks when Arial is unavailable.
+绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，图件保存于 `fig/`。`results/` 是历史结果，不作为正式绘图输入。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
 ---
 
@@ -220,4 +141,4 @@ outputs/
 └── exp5/    # 外部医院验证
 ```
 
-每个正式格点保留四组权重、必要预处理、完整内部测试预测及 `manifest.json`。`outputs/` 不保存绘图代码、生成图件、ZIP、日志或中间 bootstrap 缓存。原有 `fig/` 与论文 `docs/manuscripts/` 在本轮整理中没有修改。详细文件用途见 `outputs/README.md`。
+每个正式格点保留四组权重、必要预处理、完整内部测试预测及 `manifest.json`。`outputs/` 不保存绘图代码、生成图件、ZIP、日志或中间 bootstrap 缓存。论文 `docs/manuscripts/` 保持原稿，`fig/` 已按新结果重新生成。正式结果入口为 `outputs/exp1/` 至 `outputs/exp5/`，共享权重与患者级预测位于 `outputs/models/`。
