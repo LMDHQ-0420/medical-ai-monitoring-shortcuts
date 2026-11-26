@@ -114,11 +114,10 @@ python scripts/exp4_age_odi_transfer.py
 ### 图件
 
 ```bash
-python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
-python fig/pnas_plots.py      # Fig. 1–5 和扩展图，PDF/PNG
+python fig/build_delivery.py  # 14 个独立面板与图例，PDF/SVG/PNG
 ```
 
-绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，图件保存于 `fig/`。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
+绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，最终图件保存在 `fig/fig1b/`、`fig/fig1c/` 至 `fig/fig5c/` 等分面板目录中。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
 ---
 

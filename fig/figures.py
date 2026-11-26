@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from matplotlib.lines import Line2D
-from matplotlib.patches import Arc, Circle, Ellipse, PathPatch, Rectangle, Patch
-from matplotlib.path import Path as MplPath
+from matplotlib.patches import Rectangle, Patch
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
@@ -132,27 +131,6 @@ def _zero_if_all(axes,orientation="horizontal",lw=.65):
 
 def _light(color,amount=.68):
     rgb=np.array(mcolors.to_rgb(color)); return tuple(rgb+(1-rgb)*amount)
-
-
-def _alluvial(ax,x0,x1,y0,y1,width,color,alpha=.82):
-    verts=[(x0,y0-width/2),(x0+(x1-x0)*.38,y0-width/2),(x0+(x1-x0)*.62,y1-width/2),(x1,y1-width/2),(x1,y1+width/2),(x0+(x1-x0)*.62,y1+width/2),(x0+(x1-x0)*.38,y0+width/2),(x0,y0+width/2),(x0,y0-width/2)]
-    codes=[MplPath.MOVETO,MplPath.CURVE4,MplPath.CURVE4,MplPath.CURVE4,MplPath.LINETO,MplPath.CURVE4,MplPath.CURVE4,MplPath.CURVE4,MplPath.CLOSEPOLY]
-    ax.add_patch(PathPatch(MplPath(verts,codes),transform=ax.transAxes,fc=color,ec=COLORS["white"],lw=.35,alpha=alpha))
-
-
-def fig1a():
-    fig=figure(80,64); ax=fig.add_axes([.02,.025,.96,.95]); ax.set_xlim(0,1); ax.set_ylim(0,1); ax.axis("off")
-    ax.add_patch(Circle((.12,.79),.075,fc=_light(COLORS["blue"],.72),ec=INK,lw=1.0)); ax.add_patch(Circle((.12,.83),.022,fc=COLORS["white"],ec=INK,lw=.8)); ax.plot([.12,.12],[.808,.74],color=INK,lw=1.0); ax.plot([.085,.155],[.77,.77],color=INK,lw=.9)
-    ax.text(.12,.66,"Same Patient",ha="center",fontsize=FONT["category"],weight="bold",color=INK)
-    x=np.linspace(.27,.88,150); y=.82+.018*np.sin(np.linspace(0,8*np.pi,150)); y[66:79]+=.045*np.sin(np.linspace(0,np.pi,13)); ax.plot(x,y,color=COLORS["blue_dark"],lw=1.8)
-    ax.text(.58,.91,"Disease Signal",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
-    times=np.array([.29,.37,.40,.52,.65,.68,.79,.86]); heights=np.array([.10,.06,.14,.08,.13,.05,.11,.07])
-    for xx,hh in zip(times,heights): ax.plot([xx,xx],[.58,.58+hh],color=COLORS["coral"],lw=2.6,solid_capstyle="round")
-    ax.plot([.27,.89],[.58,.58],color=INK,lw=.7); ax.text(.58,.48,"Observation Trace",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
-    for cx,label,fill in [(.34,"D",COLORS["blue_light"]),(.67,"F",COLORS["coral_light"])]: ax.add_patch(Ellipse((cx,.31),.25,.16,fc=_light(fill,.48),ec=INK,lw=.9)); ax.text(cx,.31,label,ha="center",va="center",fontsize=FONT["emphasis"],weight="bold",color=INK)
-    ax.annotate("",xy=(.525,.31),xytext=(.475,.31),arrowprops=dict(arrowstyle="-|>",lw=.9,color=INK))
-    ax.text(.50,.15,"ODI = AUROC(F) − AUROC(D)",ha="center",fontsize=FONT["milestone"],weight="bold",color=INK)
-    return fig
 
 
 def fig1b():
@@ -397,4 +375,4 @@ LEGEND_SPECS = {
 }
 
 
-BUILDERS={"fig1a":fig1a,"fig1b":fig1b,"fig1c":fig1c,"fig2a":fig2a,"fig2b":fig2b,"fig2c":fig2c,"fig3a":fig3a,"fig3b":fig3b,"fig3c":fig3c,"fig4a":fig4a,"fig4b":fig4b,"fig4c":fig4c,"fig5a":fig5a,"fig5b":fig5b,"fig5c":fig5c}
+BUILDERS={"fig1b":fig1b,"fig1c":fig1c,"fig2a":fig2a,"fig2b":fig2b,"fig2c":fig2c,"fig3a":fig3a,"fig3b":fig3b,"fig3c":fig3c,"fig4a":fig4a,"fig4b":fig4b,"fig4c":fig4c,"fig5a":fig5a,"fig5b":fig5b,"fig5c":fig5c}
