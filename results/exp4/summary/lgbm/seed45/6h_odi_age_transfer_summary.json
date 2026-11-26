@@ -1,7 +1,0 @@
-{
-  "escalation": {
-    "mimic_gap": 0.025973412775341265,
-    "eicu_gap": 0.03335064231902052,
-    "gap_change_on_transfer": 0.007377229543679253
-  }
-}

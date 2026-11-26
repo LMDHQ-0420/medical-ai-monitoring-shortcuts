@@ -9,9 +9,6 @@ __pycache__/
 .venv/
 .DS_Store
 
-# Local-only narrative report and its generator
-/results/result_report.md
-/scripts/generate_result_report.py
 # Local-only conceptual panel
 /fig/fig1a/
 

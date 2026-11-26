@@ -118,7 +118,7 @@ python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
 python fig/pnas_plots.py      # Fig. 1–5 和扩展图，PDF/PNG
 ```
 
-绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，图件保存于 `fig/`。`results/` 是历史结果，不作为正式绘图输入。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
+绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，图件保存于 `fig/`。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
 ---
 
@@ -126,7 +126,7 @@ python fig/pnas_plots.py      # Fig. 1–5 和扩展图，PDF/PNG
 
 `src/data/` 负责队列与真实逐小时序列，`src/models/` 保存模型实现，`src/exp1/` 至 `src/exp5/` 分别保存五个实验的方法。原有 `scripts/build_cohort.py` 与 `scripts/exp1_train_grid.py` 至 `scripts/exp5_external_validation.py` 是正式入口。五个实验复用实验 1 保存的模型；D、O、D+T、F 四组权重只保存一份。GRU-seq 单独运行和汇总。
 
-`data/raw/` 与 `data/processed/` 保存输入及处理数据。`results/exp1` 至 `results/exp5` 为历史结果，保留供对照。当前正式结果直接在 `outputs/`：
+`data/raw/` 与 `data/processed/` 保存输入及处理数据。当前正式结果直接在 `outputs/`：
 
 ```text
 outputs/
