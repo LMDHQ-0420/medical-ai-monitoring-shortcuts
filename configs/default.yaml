@@ -14,14 +14,6 @@ tasks:
 training:
   seed: 42
   train_val_test_split: [0.7, 0.1, 0.2]
-  gru_seq:
-    hidden_size: 64
-    num_layers: 1
-    dropout: 0.0
-    lr: 0.001
-    batch_size: 256
-    max_epochs: 30
-    patience: 5
   xgboost:
     n_estimators: 500
     max_depth: 6

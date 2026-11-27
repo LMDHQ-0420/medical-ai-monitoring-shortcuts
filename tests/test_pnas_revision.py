@@ -1,13 +1,10 @@
-"""本轮时间边界、患者配对和序列权限的回归检查。"""
+"""本轮时间边界、患者配对的回归检查。"""
 import numpy as np
 import pandas as pd
 import pytest
-import torch
 
 from src.data.treatment_events import output_rows
-from src.exp1.sequence_trainer import channels
 from src.data.transforms import split_cohort
-from src.models.gru_seq_model import GRUSequenceModel
 
 
 def test_patient_split_ignores_input_order():
@@ -32,34 +29,6 @@ def test_treatment_after_cutoff_does_not_change_input():
     assert before.loc[1,'antibiotics_24h']==1
 
 
-def test_sequence_groups_and_future_event_boundary():
-    values=np.full((3,6,2),np.nan,dtype=np.float32)
-    counts=np.zeros((3,6,2),dtype=np.uint16)
-    treatment=np.zeros((3,6,3),dtype=np.uint8)
-    values[0,0,0]=10;counts[0,0,0]=1
-    values[1,1,1]=20;counts[1,1,1]=1
-    values[2,2,0]=30;counts[2,2,0]=1
-    base,_=channels(values,counts,treatment,np.array([0,1,2]),3)
-    future_values=values.copy();future_counts=counts.copy();future_t=treatment.copy()
-    future_values[0,5,0]=900;future_counts[0,5,0]=1;future_t[0,5,0]=1
-    after,_=channels(future_values,future_counts,future_t,np.array([0,1,2]),3)
-    for group in base:np.testing.assert_array_equal(base[group],after[group])
-    assert base['D'].shape==(3,3,2)
-    assert base['O'].shape==(3,3,6)
-    assert base['DT'].shape==(3,3,5)
-    assert base['F'].shape==(3,3,11)
-    np.testing.assert_array_equal(base['D'],base['DT'][:,:,:2])
-    np.testing.assert_array_equal(base['D'],base['F'][:,:,:2])
-    assert np.all(base['DT'][:,:,2:]==0)
-
-
-def test_gru_rejects_single_step_and_2d():
-    model=GRUSequenceModel(2,0)
-    with pytest.raises(ValueError):model(torch.ones(2,2))
-    with pytest.raises(ValueError):model(torch.ones(2,1,2))
-    assert model(torch.ones(2,3,2),torch.zeros(2,0)).shape==(2,)
-
-
 def test_treatment_group_excludes_observation_order():
     from src.data.feature_groups import MIXED_FEATURES,OBSERVATION_FEATURES
     assert 'blood_culture_sent_24h' not in MIXED_FEATURES
@@ -73,13 +42,6 @@ def test_active_d_excludes_whole_stay_fields():
                'dx_infection','dx_cardiovascular','dx_respiratory','dx_renal','dx_other'}
     assert uncertain.isdisjoint(DISEASE_FEATURES)
     assert {'age','gender','admission_source','temp_first','creatinine_first'}.issubset(DISEASE_FEATURES)
-
-
-def test_old_single_step_gru_is_retired():
-    from src.models.train_utils import create_and_fit
-    x=np.zeros((4,2),dtype=np.float32);y=np.array([0,1,0,1])
-    with pytest.raises(ValueError,match='真实序列'):
-        create_and_fit('gru',{},x,y,x,y)
 
 
 def test_smoke_and_formal_paths_and_wrong_sample_cache():
@@ -97,3 +59,12 @@ def test_smoke_and_formal_paths_and_wrong_sample_cache():
     assert not paired_cache_matches(saved.iloc[::-1],expected,manifest,'icu_mortality')
     wrong=saved.copy();wrong.loc[1,'y_true']=0
     assert not paired_cache_matches(wrong,expected,manifest,'icu_mortality')
+
+
+def test_tabular_input_validation():
+    from src.models.train_utils import create_and_fit
+    x=np.zeros((4,2),dtype=np.float32);y=np.array([0,1,0,1])
+    with pytest.raises(ValueError,match='不属于五种表格模型'):
+        create_and_fit('unknown',{},x,y,x,y)
+    with pytest.raises(ValueError,match='二维'):
+        create_and_fit('lr',{},x[:,None,:],y,x,y)

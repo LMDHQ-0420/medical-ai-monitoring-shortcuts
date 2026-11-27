@@ -4,7 +4,7 @@
   "scope_zh": "本论文及图件的统一显示术语；用于绘图和写作，不修改内部数据键或实验定义。",
   "rules_zh": [
     "同一研究概念只使用一个固定名称。图内普通标签各词首字母大写；正文按句式调整大小写，不另换近义词。",
-    "ICU、AKI、ODI、AUROC、LR、RF、MLP、GRU等缩写保持全大写；XGBoost、LightGBM、MIMIC-IV、eICU保留专有拼写。",
+    "ICU、AKI、ODI、AUROC、LR、RF、MLP等缩写保持全大写；XGBoost、LightGBM、MIMIC-IV、eICU保留专有拼写。",
     "缩写第一次出现时可解释全称；deterioration和escalation第一次出现时给出研究中的操作性定义，随后统一用固定名称。",
     "名称统一只针对本研究的任务和对象，不全局替换引用文献标题或介绍他人研究时的原始术语。",
     "Raw只用于原始ODI的计算口径；Original Set只用于原测试集。二者不是同义标签。",
@@ -216,18 +216,6 @@
         "prose": "MLP",
         "first_mention": "multilayer perceptron (MLP)"
       }
-    ],
-    "extension": [
-      {
-        "key": "gru_seq",
-        "figure": "GRU",
-        "prose": "GRU",
-        "first_mention": "gated recurrent unit (GRU)",
-        "note_zh": "真实小时序列扩展，单列呈现，不混入五模型主汇总。"
-      }
-    ],
-    "excluded_legacy_keys": [
-      "gru"
     ]
   },
   "axes_and_strata": [
@@ -394,7 +382,7 @@
     "正文和图注已按完整模型名称修订；最终图片由当前绘图流程使用本规范生成。较长名称按figure_lines换行，不压缩为新造代号。"
   ],
   "abbreviation_policy_zh": {
-    "专业缩写": "使用该领域已有的通用专业缩写，保留其惯用字母数和拼写，例如LR、RF、ICU、AKI、AUROC、MLP和GRU。",
+    "专业缩写": "使用该领域已有的通用专业缩写，保留其惯用字母数和拼写，例如LR、RF、ICU、AKI、AUROC、MLP。",
     "无通用缩写": "使用完整名称，不为压缩版面而另造缩写。",
     "必须自定义": "仅在确有必要时使用三个字母，首次出现解释全称；本轮不新增模型或特征组缩写。",
     "本研究指标": "ODI是本研究定义的三字母指标，首次出现写observation dependence index (ODI)，不称其为通行专业缩写。",

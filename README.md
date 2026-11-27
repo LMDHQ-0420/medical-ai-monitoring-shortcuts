@@ -20,15 +20,7 @@ Five experiments (exp1–exp5) test this metric's magnitude, robustness, and fai
 conda create -n medical-ai-monitoring-shortcuts python=3.10 -y
 conda activate medical-ai-monitoring-shortcuts
 
-# Install PyTorch (adjust CUDA version as needed)
-# CUDA 11.8:
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-# CUDA 12.1:
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-# CPU only:
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-# Install remaining dependencies
+# Install dependencies
 # Run from the repository root
 pip install -r requirements.txt
 ```
@@ -100,7 +92,7 @@ python scripts/build_cohort.py --dataset eicu
 
 ### 正式实验
 
-所有命令从 `code/` 运行。五模型主分析与 GRU-seq 在实验 1 拟合 D、O、D+T、F，实验 2–5 复用相同的正式权重。
+所有命令从 `code/` 运行。五模型主分析在实验 1 拟合 D、O、D+T、F，实验 2–5 复用相同的正式权重。
 
 ```bash
 python scripts/exp1_train_grid.py
@@ -119,7 +111,7 @@ python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
 
 独立图例导出需要 Ghostscript（`gs`），用于裁剪 PDF/SVG 的画布边界。
 
-Git 已包含五个实验的汇总结果、GRU 汇总、匹配平衡表及分析协议，可直接用于重新绘图。模型权重、预处理器、患者级预测和匹配明细仅保存在本地；汇总表中的 `prediction_file` 是对应的本地引用。Fig. 2 包含 A–D 四个面板，Fig. 1–3 的 B/C 文件名和绘图入口已按最终顺序统一。
+Git 已包含五个实验的汇总结果、匹配平衡表及分析协议，可直接用于重新绘图。模型权重、预处理器、患者级预测和匹配明细仅保存在本地；汇总表中的 `prediction_file` 是对应的本地引用。Fig. 2 包含 A–D 四个面板，Fig. 1–3 的 B/C 文件名和绘图入口已按最终顺序统一。
 
 绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，最终图件保存在 `fig/fig1b/`、`fig/fig1c/` 至 `fig/fig5c/` 等分面板目录中。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
@@ -127,7 +119,7 @@ Git 已包含五个实验的汇总结果、GRU 汇总、匹配平衡表及分析
 
 ## 项目目录
 
-`src/data/` 负责队列与真实逐小时序列，`src/models/` 保存模型实现，`src/exp1/` 至 `src/exp5/` 分别保存五个实验的方法。原有 `scripts/build_cohort.py` 与 `scripts/exp1_train_grid.py` 至 `scripts/exp5_external_validation.py` 是正式入口。五个实验复用实验 1 保存的模型；D、O、D+T、F 四组权重只保存一份。GRU-seq 单独运行和汇总。
+`src/data/` 负责队列与特征处理，`src/models/` 保存模型实现，`src/exp1/` 至 `src/exp5/` 分别保存五个实验的方法。原有 `scripts/build_cohort.py` 与 `scripts/exp1_train_grid.py` 至 `scripts/exp5_external_validation.py` 是正式入口。五个实验复用实验 1 保存的模型；D、O、D+T、F 四组权重只保存一份。
 
 `data/raw/` 与 `data/processed/` 保存输入及处理数据。当前正式结果直接在 `outputs/`：
 
@@ -135,8 +127,7 @@ Git 已包含五个实验的汇总结果、GRU 汇总、匹配平衡表及分析
 outputs/
 ├── analysis_protocol.json
 ├── models/
-│   ├── tabular/{task}/{model}/seed{seed}/{window}h/
-│   └── gru_seq/{task}/seed{seed}/{window}h/
+│   └── tabular/{task}/{model}/seed{seed}/{window}h/
 ├── exp1/    # 主模型比较
 ├── exp2/    # 截点前临床状态匹配与情境分层
 ├── exp3/    # 共享完整模型的治疗重分组

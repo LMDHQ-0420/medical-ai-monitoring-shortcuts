@@ -36,11 +36,8 @@
     "lgbm",
     "mlp"
   ],
-  "sequence_extension": "gru_seq",
   "expected_tabular_seed_grid": 625,
   "expected_tabular_aggregated_grid": 125,
-  "expected_sequence_seed_grid": 125,
-  "expected_sequence_aggregated_grid": 25,
   "groups": {
     "D": "14 first measured vital/lab values within the prediction window plus age, gender, admission_source",
     "O": "OBSERVATION_FEATURES (includes blood-culture observation)",

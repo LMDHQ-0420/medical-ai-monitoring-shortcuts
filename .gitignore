@@ -15,9 +15,7 @@ __pycache__/
 !/outputs/exp[1-5]/
 /outputs/exp[1-5]/*
 !/outputs/exp[1-5]/results.csv.gz
-!/outputs/exp[1-5]/gru_seq.csv.gz
 !/outputs/exp1/paired_intervals.csv.gz
-!/outputs/exp1/gru_seq_intervals.csv.gz
 !/outputs/exp2/balance.csv
 !/outputs/exp2/context.csv.gz
 !/outputs/exp2/diagnosis.csv.gz
