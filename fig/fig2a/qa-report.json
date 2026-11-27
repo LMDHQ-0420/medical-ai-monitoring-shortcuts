@@ -1,0 +1,65 @@
+{
+  "figure_id": "fig2a",
+  "generated_formats": [
+    "pdf",
+    "svg",
+    "png"
+  ],
+  "dimensions_mm": {
+    "width": 90,
+    "height": 86
+  },
+  "png": {
+    "dpi": 500,
+    "width_px": 1771,
+    "height_px": 1692
+  },
+  "source_rows": 750,
+  "checks": {
+    "files": "pass",
+    "dimensions": "pass",
+    "font": "pass",
+    "color": "pass",
+    "data_scope": "pass",
+    "visual_preview": "manual-pass",
+    "write_boundary": "pass",
+    "text_clipping": "pass",
+    "reference_style": "pass",
+    "data_mapping": "pass",
+    "paired_bar_contact": "pass",
+    "bar_outlines_removed": "pass"
+  },
+  "exceptions": [
+    "Retained the existing fig/style.py palette at user request."
+  ],
+  "style_audit": {
+    "references": "Shared Arial, palette and axis style; Fig. 4A stacked layout where applicable",
+    "font": "Arial; ticks 5.8 pt; axis labels 8.5 pt bold; task labels 6.3 pt bold",
+    "frame": "0.78 pt, #4F5660, same as fig4a",
+    "data_scope": "unchanged; plot style only",
+    "visible_text_outside_canvas": [],
+    "palette": {
+      "blue": "#3264B0",
+      "orange": "#E08B2C"
+    },
+    "color_source": "Exact existing color_registry.json values, no added lightening; legend matches bars",
+    "bars": "Adjacent paired bars with zero outline width"
+  },
+  "expression": "Paired horizontal bars: median absolute SMD before/after matching",
+  "legend_audit": {
+    "labels": [
+      "Before Matching",
+      "After Matching"
+    ],
+    "colors": [
+      "#3264b0",
+      "#e08b2c"
+    ],
+    "matches_plot": "pass",
+    "svg_and_pdf_labels": "pass",
+    "png_colors": "pass",
+    "no_outer_white_border": "pass",
+    "arial": "pass",
+    "all_three_formats": "pass"
+  }
+}

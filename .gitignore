@@ -9,5 +9,16 @@ __pycache__/
 .venv/
 .DS_Store
 
-# 本地正式实验产物（患者级预测与模型权重不入 Git）
-/outputs/
+# 仅发布可复现图件的汇总结果；模型、患者级预测和匹配明细保留本地。
+/outputs/*
+!/outputs/analysis_protocol.json
+!/outputs/exp[1-5]/
+/outputs/exp[1-5]/*
+!/outputs/exp[1-5]/results.csv.gz
+!/outputs/exp[1-5]/gru_seq.csv.gz
+!/outputs/exp1/paired_intervals.csv.gz
+!/outputs/exp1/gru_seq_intervals.csv.gz
+!/outputs/exp2/balance.csv
+!/outputs/exp2/context.csv.gz
+!/outputs/exp2/diagnosis.csv.gz
+!/outputs/exp2/matching_protocol.json

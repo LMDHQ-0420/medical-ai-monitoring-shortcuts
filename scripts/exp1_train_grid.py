@@ -9,6 +9,7 @@ ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT))
 from src.exp1.trainer import MODELS,TASKS,WINDOWS,SEEDS,run_cell
 from src.exp1.sequence_trainer import run as run_sequence
+from src.utils.logger import experiment_log
 
 
 def main():
@@ -35,8 +36,11 @@ def main():
         for model in models:
             for window in windows:
                 for seed in seeds:
-                    if model=='gru_seq':run_sequence(root,task,window,seed)
-                    else:run_cell(root,task,model,window,seed,smoke=args.smoke_test)
+                    name=f'{task}_{model}_seed{seed}_{window}h'
+                    if args.smoke_test:name='smoke_'+name
+                    with experiment_log('exp1',name,detail=f'output_root={root}'):
+                        if model=='gru_seq':run_sequence(root,task,window,seed)
+                        else:run_cell(root,task,model,window,seed,smoke=args.smoke_test)
 
 
 if __name__=='__main__':main()

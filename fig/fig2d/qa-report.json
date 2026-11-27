@@ -1,0 +1,42 @@
+{
+  "figure_id": "fig2d",
+  "generated_formats": [
+    "pdf",
+    "svg",
+    "png"
+  ],
+  "dimensions_mm": {
+    "width": 90,
+    "height": 86
+  },
+  "png": {
+    "dpi": 500,
+    "width_px": 1771,
+    "height_px": 1692
+  },
+  "source_rows": 2500,
+  "checks": {
+    "files": "pass",
+    "dimensions": "pass",
+    "font": "pass",
+    "color": "manual-pass",
+    "data_scope": "pass",
+    "visual_preview": "manual-pass",
+    "write_boundary": "pass",
+    "text_clipping": "pass",
+    "reference_style": "pass",
+    "data_mapping": "pass"
+  },
+  "exceptions": [
+    "Retained the existing fig/style.py palette at user request."
+  ],
+  "style_audit": {
+    "references": "Shared Arial, palette and axis style; Fig. 4A stacked layout where applicable",
+    "font": "Arial; ticks 5.8 pt; axis labels 8.5 pt bold; task labels 6.3 pt bold",
+    "frame": "0.78 pt, #4F5660, same as fig4a",
+    "title": "left aligned at (0.04, 0.96), no white background",
+    "box": "Same fill as Fig. 1C; thinner 0.35 pt box edge at user request",
+    "data_scope": "unchanged; plot style only",
+    "visible_text_outside_canvas": []
+  }
+}

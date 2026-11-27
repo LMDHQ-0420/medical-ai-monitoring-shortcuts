@@ -10,6 +10,7 @@ from src.exp2.diagnosis_timing import build as build_diagnosis
 from src.exp2.matching import run as match_test
 from src.exp2.evaluate import run as evaluate_test
 from src.exp2.diagnosis_strata import run as evaluate_diagnosis
+from src.utils.logger import experiment_log
 
 
 def main():
@@ -19,11 +20,16 @@ def main():
     p.add_argument('--bootstrap',type=int,default=200)
     a=p.parse_args()
     root=a.output_root.resolve()
-    if a.stage in ('prepare','all'):
-        build_clinical_state();build_diagnosis()
-    if a.stage in ('match','all'):match_test(root)
-    if a.stage in ('evaluate','all'):evaluate_test(root,a.bootstrap)
-    if a.stage in ('diagnosis','all'):evaluate_diagnosis(root)
+    stages={
+        'prepare':lambda:(build_clinical_state(),build_diagnosis()),
+        'match':lambda:match_test(root),
+        'evaluate':lambda:evaluate_test(root,a.bootstrap),
+        'diagnosis':lambda:evaluate_diagnosis(root),
+    }
+    for stage,run in stages.items():
+        if a.stage in (stage,'all'):
+            with experiment_log('exp2',stage,detail=f'output_root={root}'):
+                run()
 
 
 if __name__=='__main__':main()

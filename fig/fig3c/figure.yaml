@@ -1,7 +1,7 @@
 id: fig3c
 canvas:
-  width_mm: 84
-  height_mm: 58
+  width_mm: 190
+  height_mm: 80
 formats:
 - pdf
 - svg
@@ -9,15 +9,15 @@ formats:
 png_dpi: 500
 title: none
 panel_label: none
-kind: task-wise AUROC-change sina distributions
-legend: none
+kind: task-faceted model boxplots with prediction-window medians
+legend: separate frameless files
 heatmap: false
 data_policy: stored result files only; five seeds averaged only where explicitly stated;
   missing values preserved
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: Reference Gain，即AUROC(Clinical State And Treatment Model)−AUROC(Clinical State Model)。
-y_axis: 五个预测任务；每行密度抖动圆点对应一项任务，纵向抖动没有数值含义。
-aggregation: 每行保留5个模型×5个时间窗×5个seed的125个结果，不先平均。每个圆点是一个配置结果；灰色横线表示四分位范围，黑色竖线表示中位数。
+x_axis: 五种表格模型；五种颜色的圆点表示五个预测时间窗。
+y_axis: Reference Gain，即AUROC(Clinical State And Treatment Model)−AUROC(Clinical State Model)；每个任务独立缩放纵轴。
+aggregation: 每个箱体保留5个时间窗×5个seed的25个结果；圆点是固定模型和时间窗下5个seed的中位数。纵轴按箱线须的可见范围缩放，避免极端值造成无效留白。
 caption_en: Reference Gain = AUROC(Clinical State And Treatment Model) − AUROC(Clinical State Model).

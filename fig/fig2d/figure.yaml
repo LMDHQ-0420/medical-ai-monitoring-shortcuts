@@ -1,0 +1,16 @@
+id: fig2d
+canvas: {width_mm: 90, height_mm: 86}
+formats: [pdf, svg, png]
+png_dpi: 500
+title: none
+panel_label: none
+kind: horizontal boxplot
+data_source: outputs/exp2/context.csv.gz
+aggregation: 各任务×入院情境保留5模型×5窗口×5种子共125个配置；箱为四分位距，须为1.5倍四分位距内的值，外点单独显示。
+x_axis: Residual ODI; each outcome uses its own range
+y_axis: Admission Context
+legend: none
+style: Arial; existing fig/style.py palette at user request
+exceptions:
+  - 用户明确要求延续项目现有图件的配色，因此使用 fig/style.py 的命名色，而非技能内置调色板。
+style_reference: Fig. 1C box fill; 0.35 pt box edge at user request; Fig. 4A task-label style; additional spacing for per-row x ticks

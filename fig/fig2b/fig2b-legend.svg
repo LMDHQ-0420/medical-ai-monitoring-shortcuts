@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T21:07:24.032757</dc:date>
+    <dc:date>2026-11-27T13:26:15.904346</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -36,7 +36,7 @@ L 77.563124 12.837973
 L 77.563124 8.777973
 L 69.82979 8.777973
 z
-" style="fill: #e6928d"/>
+" style="fill: #e08b2c"/>
    </g>
    <g id="text_1">
     <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="80.753124" y="12.837973" transform="rotate(-0 80.753124 12.837973)">Raw ODI</text>
@@ -47,7 +47,7 @@ L 119.261801 12.837973
 L 119.261801 8.777973
 L 111.528467 8.777973
 z
-" style="fill: #7a9acc"/>
+" style="fill: #178c8c"/>
    </g>
    <g id="text_2">
     <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="122.451801" y="12.837973" transform="rotate(-0 122.451801 12.837973)">Residual ODI</text>

@@ -6,3 +6,5 @@ sys.path.insert(0, str(ROOT))
 from figures import BUILDERS, LEGEND_SPECS
 from style import export, legend_figure
 export(BUILDERS["fig2c"](), Path(__file__).resolve().parent, "fig2c")
+ls=LEGEND_SPECS["fig2c"]
+export(legend_figure(ls["handles"],ls["width"],ls["height"],ls["ncol"]), Path(__file__).resolve().parent, "fig2c-legend")

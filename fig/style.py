@@ -171,6 +171,11 @@ def export(fig, outdir: Path, stem: str, dpi: int = 500):
         return
     for ext in ("pdf", "svg"):
         fig.savefig(outdir / f"{stem}.{ext}", bbox_inches=None, pad_inches=0)
+    svg_path = outdir / f"{stem}.svg"
+    svg_path.write_text(
+        "\n".join(line.rstrip() for line in svg_path.read_text().splitlines()) + "\n",
+        encoding="utf-8",
+    )
     fig.savefig(outdir / f"{stem}.png", dpi=dpi, bbox_inches=None, pad_inches=0)
     plt.close(fig)
 

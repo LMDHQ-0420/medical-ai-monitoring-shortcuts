@@ -114,10 +114,12 @@ python scripts/exp4_age_odi_transfer.py
 ### 图件
 
 ```bash
-python fig/build_delivery.py  # 14 个独立面板与图例，PDF/SVG/PNG
+python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
 ```
 
 独立图例导出需要 Ghostscript（`gs`），用于裁剪 PDF/SVG 的画布边界。
+
+Git 已包含五个实验的汇总结果、GRU 汇总、匹配平衡表及分析协议，可直接用于重新绘图。模型权重、预处理器、患者级预测和匹配明细仅保存在本地；汇总表中的 `prediction_file` 是对应的本地引用。Fig. 2 包含 A–D 四个面板，Fig. 1–3 的 B/C 文件名和绘图入口已按最终顺序统一。
 
 绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，最终图件保存在 `fig/fig1b/`、`fig/fig1c/` 至 `fig/fig5c/` 等分面板目录中。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
 
@@ -143,3 +145,9 @@ outputs/
 ```
 
 每个正式格点保留四组权重、必要预处理、完整内部测试预测及 `manifest.json`。`outputs/` 不保存绘图代码、生成图件、ZIP、日志或中间 bootstrap 缓存。论文 `docs/manuscripts/` 保持原稿，`fig/` 已按新结果重新生成。正式结果入口为 `outputs/exp1/` 至 `outputs/exp5/`，共享权重与患者级预测位于 `outputs/models/`。
+
+### 运行日志
+
+五个实验的日志统一放在 `logs/exp1/` 至 `logs/exp5/`，由正式入口自动记录命令、代码提交与源文件指纹、终端输出及完成状态。同一格点或阶段再次执行会覆盖原日志；不同格点使用独立文件，smoke 日志带 `smoke_` 前缀。exp4 和 exp5 共用一次评估，对应日志在两个实验目录各保存一份。强制终止的日志可能没有结束标记，不应视为完成。
+
+旧实现的日志已清除；此前正式结果缺少可核实的运行日志，不追补或伪造。日志不上传 Git。Smoke 数据位于 `data/processed/smoke/`，smoke 模型位于 `outputs/smoke/models/`，不与日志或正式模型混放。

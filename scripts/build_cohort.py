@@ -31,7 +31,7 @@ def main() -> None:
     with open(args.config) as f:
         cfg = yaml.safe_load(f)
 
-    output_dir = Path(args.output_dir or ("logs/smoke_cohort" if args.smoke_test else "data/processed"))
+    output_dir = Path(args.output_dir or ("data/processed/smoke" if args.smoke_test else "data/processed"))
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if args.dataset in ("mimic", "both"):

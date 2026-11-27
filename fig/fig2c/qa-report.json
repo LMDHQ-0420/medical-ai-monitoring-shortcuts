@@ -1,0 +1,58 @@
+{
+  "figure_id": "fig2c",
+  "generated_formats": [
+    "pdf",
+    "svg",
+    "png"
+  ],
+  "dimensions_mm": {
+    "width": 100,
+    "height": 86
+  },
+  "png": {
+    "dpi": 500,
+    "width_px": 1968,
+    "height_px": 1692
+  },
+  "source_rows": 625,
+  "checks": {
+    "files": "pass",
+    "dimensions": "pass",
+    "font": "pass",
+    "color": "manual-pass",
+    "data_scope": "pass",
+    "visual_preview": "manual-pass",
+    "write_boundary": "pass",
+    "text_clipping": "pass",
+    "reference_style": "pass",
+    "panel_numbering": "pass"
+  },
+  "exceptions": [
+    "Retained the existing fig/style.py palette at user request."
+  ],
+  "style_audit": {
+    "references": "Fig. 4A stacked layout, unoutlined violin fill and cross summary",
+    "font": "Arial; ticks 5.8 pt; axis labels 8.5 pt bold; task labels 6.3 pt bold",
+    "frame": "0.78 pt, #4F5660, same as fig4a",
+    "title": "left aligned at (0.04, 0.96), no white background",
+    "violin": "same cross summary and no outline as fig4a",
+    "data_scope": "unchanged; plot style only",
+    "visible_text_outside_canvas": []
+  },
+  "legend_audit": {
+    "labels": [
+      "Original Set",
+      "Matched Set"
+    ],
+    "colors": [
+      "#4aa5a5",
+      "#e7a55a"
+    ],
+    "matches_plot": "pass",
+    "svg_and_pdf_labels": "pass",
+    "png_colors": "pass",
+    "no_outer_white_border": "pass",
+    "arial": "pass",
+    "all_three_formats": "pass"
+  }
+}

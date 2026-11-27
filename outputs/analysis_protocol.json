@@ -1,0 +1,103 @@
+{
+  "protocol_id": "pnas-revision-20261125",
+  "source_commit": "97a70410c5ad0b7ae1627901d61696a779073d06",
+  "dataset_versions": {
+    "mimic_iv": "2.2",
+    "eicu_crd": "2.0"
+  },
+  "tasks": [
+    "icu_mortality",
+    "inhosp_mortality",
+    "aki",
+    "sepsis_deterioration",
+    "escalation"
+  ],
+  "display_names": {
+    "sepsis_deterioration": "Deterioration"
+  },
+  "windows_h": [
+    3,
+    6,
+    12,
+    18,
+    24
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "tabular_models": [
+    "lr",
+    "rf",
+    "xgb",
+    "lgbm",
+    "mlp"
+  ],
+  "sequence_extension": "gru_seq",
+  "expected_tabular_seed_grid": 625,
+  "expected_tabular_aggregated_grid": 125,
+  "expected_sequence_seed_grid": 125,
+  "expected_sequence_aggregated_grid": 25,
+  "groups": {
+    "D": "14 first measured vital/lab values within the prediction window plus age, gender, admission_source",
+    "O": "OBSERVATION_FEATURES (includes blood-culture observation)",
+    "T": "antibiotics_24h, vasopressors_24h, mechanical_ventilation_24h",
+    "F": "D+O+T",
+    "DT": "D+T"
+  },
+  "estimands": {
+    "odi_raw": "AUROC(F)-AUROC(D)",
+    "odi_residual": "AUROC(F)-AUROC(D+T)",
+    "reference_gain": "AUROC(D+T)-AUROC(D)",
+    "identity": "odi_raw-odi_residual=reference_gain"
+  },
+  "split": {
+    "unit": "subject_id",
+    "ratios": [
+      0.7,
+      0.1,
+      0.2
+    ],
+    "order_rule": "sort unique patient keys before seeded permutation",
+    "shared_within_grid": true
+  },
+  "preprocessing": {
+    "fit_on": "train only",
+    "common_numeric_channels": "same fitted train statistics across D/DT/F",
+    "time_cutoff": "strictly before window end",
+    "tabular_temperature": "temp_first 80–115 F converted to Celsius in both cohorts"
+  },
+  "inference": {
+    "paired_auc": "same patients and bootstrap indices for each contrast",
+    "bootstrap_unit": "patient",
+    "external_cluster": "hospital; seeds and tasks are repeated measures",
+    "aggregate_order": "seed-level metrics, then configuration-level summary",
+    "smoke_excluded": true
+  },
+  "scientific_definition_pending": [
+    "MIMIC/eICU deterioration harmonization",
+    "MIMIC/eICU AKI window harmonization",
+    "MIMIC/eICU escalation window harmonization",
+    "death outcome risk set at each landmark",
+    "severity/comorbidity availability at landmark"
+  ],
+  "historical_results_policy": "read-only, never counted as formal rerun",
+  "grouping_correction": "blood_culture_sent_24h excluded from T because it is a test/observation event and duplicates has_blood_culture_24h in O",
+  "excluded_from_active_D": [
+    "sofa_score",
+    "has_diabetes",
+    "has_ckd",
+    "has_heart_failure",
+    "has_copd",
+    "has_cancer",
+    "dx_infection",
+    "dx_cardiovascular",
+    "dx_respiratory",
+    "dx_renal",
+    "dx_other"
+  ],
+  "availability_correction": "Whole-stay SOFA proxy, diagnoses and comorbidities lack reliable pre-landmark availability; retained in parquet for audit but excluded from active predictive features"
+}

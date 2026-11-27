@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="113.32799699999998pt" height="6.354000000000001pt" viewBox="57.887998 7.701164999999998 113.32799699999998 6.354000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="108.29087999999999pt" height="5.454000000000001pt" viewBox="59.055115 8.601164999999998 108.29087999999999 5.454000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T21:07:23.349051</dc:date>
+    <dc:date>2026-11-27T13:22:49.073102</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -30,42 +30,27 @@ z
 " style="fill: none"/>
   </g>
   <g id="legend_1">
-   <g id="line2d_1">
-    <defs>
-     <path id="mdd83b8f0b6" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
+   <g id="patch_2">
+    <path d="M 59.025931 12.839333
+L 66.759264 12.839333
+L 66.759264 8.779333
+L 59.025931 8.779333
 z
-" style="stroke: #3264b0"/>
-    </defs>
-    <g>
-     <use xlink:href="#mdd83b8f0b6" x="60.959264" y="10.809333" style="fill: #3264b0; stroke: #3264b0"/>
-    </g>
+" style="fill: #3264b0"/>
    </g>
    <g id="text_1">
     <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="69.949264" y="12.839333" transform="rotate(-0 69.949264 12.839333)">Before Matching</text>
    </g>
-   <g id="line2d_2">
-    <defs>
-     <path id="m9c95d5f3c7" d="M -2.6 2.6
-L 2.6 2.6
-L 2.6 -2.6
-L -2.6 -2.6
+   <g id="patch_3">
+    <path d="M 119.430514 12.839333
+L 127.163848 12.839333
+L 127.163848 8.779333
+L 119.430514 8.779333
 z
-" style="stroke: #e08b2c; stroke-linejoin: miter"/>
-    </defs>
-    <g>
-     <use xlink:href="#m9c95d5f3c7" x="125.230514" y="10.809333" style="fill: #e08b2c; stroke: #e08b2c; stroke-linejoin: miter"/>
-    </g>
+" style="fill: #e08b2c"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="134.220514" y="12.839333" transform="rotate(-0 134.220514 12.839333)">After Matching</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="130.353848" y="12.839333" transform="rotate(-0 130.353848 12.839333)">After Matching</text>
    </g>
   </g>
  </g>

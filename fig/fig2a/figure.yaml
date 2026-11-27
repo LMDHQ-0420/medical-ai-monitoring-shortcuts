@@ -1,23 +1,22 @@
 id: fig2a
-canvas:
-  width_mm: 190
-  height_mm: 80
-formats:
-- pdf
-- svg
-- png
+canvas: {width_mm: 90, height_mm: 86}
+formats: [pdf, svg, png]
 png_dpi: 500
 title: none
 panel_label: none
-kind: clinical-state matching balance chart
+kind: grouped horizontal bars
+data_source: outputs/exp2/balance.csv
+aggregation: 对25个窗口×种子匹配集合的每项协变量，分别计算匹配前后绝对SMD的中位数。
+x_axis: Absolute SMD
+y_axis: 截点前临床状态协变量及其测量指示
+reference_line: Absolute SMD = 0.1
 legend: separate frameless files
-heatmap: false
-data_policy: stored result files only; five seeds averaged only where explicitly stated;
-  missing values preserved
-legend_frame: none
-tick_guide_lines: forbidden
-all_text_color: black
-x_axis: 截点前临床状态协变量的标准化差异绝对值中位数；虚线标记0.1。
-y_axis: 年龄、性别、入院背景、常规生命体征及缺失指示。
-aggregation: 每项协变量在五个窗口和五个种子上的匹配前、匹配后绝对标准化差异分别取中位数。
-caption_en: Points show median Absolute SMD across 25 window-by-seed matching sets; the dashed line marks 0.1.
+style: Arial; existing fig/style.py palette at user request
+exceptions:
+  - 用户明确要求延续项目现有图件的配色，因此使用 fig/style.py 的命名色，而非技能内置调色板。
+style_reference: Shared font/axis style; paired bars using the existing blue/orange palette
+semantic_colors:
+  Before Matching: blue
+  After Matching: orange
+color_treatment: existing palette colors at full strength, no added lightening
+bar_style: adjacent paired bars with no gap and no outline

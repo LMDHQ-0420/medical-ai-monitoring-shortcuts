@@ -1,30 +1,53 @@
+version: 1
+units: mm
+size_source: full-width 190 mm reference and approved two-by-two arrangement
+rows:
+- id: fig2_row1
+  target_width: 190
+  target_height: 86
+  horizontal_gaps:
+  - 0
+  figures:
+  - fig2a
+  - fig2b
+- id: fig2_row2
+  target_width: 190
+  target_height: 86
+  horizontal_gaps:
+  - 0
+  figures:
+  - fig2c
+  - fig2d
 canvas_width_mm: 190
 interpanel_gap_mm: 0
 panels:
   fig1b:
-    width_mm: 190
-    height_mm: 80
-  fig1c:
     width_mm: 110
     height_mm: 64
-  fig2a:
+  fig1c:
     width_mm: 190
     height_mm: 80
+  fig2a:
+    width_mm: 90
+    height_mm: 86
   fig2b:
-    width_mm: 96
-    height_mm: 110
+    width_mm: 100
+    height_mm: 86
   fig2c:
-    width_mm: 94
-    height_mm: 110
+    width_mm: 100
+    height_mm: 86
+  fig2d:
+    width_mm: 90
+    height_mm: 86
   fig3a:
     width_mm: 106
     height_mm: 58
   fig3b:
-    width_mm: 190
-    height_mm: 80
-  fig3c:
     width_mm: 84
     height_mm: 58
+  fig3c:
+    width_mm: 190
+    height_mm: 80
   fig4a:
     width_mm: 102
     height_mm: 86
@@ -45,16 +68,17 @@ panels:
     height_mm: 84
 composition:
   fig1:
-  - - fig1c
   - - fig1b
+  - - fig1c
   fig2:
   - - fig2a
-  - - fig2b
-    - fig2c
+    - fig2b
+  - - fig2c
+    - fig2d
   fig3:
   - - fig3a
-    - fig3c
-  - - fig3b
+    - fig3b
+  - - fig3c
   fig4:
   - - fig4a
     - fig4b
@@ -64,10 +88,26 @@ composition:
     - fig5c
   - - fig5b
 row_width_checks_mm:
-  fig2_row2: 96 + 94 = 190
+  fig2_row1: 90 + 100 = 190
+  fig2_row2: 100 + 90 = 190
   fig3_row1: 106 + 84 = 190
   fig4_row1: 102 + 88 = 190
   fig5_row1: 84 + 106 = 190
   full_width_rows: '190'
 heatmap_panels: []
 legend_policy: all legends exported separately from data panels
+fig2_design:
+  row1:
+  - fig2a
+  - fig2b
+  row2:
+  - fig2c
+  - fig2d
+  data_sources:
+  - outputs/exp2/balance.csv
+  - outputs/exp2/results.csv.gz
+  - outputs/exp2/context.csv.gz
+  statistical_unit: model-window-seed configuration; matching balance uses window-seed
+    matching sets
+  size_source: user-approved 2x2 arrangement and 190 mm full-width reference
+  palette_exception: existing fig/style.py colors retained at user request

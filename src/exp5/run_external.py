@@ -7,6 +7,7 @@ import pandas as pd
 from src.exp1.trainer import MODELS,TASKS,WINDOWS,SEEDS
 from src.exp5.external_validation import run as evaluate_tabular
 from src.exp5.sequence_validation import run as evaluate_sequence
+from src.utils.logger import experiment_log
 
 DERIVED=('age_metrics.csv','external_hospital_metrics.csv','external_predictions.csv.gz',
          'hospital_metrics.csv','postprocess_manifest.json')
@@ -36,18 +37,20 @@ def run_experiment(root:Path,task:str|None,model:str|None,window:int|None,seed:i
     windows=(window,) if window else WINDOWS
     seeds=(seed,) if seed is not None else SEEDS
     for t,m,w,s in itertools.product(tasks,models,windows,seeds):
-        if m=='gru_seq':evaluate_sequence(root,t,w,s)
-        else:evaluate_tabular(root,t,m,w,s)
+        with experiment_log(('exp4','exp5'),f'{t}_{m}_seed{s}_{w}h',detail=f'output_root={root}; shared_age_external_evaluation=True'):
+            if m=='gru_seq':evaluate_sequence(root,t,w,s)
+            else:evaluate_tabular(root,t,m,w,s)
     # 指定单格时只保存该格中间结果，避免用局部结果覆盖完整正式表。
     if any(value is not None for value in (task,model,window,seed)):
         print('单格已完成；完整五模型与 GRU 网格完成后再汇总 exp4/exp5')
         return
-    for kind in ('exp4','exp5'):
-        out=root/kind;out.mkdir(parents=True,exist_ok=True)
-        collect(root,kind,False).to_csv(out/'results.csv.gz',index=False,compression='gzip')
-        collect(root,kind,True).to_csv(out/'gru_seq.csv.gz',index=False,compression='gzip')
-    for path in (root/'models').rglob('*'):
-        if path.is_file() and path.name in DERIVED:path.unlink()
+    with experiment_log(('exp4','exp5'),'summary',detail=f'output_root={root}'):
+        for kind in ('exp4','exp5'):
+            out=root/kind;out.mkdir(parents=True,exist_ok=True)
+            collect(root,kind,False).to_csv(out/'results.csv.gz',index=False,compression='gzip')
+            collect(root,kind,True).to_csv(out/'gru_seq.csv.gz',index=False,compression='gzip')
+        for path in (root/'models').rglob('*'):
+            if path.is_file() and path.name in DERIVED:path.unlink()
 
 
 def main():

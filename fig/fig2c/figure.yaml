@@ -1,23 +1,16 @@
 id: fig2c
-canvas:
-  width_mm: 94
-  height_mm: 110
-formats:
-- pdf
-- svg
-- png
+canvas: {width_mm: 100, height_mm: 86}
+formats: [pdf, svg, png]
 png_dpi: 500
 title: none
 panel_label: none
-kind: admission-context treatment-adjusted gain dots
-legend: none
-heatmap: false
-data_policy: stored result files only; five seeds averaged only where explicitly stated;
-  missing values preserved
-legend_frame: none
-tick_guide_lines: forbidden
-all_text_color: black
-x_axis: 截点前可知的入院背景或医疗情境，非最终住院诊断。
-y_axis: 五个预测任务。
-aggregation: 对每个任务和入院情境的有效模型、窗口、种子结果计算Residual ODI均值；颜色表示方向，点面积表示绝对值。
-caption_en: Bubble area represents absolute mean Residual ODI within each Admission Context; color indicates its sign.
+kind: split half-violin
+data_source: outputs/exp2/results.csv.gz
+aggregation: 各任务×窗口的两半分别保留5模型×5种子共25个配置；内部十字纵线为四分位范围，横线为中位数，与Fig. 4A一致。
+x_axis: Window (h)
+y_axis: Residual ODI
+legend: Original Set versus Matched Set; separate frameless files
+style: Arial; existing fig/style.py palette at user request
+exceptions:
+  - 用户明确要求延续项目现有图件的配色，因此使用 fig/style.py 的命名色，而非技能内置调色板。
+style_reference: Fig. 4A stacked layout, unoutlined violin fill and cross summary

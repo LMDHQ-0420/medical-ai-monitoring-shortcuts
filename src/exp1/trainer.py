@@ -44,7 +44,7 @@ def atomic_json(path,obj):
 
 
 def cell_path(run_dir,task,model,window,seed,smoke=False):
-    return (run_dir.parent/'logs/smoke' if smoke else run_dir/'models')/'tabular'/task/model/f'seed{seed}'/f'{window}h'
+    return (run_dir/'smoke/models' if smoke else run_dir/'models')/'tabular'/task/model/f'seed{seed}'/f'{window}h'
 
 def paired_cache_matches(saved,expected,manifest,task):
     labels=expected[task].astype(int).to_numpy()

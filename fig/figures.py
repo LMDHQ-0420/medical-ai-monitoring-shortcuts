@@ -1,4 +1,4 @@
-"""Fourteen publication panels with consistent manuscript terminology."""
+"""论文图件及独立图例，共享配色、字体和显示术语。"""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle, Patch
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-from matplotlib.ticker import PercentFormatter
+from matplotlib.ticker import MaxNLocator, PercentFormatter
 import numpy as np
 import pandas as pd
 
@@ -154,7 +154,7 @@ def _light(color,amount=.68):
     rgb=np.array(mcolors.to_rgb(color)); return tuple(rgb+(1-rgb)*amount)
 
 
-def fig1b():
+def fig1c():
     d=rd.exp1(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.32); axes=[]; xs=np.arange(len(rd.MODEL_KEYS))
     for i,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].odi.to_numpy() for m in rd.MODEL_KEYS]
@@ -169,7 +169,7 @@ def fig1b():
     return fig
 
 
-def fig1c():
+def fig1b():
     d=rd.exp1(); fig=figure(110,64); ax=fig.add_axes([.11,.18,.88,.80])
     groups=[("disease",COLORS["blue"]),("observation",COLORS["orange"]),("mixed",COLORS["teal"])]
     offsets=[-.22,0,.22]
@@ -184,68 +184,107 @@ def fig1c():
 
 
 def fig2a():
-    # 同一批截点前临床状态协变量，比较匹配前后的标准化差异。
+    # 25 个匹配集合分别计算平衡，再对每项协变量取中位数。
     b=rd.balance().copy(); b["abs_smd"]=b.smd.abs()
     summary=b.groupby(["covariate","stage"]).abs_smd.median().unstack()
     summary=summary.dropna(subset=["before","after"]).sort_values("before")
-    fig=figure(190,80); ax=fig.add_axes([.28,.16,.69,.80]); ys=np.arange(len(summary))
-    ax.plot(summary.before,ys,"o",ms=3.6,color=COLORS["blue"])
-    ax.plot(summary.after,ys,"s",ms=3.6,color=COLORS["orange"])
-    for y,before,after in zip(ys,summary.before,summary.after):
-        ax.plot([before,after],[y,y],color=COLORS["gray_light"],lw=.7,zorder=0)
-    ax.axvline(.1,color=ZERO,ls=(0,(3,2)),lw=.65)
+    fig=figure(90,86); ax=fig.add_axes([.46,.11,.53,.88]); ys=np.arange(len(summary))
+    ax.barh(ys+.15,summary.before,height=.30,color=COLORS["blue"],
+            edgecolor="none",linewidth=0,zorder=2)
+    ax.barh(ys-.15,summary.after,height=.30,color=COLORS["orange"],
+            edgecolor="none",linewidth=0,zorder=2)
+    ax.axvline(.1,color=ZERO,ls=(0,(3,2)),lw=.65,zorder=0)
     ax.set_yticks(ys,[BALANCE_LABELS[c] for c in summary.index]); ax.set_ylim(-.5,len(ys)-.5)
-    ax.set_xlabel(TERMS["absolute_smd"] + "\nMedian Across Matching Sets",fontweight="bold")
+    ax.set_xlim(0,max(.47,float(summary.before.max())*1.05))
+    ax.set_xlabel(TERMS["absolute_smd"],fontweight="bold",labelpad=2)
+    ax.tick_params(axis="both",pad=1.3)
     clean_axis(ax); return fig
-
-
-def fig2b():
-    # D、D+T、F 均为原测试集已冻结模型；箱体汇集五模型、窗口和种子。
-    d,_=rd.exp2(); fig=figure(190,80)
-    gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34)
-    axes=[]; xs=np.arange(2)
-    for i,task in enumerate(rd.TASKS):
-        ax=fig.add_subplot(gs[0,i]); axes.append(ax); st=d[d.task==task]
-        raw=[st.odi_raw_original.dropna().to_numpy(),st.odi_raw_matched.dropna().to_numpy()]
-        residual=[st.odi_residual_original.dropna().to_numpy(),st.odi_residual_matched.dropna().to_numpy()]
-        for x,(rv,tv) in enumerate(zip(raw,residual)):
-            _box_v(ax,x-.13,rv,_light(COLORS["coral"],.35),.22)
-            _box_v(ax,x+.13,tv,_light(COLORS["blue"],.35),.22)
-        values=np.concatenate(raw+residual); pad=max(np.ptp(values)*.08,.005)
-        ax.set_xlim(-.48,1.48); ax.set_ylim(values.min()-pad,values.max()+pad)
-        ax.set_xticks(xs,[TERMS["original"],TERMS["matched"]],rotation=25,ha="right")
-        ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",
-                fontsize=FONT["category"],weight="bold",color=INK)
-        clean_axis(ax)
-    _zero_if_all(axes,"horizontal",.65)
-    axes[0].set_ylabel("ODI",fontweight="bold")
-    fig.text(.53,.045,"Test Set",
-             ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
-    return fig
 
 
 def fig2c():
-    _,d=rd.exp2()
-    # 类别取自正式分层表；优先顺序只控制排版，不过滤新增类别。
-    priority={"Emergency":0,"Transfer":1,"Elective/procedure":2}
-    order=sorted(d.stratum.dropna().unique(),key=lambda value:(priority.get(value,3),value))
-    values=d.groupby(["task","stratum"]).odi_residual.mean().unstack().reindex(index=rd.TASKS,columns=order)
-    fig=figure(106,84); ax=fig.add_axes([.18,.24,.78,.71]); xs=np.arange(len(order)); ys=np.arange(5)
-    lim=max(abs(np.nanmin(values.to_numpy())),abs(np.nanmax(values.to_numpy())),.01)
-    for yi,task in enumerate(rd.TASKS):
-        for xi,stratum in enumerate(order):
-            value=values.loc[task,stratum]
-            if np.isfinite(value):
-                color=COLORS["teal"] if value>=0 else COLORS["coral"]
-                ax.scatter(xi,yi,s=max(abs(value)/lim*360,12),color=_light(color,.25),
-                           edgecolor=color,lw=.6)
-    ax.set_xlim(-.5,len(order)-.5); ax.set_ylim(4.5,-.5)
-    ax.set_xticks(xs,[value.title() for value in order],rotation=35,ha="right"); ax.set_yticks(ys,rd.TASK_LABELS)
-    ax.set_xlabel(TERMS["admission_context"],fontweight="bold")
-    clean_axis(ax); return fig
+    # 每个半小提琴包含同一任务和窗口的 5 模型 × 5 种子配置。
+    d,_=rd.exp2(); fig=figure(100,86)
+    gs=fig.add_gridspec(5,1,left=.13,right=.99,bottom=.11,top=.99,hspace=.18)
+    xs=np.arange(5)
+    for i,task in enumerate(rd.TASKS):
+        ax=fig.add_subplot(gs[i]); st=d[d.task==task]; values=[]
+        for x,w in zip(xs,rd.WINDOWS):
+            sw=st[st.window==w]
+            original=sw.odi_residual_original.to_numpy(); matched=sw.odi_residual_matched.to_numpy()
+            values.extend(original); values.extend(matched)
+            _violin_v(ax,x,original,COLORS["teal"],.33,"left",summary="cross")
+            _violin_v(ax,x,matched,COLORS["orange"],.33,"right",summary="cross")
+        span=np.ptp(values); lower=max(span*.06,.004); upper=max(span*.28,.010)
+        ax.set_xlim(-.42,4.42); ax.set_ylim(min(values)-lower,max(values)+upper)
+        ax.set_xticks(xs,[f"{w} h" for w in rd.WINDOWS] if i==4 else [])
+        ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",
+                fontsize=FONT["milestone"],weight="bold",color=INK)
+        ax.tick_params(axis="x",length=0,pad=1.3); ax.tick_params(axis="y",pad=1.3)
+        clean_axis(ax)
+    fig.text(.018,.55,TERMS["residual_odi"],rotation=90,ha="center",va="center",
+             fontsize=FONT["axis"],weight="bold",color=INK)
+    fig.text(.555,.012,TERMS["window"],ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    return fig
 
 
-def fig3c():
+def fig2b():
+    # 柱高为匹配测试集的配置中位数，须线为描述性 10–90% 分位范围。
+    d,_=rd.exp2(); fig=figure(100,86)
+    gs=fig.add_gridspec(5,1,left=.13,right=.99,bottom=.11,top=.99,hspace=.18)
+    xs=np.arange(len(rd.WINDOWS))
+    for i,task in enumerate(rd.TASKS):
+        ax=fig.add_subplot(gs[i]); st=d[d.task==task]; all_values=[0.]
+        for offset,column,color in [(-.14,"odi_raw_matched",COLORS["orange"]),
+                                    (.14,"odi_residual_matched",COLORS["teal"])]:
+            summaries=np.asarray([_summary(st.loc[st.window==w,column]) for w in rd.WINDOWS])
+            all_values.extend(summaries[:,[0,4]].ravel())
+            ax.bar(xs+offset,summaries[:,2],width=.28,color=color,
+                   edgecolor="none",linewidth=0,zorder=2)
+            ax.errorbar(xs+offset,summaries[:,2],
+                        yerr=np.vstack([summaries[:,2]-summaries[:,0],
+                                        summaries[:,4]-summaries[:,2]]),
+                        fmt="none",ecolor=INK,elinewidth=.60,capsize=1.4,capthick=.60,zorder=3)
+        span=np.ptp(all_values); lower=max(span*.06,.004); upper=max(span*.28,.010)
+        ax.set_xlim(-.48,4.48); ax.set_ylim(min(all_values)-lower,max(all_values)+upper)
+        ax.axhline(0,color=ZERO,lw=.5,zorder=1)
+        ax.set_xticks(xs,[f"{w} h" for w in rd.WINDOWS] if i==4 else [])
+        ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",
+                fontsize=FONT["milestone"],weight="bold",color=INK)
+        ax.tick_params(axis="x",length=0,pad=1.3); ax.tick_params(axis="y",pad=1.3)
+        clean_axis(ax)
+    fig.text(.018,.55,"ODI",rotation=90,ha="center",va="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    fig.text(.555,.012,TERMS["window"],ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    return fig
+
+
+def fig2d():
+    # 截点前已知的入院情境；每个箱体包含 125 个模型、窗口和种子配置。
+    _,d=rd.exp2(); fig=figure(90,86)
+    gs=fig.add_gridspec(5,1,left=.40,right=.97,bottom=.11,top=.99,hspace=.34)
+    contexts=["Emergency","Transfer","Elective/procedure","Other/unknown"]
+    for i,task in enumerate(rd.TASKS):
+        ax=fig.add_subplot(gs[i]); st=d[d.task==task]
+        data=[st.loc[st.stratum==c,"odi_residual"].dropna().to_numpy() for c in contexts]
+        bp=ax.boxplot(data,vert=False,positions=np.arange(4),widths=.56,patch_artist=True,
+                      whis=1.5,showfliers=True,
+                      medianprops=dict(color=INK,lw=1.0),whiskerprops=dict(color=INK,lw=.65),
+                      capprops=dict(color=INK,lw=.65),flierprops=dict(marker="o",markersize=1.8,
+                      markerfacecolor=TC[task],markeredgecolor=COLORS["white"],markeredgewidth=.25))
+        for box in bp["boxes"]: box.set(fc=_light(TC[task],.38),ec=COLORS["gray"],lw=.35)
+        ax.set_yticks(range(4),["Emergency","Transfer","Elective/Procedure","Other/Unknown"]); ax.set_ylim(3.55,-1.35)
+        ax.axvline(0,color=ZERO,ls=(0,(3,2)),lw=.65,zorder=0)
+        local=np.concatenate(data); pad=max(np.ptp(local)*.06,.004)
+        ax.set_xlim(local.min()-pad,local.max()+pad)
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+        ax.text(.04,.96,TL[task],transform=ax.transAxes,ha="left",va="top",
+                fontsize=FONT["milestone"],weight="bold",color=INK)
+        ax.tick_params(axis="both",pad=1.3)
+        clean_axis(ax)
+    fig.text(.69,.012,TERMS["residual_odi"],ha="center",fontsize=FONT["axis"],weight="bold",color=INK)
+    return fig
+
+
+def fig3b():
     d=rd.exp3(); fig=figure(84,58); ax=fig.add_axes([.20,.18,.77,.80]); ys=np.arange(5)[::-1]
     allv=d.mixed_change.dropna().to_numpy(); lo,hi=np.quantile(allv,[.01,.99]); lim=max(abs(lo),abs(hi),.0025)*1.10
     for y,task in zip(ys,rd.TASKS):
@@ -265,7 +304,7 @@ def fig3a():
     return fig
 
 
-def fig3b():
+def fig3c():
     d=rd.exp3(); fig=figure(190,80); gs=fig.add_gridspec(1,5,left=.07,right=.995,bottom=.20,top=.97,wspace=.34); axes=[]; xs=np.arange(len(rd.MODEL_KEYS))
     for ti,task in enumerate(rd.TASKS):
         ax=fig.add_subplot(gs[0,ti]); axes.append(ax); st=d[d.task==task]; data=[st[st.model==m].mixed_change.to_numpy() for m in rd.MODEL_KEYS]
@@ -385,12 +424,13 @@ _fig5b_handles=[_fig5b_handles[i] for i in (0,3,1,4,2)]
 
 
 LEGEND_SPECS = {
-    "fig1b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
-    "fig1c": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=CONFIG_LABELS[k]) for c,k in [(COLORS["blue"],"clinical_state_model"),(COLORS["orange"],"observation_model"),(COLORS["teal"],"full_model")]],ncol=3,width=140,height=8),
-    "fig2a": dict(handles=[Line2D([],[],marker="o",ls="",ms=5.2,color=COLORS["blue"],label="Before Matching"),Line2D([],[],marker="s",ls="",ms=5.2,color=COLORS["orange"],label="After Matching")],ncol=2,width=80,height=8),
-    "fig2b": dict(handles=[Patch(fc=_light(COLORS["coral"],.35),ec="none",label=TERMS["raw_odi"]),Patch(fc=_light(COLORS["blue"],.35),ec="none",label=TERMS["residual_odi"])],ncol=2,width=80,height=8),
+    "fig1c": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
+    "fig1b": dict(handles=[Patch(fc=_light(c,.22),ec="none",label=CONFIG_LABELS[k]) for c,k in [(COLORS["blue"],"clinical_state_model"),(COLORS["orange"],"observation_model"),(COLORS["teal"],"full_model")]],ncol=3,width=140,height=8),
+    "fig2a": dict(handles=[Patch(fc=COLORS["blue"],ec="none",label="Before Matching"),Patch(fc=COLORS["orange"],ec="none",label="After Matching")],ncol=2,width=80,height=8),
+    "fig2c": dict(handles=[Patch(fc=_light(COLORS["teal"],.22),ec="none",label=TERMS["original"]),Patch(fc=_light(COLORS["orange"],.22),ec="none",label=TERMS["matched"])],ncol=2,width=80,height=8),
+    "fig2b": dict(handles=[Patch(fc=COLORS["orange"],ec="none",label=TERMS["raw_odi"]),Patch(fc=COLORS["teal"],ec="none",label=TERMS["residual_odi"])],ncol=2,width=80,height=8),
     "fig3a": dict(handles=[Patch(fc=_light(COLORS["coral"],.22),ec="none",label=TERMS["raw_odi"]),Patch(fc=_light(COLORS["blue"],.22),ec="none",label=TERMS["residual_odi"])],ncol=2,width=62,height=8),
-    "fig3b": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
+    "fig3c": dict(handles=_point_handles([f"{w} h" for w in rd.WINDOWS],TASK_COLORS),ncol=5,width=58,height=8),
     "fig4a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC-IV Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External")],ncol=2,width=62,height=8),
     "fig4c": dict(handles=_point_handles(rd.MODEL_LABELS,MODEL_COLORS),ncol=len(rd.MODEL_KEYS),width=92,height=8),
     "fig5a": dict(handles=[Patch(fc=_light(COLORS["blue"],.22),ec="none",label="MIMIC-IV Internal"),Patch(fc=_light(COLORS["coral"],.22),ec="none",label="eICU External (Hospital Median)")],ncol=2,width=120,height=8),
@@ -399,4 +439,4 @@ LEGEND_SPECS = {
 }
 
 
-BUILDERS={"fig1b":fig1b,"fig1c":fig1c,"fig2a":fig2a,"fig2b":fig2b,"fig2c":fig2c,"fig3a":fig3a,"fig3b":fig3b,"fig3c":fig3c,"fig4a":fig4a,"fig4b":fig4b,"fig4c":fig4c,"fig5a":fig5a,"fig5b":fig5b,"fig5c":fig5c}
+BUILDERS={"fig1b":fig1b,"fig1c":fig1c,"fig2a":fig2a,"fig2b":fig2b,"fig2c":fig2c,"fig2d":fig2d,"fig3a":fig3a,"fig3b":fig3b,"fig3c":fig3c,"fig4a":fig4a,"fig4b":fig4b,"fig4c":fig4c,"fig5a":fig5a,"fig5b":fig5b,"fig5c":fig5c}

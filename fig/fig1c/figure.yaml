@@ -1,7 +1,7 @@
 id: fig1c
 canvas:
-  width_mm: 110
-  height_mm: 64
+  width_mm: 190
+  height_mm: 80
 formats:
 - pdf
 - svg
@@ -9,7 +9,7 @@ formats:
 png_dpi: 500
 title: none
 panel_label: none
-kind: grouped feature-view AUROC violins
+kind: task-faceted model boxplots with prediction-window medians
 legend: separate frameless files
 heatmap: false
 data_policy: stored result files only; five seeds averaged only where explicitly stated;
@@ -17,6 +17,6 @@ data_policy: stored result files only; five seeds averaged only where explicitly
 legend_frame: none
 tick_guide_lines: forbidden
 all_text_color: black
-x_axis: 五个预测任务；每个任务内并列三种输入视野。
-y_axis: 原始AUROC，越高表示区分阳性与阴性患者的能力越强。
-aggregation: 每把小提琴保留5个模型×5个时间窗×5个seed的125个AUROC。时间窗和seed均不预先求平均；贯穿全宽的黑线是中位数，两条较细灰线分别是第25%和第75%分位。
+x_axis: 五种表格模型：LR、RF、XGBoost、LightGBM和MLP。
+y_axis: Raw ODI（原始ODI），即加入观察信息后AUROC增加了多少。五个任务各自使用独立纵轴范围。
+aggregation: 箱体保留5个时间窗×5个seed的25个原始ODI，不先平均；每个彩色圆点是相应时间窗5个seed的中位数。

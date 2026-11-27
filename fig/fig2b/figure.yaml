@@ -1,22 +1,21 @@
 id: fig2b
-canvas:
-  width_mm: 96
-  height_mm: 110
-formats:
-- pdf
-- svg
-- png
+canvas: {width_mm: 100, height_mm: 86}
+formats: [pdf, svg, png]
 png_dpi: 500
 title: none
 panel_label: none
-kind: frozen-model original and matched cohort boxplots
-legend: separate frameless files
-heatmap: false
-data_policy: stored result files only; five seeds averaged only where explicitly stated;
-  missing values preserved
-legend_frame: none
-tick_guide_lines: forbidden
-all_text_color: black
-x_axis: Original Set（原测试集）与Matched Set（匹配测试子集）；每组左侧为Raw ODI，右侧为Residual ODI。
-y_axis: ODI；五个任务各自使用独立纵轴范围。
-aggregation: 每个箱体保留5个模型×5个时间窗×5个seed的125个固定模型结果；箱线表示10%和90%分位，中心线为中位数。
+kind: grouped median bars with descriptive quantile whiskers
+data_source: outputs/exp2/results.csv.gz
+aggregation: 匹配测试集各任务×窗口的25个配置的中位数柱高和10–90%分位须线；须线不是置信区间，各纵轴均包含零。
+x_axis: Window (h)
+y_axis: ODI
+legend: Raw ODI versus Residual ODI; separate frameless files
+style: Arial; existing fig/style.py palette at user request
+exceptions:
+  - 用户明确要求延续项目现有图件的配色，因此使用 fig/style.py 的命名色，而非技能内置调色板。
+style_reference: Fig. 4A stacked layout; grouped bars with the existing orange/teal palette
+semantic_colors:
+  Raw ODI: orange
+  Residual ODI: teal
+color_treatment: existing palette colors at full strength, no added lightening
+bar_style: adjacent paired bars with no gap and no outline

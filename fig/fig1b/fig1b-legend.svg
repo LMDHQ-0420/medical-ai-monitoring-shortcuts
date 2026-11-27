@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="149.28053400000002pt" height="5.219999999999999pt" viewBox="8.975461 8.205165 149.28053400000002 5.219999999999999" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="173.429994pt" height="4.302000000000001pt" viewBox="111.527997 8.601164999999998 173.429994 4.302000000000001" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-26T21:07:21.849081</dc:date>
+    <dc:date>2026-11-26T21:07:22.599447</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -22,118 +22,46 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 22.677165
-L 164.409449 22.677165
-L 164.409449 0
+L 396.850394 22.677165
+L 396.850394 0
 L 0 0
 L 0 22.677165
 z
 " style="fill: none"/>
   </g>
   <g id="legend_1">
-   <g id="line2d_1">
-    <defs>
-     <path id="m6f7e4d1581" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
+   <g id="patch_2">
+    <path d="M 111.448306 12.837973
+L 119.18164 12.837973
+L 119.18164 8.777973
+L 111.448306 8.777973
 z
-" style="stroke: #ffffff; stroke-width: 0.45"/>
-    </defs>
-    <g>
-     <use xlink:href="#m6f7e4d1581" x="11.536709" y="10.807973" style="fill: #3264b0; stroke: #ffffff; stroke-width: 0.45"/>
-    </g>
+" style="fill: #5f86c1"/>
    </g>
    <g id="text_1">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="20.526709" y="12.837973" transform="rotate(-0 20.526709 12.837973)">3 h</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="122.37164" y="12.837973" transform="rotate(-0 122.37164 12.837973)">Clinical State Model</text>
    </g>
-   <g id="line2d_2">
-    <defs>
-     <path id="m711dda8355" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
+   <g id="patch_3">
+    <path d="M 180.876421 12.837973
+L 188.609754 12.837973
+L 188.609754 8.777973
+L 180.876421 8.777973
 z
-" style="stroke: #ffffff; stroke-width: 0.45"/>
-    </defs>
-    <g>
-     <use xlink:href="#m711dda8355" x="41.638709" y="10.807973" style="fill: #d9574f; stroke: #ffffff; stroke-width: 0.45"/>
-    </g>
+" style="fill: #e7a55a"/>
    </g>
    <g id="text_2">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="50.628709" y="12.837973" transform="rotate(-0 50.628709 12.837973)">6 h</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="191.799754" y="12.837973" transform="rotate(-0 191.799754 12.837973)">Observation Model</text>
    </g>
-   <g id="line2d_3">
-    <defs>
-     <path id="m575e3bb07c" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
+   <g id="patch_4">
+    <path d="M 247.726254 12.837973
+L 255.459587 12.837973
+L 255.459587 8.777973
+L 247.726254 8.777973
 z
-" style="stroke: #ffffff; stroke-width: 0.45"/>
-    </defs>
-    <g>
-     <use xlink:href="#m575e3bb07c" x="71.740709" y="10.807973" style="fill: #178c8c; stroke: #ffffff; stroke-width: 0.45"/>
-    </g>
+" style="fill: #4aa5a5"/>
    </g>
    <g id="text_3">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="80.730709" y="12.837973" transform="rotate(-0 80.730709 12.837973)">12 h</text>
-   </g>
-   <g id="line2d_4">
-    <defs>
-     <path id="mf8c9d8fa66" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
-z
-" style="stroke: #ffffff; stroke-width: 0.45"/>
-    </defs>
-    <g>
-     <use xlink:href="#mf8c9d8fa66" x="105.068053" y="10.807973" style="fill: #e08b2c; stroke: #ffffff; stroke-width: 0.45"/>
-    </g>
-   </g>
-   <g id="text_4">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="114.058053" y="12.837973" transform="rotate(-0 114.058053 12.837973)">18 h</text>
-   </g>
-   <g id="line2d_5">
-    <defs>
-     <path id="mf700570bf9" d="M 0 2.6
-C 0.689528 2.6 1.350908 2.326048 1.838478 1.838478
-C 2.326048 1.350908 2.6 0.689528 2.6 0
-C 2.6 -0.689528 2.326048 -1.350908 1.838478 -1.838478
-C 1.350908 -2.326048 0.689528 -2.6 0 -2.6
-C -0.689528 -2.6 -1.350908 -2.326048 -1.838478 -1.838478
-C -2.326048 -1.350908 -2.6 -0.689528 -2.6 0
-C -2.6 0.689528 -2.326048 1.350908 -1.838478 1.838478
-C -1.350908 2.326048 -0.689528 2.6 0 2.6
-z
-" style="stroke: #ffffff; stroke-width: 0.45"/>
-    </defs>
-    <g>
-     <use xlink:href="#mf700570bf9" x="138.395396" y="10.807973" style="fill: #7651b5; stroke: #ffffff; stroke-width: 0.45"/>
-    </g>
-   </g>
-   <g id="text_5">
-    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="147.385396" y="12.837973" transform="rotate(-0 147.385396 12.837973)">24 h</text>
+    <text style="fill: #111111; font: 5.8px 'Arial'; text-anchor: start" x="258.649587" y="12.837973" transform="rotate(-0 258.649587 12.837973)">Full Model</text>
    </g>
   </g>
  </g>
