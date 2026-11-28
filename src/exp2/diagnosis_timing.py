@@ -18,8 +18,8 @@ CATEGORIES = {
 }
 
 
-def read_events() -> pd.DataFrame:
-    ids = set(pd.read_parquet(ROOT / "data/processed/eicu_24h.parquet", columns=["stay_id"]).stay_id)
+def read_events(data_root: Path) -> pd.DataFrame:
+    ids = set(pd.read_parquet(data_root / "eicu_3h.parquet", columns=["stay_id"]).stay_id)
     pieces = []
     for name, offset, text_cols in (
         ("diagnosis", "diagnosisoffset", ["diagnosisstring"]),
@@ -42,9 +42,8 @@ def read_events() -> pd.DataFrame:
     return pd.concat(pieces, ignore_index=True)
 
 
-def build() -> None:
-    events = read_events()
-    ids = pd.read_parquet(ROOT / "data/processed/eicu_24h.parquet", columns=["stay_id"])
+def build(data_root: Path) -> None:
+    events = read_events(data_root)
     outputs = []
     for window in (3, 6, 12, 18, 24):
         d = events.loc[events.entry_offset_min.lt(window * 60)].copy()
@@ -53,6 +52,7 @@ def build() -> None:
         counts = grouped.agg(n_recorded=("entry_offset_min", "size"),
                              first_entry_offset_min=("entry_offset_min", "min"),
                              last_entry_offset_min=("entry_offset_min", "max")).reset_index()
+        ids = pd.read_parquet(data_root / f"eicu_{window}h.parquet", columns=["stay_id"])
         frame = ids.merge(flags, on="stay_id", how="left", validate="one_to_one")
         frame = frame.merge(counts, on="stay_id", how="left", validate="one_to_one")
         frame["n_recorded"] = frame.n_recorded.fillna(0).astype(int)
@@ -64,7 +64,7 @@ def build() -> None:
         outputs.append(frame)
         print(window, "recorded", int((~frame.not_recorded).sum()), "unrecorded", int(frame.not_recorded.sum()), flush=True)
     out = pd.concat(outputs, ignore_index=True)
-    path = ROOT / "data/processed/eicu_fig2_diagnosis.parquet"
+    path = data_root / "eicu_diagnosis_timing.parquet"
     tmp = path.with_suffix(".tmp.parquet")
     out.to_parquet(tmp, index=False)
     tmp.replace(path)
@@ -75,6 +75,6 @@ def build() -> None:
               "categories": CATEGORIES, "rows": len(out),
               "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
               "overlap": "named categories are multi-label and can overlap"}
-    (ROOT / "data/processed/eicu_fig2_diagnosis_manifest.json").write_text(
+    (data_root / "eicu_diagnosis_timing_manifest.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print("complete", len(out), flush=True)

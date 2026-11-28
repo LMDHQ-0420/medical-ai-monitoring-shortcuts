@@ -1,0 +1,91 @@
+{
+  "protocol_id": "landmark-v2-20261128",
+  "endpoint_version": "landmark-endpoints-v2",
+  "analysis_id": "paired-gain-bootstrap-v2-1000",
+  "datasets": {
+    "internal": "MIMIC-IV 2.2",
+    "external": "eICU-CRD 2.0"
+  },
+  "index_stay": "MIMIC: first ICU intime per subject_id; eICU: minimum unitvisitnumber, then patientunitstayid per uniquepid; cross-admission chronology uncertain",
+  "risk_set": "adult age >=18, still alive and in ICU at each strict prediction cutoff; ICU outtime or unitdischargeoffset must exceed cutoff",
+  "death_time": "MIMIC admissions.deathtime exact timestamp; patients.dod is date-only and cannot set ICU death hour; eICU unit and hospital discharge status with discharge offsets",
+  "input_availability": {
+    "mimic_chart_and_lab": "measurement charttime >= ICU admission and max(charttime,storetime) < cutoff; missing storetime excluded",
+    "mimic_input_and_procedure": "starttime >= ICU admission and storetime < cutoff",
+    "mimic_prescriptions": "prescriptions.starttime and linked poe.ordertime both < cutoff; missing POE link excluded",
+    "eicu_vitals": "observationoffset in [0,cutoff); no separate entry timestamp in source",
+    "eicu_lab": "labresultoffset >=0 and max(labresultoffset,labresultrevisedoffset) < cutoff",
+    "eicu_medication": "drugorderoffset and drugstartoffset both before cutoff"
+  },
+  "endpoints": {
+    "icu_mortality": "ICU death after cutoff and on or before ICU outtime; exact deathtime required in MIMIC",
+    "inhosp_mortality": "hospital death after cutoff and before hospital discharge; exact MIMIC deathtime or eICU discharge status/offset",
+    "aki": "creatinine rise >=0.3 mg/dL or >=1.5x last available pre-cutoff creatinine within next 48h; no qualifying follow-up -> unknown",
+    "sepsis_deterioration": "operational Deterioration: GCS drop >=3 or MAP crossing from median >=70 to min <65 in next 24h (MIMIC); eICU MAP-only exploratory",
+    "escalation": "new vasopressor or invasive ventilation indicator within next 24h; incomplete negative follow-up -> unknown"
+  },
+  "external_primary_tasks": [
+    "icu_mortality",
+    "inhosp_mortality"
+  ],
+  "external_exploratory_tasks": [
+    "aki",
+    "sepsis_deterioration",
+    "escalation"
+  ],
+  "split": {
+    "version": "legacy-preserving-hash-v1",
+    "unit": "subject_id",
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "legacy": "preserve deterministic 70/10/20 assignment among original cohort; new patient SHA256(version|seed|ID) quantiles 0.7/0.8"
+  },
+  "models": [
+    "lr",
+    "rf",
+    "xgb",
+    "lgbm",
+    "mlp"
+  ],
+  "windows_h": [
+    3,
+    6,
+    12,
+    18,
+    24
+  ],
+  "predictor_sets": [
+    "clinical_state",
+    "observation",
+    "clinical_state_treatment",
+    "full_model"
+  ],
+  "gains": {
+    "observation_gain": "AUROC(full_model)-AUROC(clinical_state_treatment)",
+    "treatment_gain": "AUROC(clinical_state_treatment)-AUROC(clinical_state)",
+    "combined_gain": "AUROC(full_model)-AUROC(clinical_state)",
+    "brier_improvement": "Brier(clinical_state_treatment)-Brier(full_model)"
+  },
+  "n_bootstrap": 1000,
+  "bootstrap_unit": "patient; matched analysis samples pairs; hospital summary samples hospitals",
+  "probability_analysis": {
+    "task": "inhosp_mortality",
+    "window_h": 24,
+    "models": [
+      "lr",
+      "lgbm"
+    ],
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ]
+  }
+}

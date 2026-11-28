@@ -14,7 +14,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[2]
-from src.data.transforms import split_cohort
+from src.formal.splits import split_frame
 from src.data.feature_groups import OBSERVATION_FEATURES
 from src.exp2.oii import OIIScaler
 
@@ -100,17 +100,17 @@ def pair(frame: pd.DataFrame, caliper_sd: float, age_limit: float, train_logit_s
     return pd.DataFrame(pairs)
 
 
-def run(run_dir: Path) -> None:
-    state = pd.read_parquet(ROOT / "data/processed/mimic_iv_fig2_clinical_state.parquet")
+def run(run_dir: Path, data_root: Path, registry: pd.DataFrame) -> None:
+    state = pd.read_parquet(data_root / "mimic_iv_clinical_state.parquet")
     diagnostics, all_pairs, thresholds = [], [], []
     for window in (3, 6, 12, 18, 24):
-        cohort = pd.read_parquet(ROOT / f"data/processed/mimic_iv_{window}h.parquet")
+        cohort = pd.read_parquet(data_root / f"mimic_iv_{window}h.parquet")
         st = state.loc[state.window_h.eq(window)].drop(columns="window_h")
         cohort = cohort.merge(st, on="stay_id", how="left", validate="one_to_one")
         if cohort.prediction_cutoff.isna().any():
             raise ValueError(f"{window}h 临床状态未覆盖完整队列")
         for seed in (42, 43, 44, 45, 46):
-            train, _, test = split_cohort(cohort, seed=seed)
+            train, _, test = split_frame(cohort, registry, seed=seed)
             # 用训练集分位点限制显然不合理的生命体征极端值；缺失仍保留并另设指示。
             clipping = {}
             for vital in VITALS:
@@ -184,6 +184,6 @@ def run(run_dir: Path) -> None:
     if pairs.duplicated(["window_h", "seed", "high_stay_id"]).any() or pairs.duplicated(["window_h", "seed", "low_stay_id"]).any():
         raise ValueError("重复匹配患者")
     pairs.to_csv(out / "matched_pairs.csv.gz", index=False, compression="gzip")
-    pd.DataFrame(diagnostics).to_csv(out / "balance_diagnostics.csv", index=False)
+    pd.DataFrame(diagnostics).to_csv(out / "balance.csv", index=False)
     pd.DataFrame(thresholds).to_json(out / "matching_protocol.json", orient="records", indent=2)
     print("total pairs", len(pairs), flush=True)

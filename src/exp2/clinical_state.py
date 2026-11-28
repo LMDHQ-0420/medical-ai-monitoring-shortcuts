@@ -25,6 +25,8 @@ ID_TO_NAME = {item: name for name, ids in VITAL_IDS.items() for item in ids}
 def extract_one(arg: tuple[int, pd.Timestamp]) -> list[dict]:
     stay_id, intime = arg
     path = ROOT / "data/processed/cache/chartevents" / f"{stay_id}.parquet"
+    if not path.exists():
+        path = ROOT / "data/processed/cache_landmark_short/chartevents" / f"{stay_id}.parquet"
     events = pd.DataFrame()
     if path.exists():
         table = pq.read_table(path, columns=["itemid", "charttime", "storetime", "valuenum"])
@@ -34,7 +36,7 @@ def extract_one(arg: tuple[int, pd.Timestamp]) -> list[dict]:
     if not events.empty:
         events["charttime"] = pd.to_datetime(events.charttime, errors="coerce", format="mixed")
         events["storetime"] = pd.to_datetime(events.storetime, errors="coerce", format="mixed")
-        events["available_time"] = events[["charttime", "storetime"]].max(axis=1)
+        events["available_time"] = events[["charttime", "storetime"]].max(axis=1).where(events.storetime.notna())
         events["valuenum"] = pd.to_numeric(events.valuenum, errors="coerce")
         events = events.loc[
             events.charttime.ge(intime) & events.available_time.ge(intime)
@@ -69,8 +71,8 @@ def extract_one(arg: tuple[int, pd.Timestamp]) -> list[dict]:
     return rows
 
 
-def build() -> None:
-    cohort = pd.read_parquet(ROOT / "data/processed/mimic_iv_24h.parquet", columns=["stay_id"])
+def build(data_root: Path) -> None:
+    cohort = pd.read_parquet(data_root / "mimic_iv_3h.parquet", columns=["stay_id"])
     stays = pd.read_csv(
         ROOT / "data/raw/mimic_iv/mimic-iv-2.2/icu/icustays.csv.gz",
         usecols=["stay_id", "intime"],
@@ -79,7 +81,7 @@ def build() -> None:
     frame = cohort.merge(stays, on="stay_id", validate="one_to_one")
     if frame.intime.isna().any():
         raise ValueError("ICU 入科时间缺失")
-    out = ROOT / "data/processed/mimic_iv_fig2_clinical_state.parquet"
+    out = data_root / "mimic_iv_clinical_state.parquet"
     temp = out.with_suffix(".tmp.parquet")
     writer = None
     inputs = list(frame[["stay_id", "intime"]].itertuples(index=False, name=None))
@@ -111,7 +113,7 @@ def build() -> None:
         "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
         "coverage": result.groupby("window_h")[[v + "_observed" for v in VITAL_IDS]].mean().to_dict("index"),
     }
-    (ROOT / "data/processed/mimic_iv_fig2_clinical_state_manifest.json").write_text(
+    (data_root / "mimic_iv_clinical_state_manifest.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     )
     print("complete", len(result), out, flush=True)

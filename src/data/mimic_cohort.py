@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import gzip
 import os
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -105,6 +107,52 @@ def _parse_time(series: pd.Series) -> pd.Series:
     return pd.to_datetime(series, errors="coerce", utc=False)
 
 
+POE_ORDER_TIMES = None
+
+
+def _extract_all_windows(arg):
+    """一位患者只读取一次原始事件 shard，计算所有合格截点。"""
+    stay, time_windows = arg
+    cache_dir = Path(__file__).resolve().parents[2] / 'data/processed/cache'
+    sid, hid = stay['stay_id'], stay['hadm_id']
+    ce = _read_shard(cache_dir / 'chartevents', id_col='stay_id', gid=sid)
+    le = _read_shard(cache_dir / 'labevents', id_col='hadm_id', gid=hid)
+    pr = _read_shard(cache_dir / 'prescriptions', id_col='hadm_id', gid=hid)
+    ie = _read_shard(cache_dir / 'inputevents', id_col='stay_id', gid=sid)
+    pe = _read_shard(cache_dir / 'procedureevents', id_col='stay_id', gid=sid)
+    if not pr.empty:
+        pr['order_time'] = _parse_time(pr['poe_id'].map(POE_ORDER_TIMES))
+    if not ce.empty:
+        ce['charttime'] = _parse_time(ce['charttime'])
+        ce['valuenum'] = pd.to_numeric(ce['valuenum'], errors='coerce')
+        ce['storetime'] = _parse_time(ce['storetime'])
+        ce['available_time'] = ce[['charttime', 'storetime']].max(axis=1).where(ce['storetime'].notna())
+    if not le.empty:
+        le['charttime'] = _parse_time(le['charttime'])
+        le['valuenum'] = pd.to_numeric(le['valuenum'], errors='coerce')
+        le['storetime'] = _parse_time(le['storetime'])
+        le['available_time'] = le[['charttime', 'storetime']].max(axis=1).where(le['storetime'].notna())
+    for events in (pr, ie, pe):
+        if not events.empty and 'starttime' in events.columns:
+            events['starttime'] = _parse_time(events['starttime'])
+            if 'storetime' in events.columns:
+                events['storetime'] = _parse_time(events['storetime'])
+    result = []
+    for window_h in time_windows:
+        cutoff = stay['intime'] + pd.Timedelta(hours=window_h)
+        if pd.isna(stay['outtime']) or stay['outtime'] <= cutoff:
+            continue
+        death_time = stay.get('deathtime')
+        if pd.notna(death_time) and death_time <= cutoff:
+            continue
+        dod = stay.get('dod')
+        if pd.isna(death_time) and pd.notna(dod) and dod.normalize() <= cutoff.normalize():
+            continue
+        result.append((window_h, _extract_stay_features(
+            stay, window_h, ce, le, pr, ie, pe, {}, {}, {})))
+    return result
+
+
 def build_cohort(
     mimic_dir: str,
     time_windows: list[int],
@@ -131,8 +179,9 @@ def build_cohort(
     import gc
     mimic_dir  = Path(mimic_dir)
     output_dir = Path(output_dir)
-    cache_dir  = output_dir / "cache"
+    cache_dir  = Path(__file__).resolve().parents[2] / "data/processed/cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
+    short_cache = cache_dir.parent / "cache_landmark_short"
 
     # ------------------------------------------------------------------
     # Step 1: small lookup tables (all easily fit in RAM)
@@ -141,7 +190,7 @@ def build_cohort(
     icustays   = _read_csv(_find(mimic_dir, "icu/icustays"))
     patients   = _read_csv(_find(mimic_dir, "hosp/patients"))
     admissions = _read_csv(_find(mimic_dir, "hosp/admissions"))
-    diagnoses  = _read_csv(_find(mimic_dir, "hosp/diagnoses_icd"))
+    diagnoses = None  # 最终诊断不进入正式预测数据
 
     icustays["intime"]  = _parse_time(icustays["intime"])
     icustays["outtime"] = _parse_time(icustays["outtime"])
@@ -149,32 +198,41 @@ def build_cohort(
     icustays = icustays.drop_duplicates(subset="subject_id", keep="first")
 
     patients["anchor_age"] = patients["anchor_age"].astype(float)
+    patients["dod"] = _parse_time(patients["dod"])
     icustays = icustays.merge(
         patients[["subject_id", "anchor_age", "gender", "anchor_year", "dod"]],
         on="subject_id", how="left",
     )
     admissions["admittime"] = _parse_time(admissions["admittime"])
+    admissions["deathtime"] = _parse_time(admissions["deathtime"])
+    admissions["dischtime"] = _parse_time(admissions["dischtime"])
     icustays = icustays.merge(
         admissions[["hadm_id", "admittime", "admission_location", "insurance",
-                     "discharge_location", "hospital_expire_flag"]],
+                     "discharge_location", "hospital_expire_flag", "deathtime", "dischtime"]],
         on="hadm_id", how="left",
     )
     icustays["los_h"] = (
         (icustays["outtime"] - icustays["intime"]).dt.total_seconds() / 3600
     )
-    icustays = icustays[(icustays["los_h"] >= 12) & (icustays["anchor_age"] >= 18)].copy()
+    icustays = icustays[icustays["anchor_age"] >= 18].copy()
     icustays = icustays.reset_index(drop=True)
     if max_stays is not None:
         icustays = icustays.head(max_stays)
     print(f"Cohort size: {len(icustays)}")
 
-    cohort_stay_ids = set(icustays["stay_id"].tolist())
-    cohort_hadm_ids = set(icustays["hadm_id"].tolist())
+    short_stays = icustays[icustays["los_h"] < 12]
+    cohort_stay_ids = set(short_stays["stay_id"].tolist())
+    cohort_hadm_ids = set(short_stays["hadm_id"].tolist())
 
-    comorbidity_df = _compute_comorbidities(diagnoses)
-    dx_cat_df      = _compute_dx_categories(diagnoses)
+    comorbidity_df, dx_cat_df = {}, {}
     del diagnoses, patients, admissions
     gc.collect()
+
+    poe_path = cache_dir.parent / "poe_order_times.parquet"
+    if not poe_path.exists():
+        raise FileNotFoundError(f"缺少处方录入时间索引: {poe_path}")
+    global POE_ORDER_TIMES
+    POE_ORDER_TIMES = pd.read_parquet(poe_path).set_index("poe_id")["ordertime"]
 
     # ------------------------------------------------------------------
     # Step 2: scan each large file ONCE → per-stay parquet shards in cache
@@ -188,11 +246,11 @@ def build_cohort(
     }
 
     for table_name, (csv_path, id_col) in large_files.items():
-        shard_dir = cache_dir / table_name
-        if shard_dir.exists() and any(shard_dir.glob("*.parquet")):
-            print(f"  {table_name}: cache exists, skipping scan")
+        shard_dir = short_cache / table_name
+        if (shard_dir / ".complete").exists():
+            print(f"  {table_name}: short-stay cache complete, skipping scan")
             continue
-        shard_dir.mkdir(exist_ok=True)
+        shard_dir.mkdir(parents=True, exist_ok=True)
         filter_ids = cohort_stay_ids if id_col == "stay_id" else cohort_hadm_ids
         print(f"  Scanning {table_name} ({csv_path.name})...")
         buffers: dict[int, list[pd.DataFrame]] = {}
@@ -221,53 +279,29 @@ def build_cohort(
                 gc.collect()
         if buffers:
             _flush_shards(buffers, shard_dir, id_col)
+        (shard_dir / ".complete").write_text("complete\n")
         print(f"    done → {shard_dir}")
         gc.collect()
 
     # ------------------------------------------------------------------
     # Step 3: SOFA lookup — read from chartevents shard cache
     # ------------------------------------------------------------------
-    print("Computing SOFA from cache...")
-    sofa_dict = _compute_sofa_from_cache(cache_dir / "chartevents", icustays)
+    sofa_dict = {}  # 整次住院 SOFA 不进入正式预测数据
 
-    # ------------------------------------------------------------------
-    # Step 4: per time window — read shards, extract features
-    # ------------------------------------------------------------------
+    # 多进程计算按患者独立执行；每位患者只读取一次缓存。
     output_dir.mkdir(parents=True, exist_ok=True)
-    for window_h in time_windows:
-        print(f"\nExtracting features for {window_h}h window...")
-        records = []
-        for _, stay in tqdm(icustays.iterrows(), total=len(icustays)):
-            sid = stay["stay_id"]
-            hid = stay["hadm_id"]
-
-            ce = _read_shard(cache_dir / "chartevents",     id_col="stay_id",  gid=sid)
-            le = _read_shard(cache_dir / "labevents",       id_col="hadm_id",  gid=hid)
-            pr = _read_shard(cache_dir / "prescriptions",   id_col="hadm_id",  gid=hid)
-            ie = _read_shard(cache_dir / "inputevents",     id_col="stay_id",  gid=sid)
-            pe = _read_shard(cache_dir / "procedureevents", id_col="stay_id",  gid=sid)
-
-            if not ce.empty:
-                ce["charttime"] = _parse_time(ce["charttime"])
-                ce["valuenum"]  = pd.to_numeric(ce["valuenum"], errors="coerce")
-            if not le.empty:
-                tc = "charttime" if "charttime" in le.columns else "storetime"
-                le["charttime"] = _parse_time(le[tc])
-                le["valuenum"]  = pd.to_numeric(le["valuenum"], errors="coerce")
-            for df in (pr, ie, pe):
-                if not df.empty and "starttime" in df.columns:
-                    df["starttime"] = _parse_time(df["starttime"])
-
-            row = _extract_stay_features(
-                stay, window_h, ce, le, pr, ie, pe,
-                comorbidity_df, dx_cat_df, sofa_dict,
-            )
-            records.append(row)
-
-        df_out = pd.DataFrame(records)
+    records = {window: [] for window in time_windows}
+    args = ((stay, tuple(time_windows)) for _, stay in icustays.iterrows())
+    with ProcessPoolExecutor(max_workers=8,
+                             mp_context=multiprocessing.get_context('fork')) as pool:
+        for result in tqdm(pool.map(_extract_all_windows, args, chunksize=16),
+                           total=len(icustays), mininterval=10):
+            for window_h, row in result:
+                records[window_h].append(row)
+    for window_h, rows in records.items():
         out_path = output_dir / f"mimic_iv_{window_h}h.parquet"
-        df_out.to_parquet(out_path, index=False)
-        print(f"Saved {len(df_out)} stays → {out_path}")
+        pd.DataFrame(rows).to_parquet(out_path, index=False)
+        print(f"Saved {len(rows)} stays → {out_path}", flush=True)
 
 
 def _flush_shards(
@@ -290,7 +324,8 @@ def _read_shard(shard_dir: Path, id_col: str, gid: int) -> pd.DataFrame:
     p = shard_dir / f"{int(gid)}.parquet"
     if p.exists():
         return pd.read_parquet(p)
-    return pd.DataFrame()
+    q = shard_dir.parent.parent / "cache_landmark_short" / shard_dir.name / f"{int(gid)}.parquet"
+    return pd.read_parquet(q) if q.exists() else pd.DataFrame()
 
 
 def _compute_sofa_from_cache(
@@ -375,11 +410,11 @@ def _extract_stay_features(
 
     # Ensure expected columns exist on empty DataFrames to avoid KeyError
     if chartevents.empty:
-        chartevents = pd.DataFrame(columns=["charttime", "itemid", "valuenum"])
+        chartevents = pd.DataFrame(columns=["charttime", "available_time", "itemid", "valuenum"])
     if labevents.empty:
-        labevents = pd.DataFrame(columns=["charttime", "itemid", "valuenum"])
+        labevents = pd.DataFrame(columns=["charttime", "available_time", "itemid", "valuenum"])
     if prescriptions.empty:
-        prescriptions = pd.DataFrame(columns=["starttime", "drug"])
+        prescriptions = pd.DataFrame(columns=["starttime", "order_time", "drug"])
     if inputevents.empty:
         inputevents = pd.DataFrame(columns=["starttime", "itemid", "amount"])
     if procedureevents.empty:
@@ -393,24 +428,13 @@ def _extract_stay_features(
     row["gender"] = 1 if str(stay["gender"]).upper() == "M" else 0
     row["admission_source"] = _encode_admission_source(stay.get("admission_location", ""))
 
-    comor = comorbidity_df.get(hadm_id, {})
-    for k in ["has_diabetes", "has_ckd", "has_heart_failure", "has_copd", "has_cancer"]:
-        row[k] = int(comor.get(k, 0))
-
-    dx = dx_cat_df.get(hadm_id, {})
-    for k in ["dx_infection", "dx_cardiovascular", "dx_respiratory", "dx_renal", "dx_other"]:
-        row[k] = int(dx.get(k, 0))
-
-    sofa_val = sofa_df.get(stay_id, np.nan)
-    row["sofa_score"] = sofa_val
-
     # Vital sign first values within window (chartevents already filtered to this stay)
     ce_stay = chartevents[
         (chartevents["charttime"] >= intime) &
-        (chartevents["charttime"] < window_end)
+        (chartevents["available_time"] < window_end)
     ]
     for vital, itemids in VITAL_ITEMIDS.items():
-        sub = ce_stay[ce_stay["itemid"].isin(itemids)].sort_values("charttime")
+        sub = ce_stay[ce_stay["itemid"].isin(itemids)].sort_values(["available_time", "charttime"])
         value = float(sub["valuenum"].iloc[0]) if len(sub) > 0 else np.nan
         if vital == "temp" and 80 <= value <= 115:
             value = (value - 32) * 5 / 9
@@ -419,11 +443,11 @@ def _extract_stay_features(
     # Lab first values within window (labevents already filtered to this hadm)
     le_stay = labevents[
         (labevents["charttime"] >= intime) &
-        (labevents["charttime"] < window_end)
+        (labevents["available_time"] < window_end)
     ]
     for lab in ["creatinine", "lactate", "wbc", "hgb", "sodium", "potassium", "bilirubin", "inr"]:
         itemids = LAB_ITEMIDS[lab]
-        sub = le_stay[le_stay["itemid"].isin(itemids)].sort_values("charttime")
+        sub = le_stay[le_stay["itemid"].isin(itemids)].sort_values(["available_time", "charttime"])
         row[f"{lab}_first"] = float(sub["valuenum"].iloc[0]) if len(sub) > 0 else np.nan
 
     # --- Observation-behaviour features ---
@@ -448,8 +472,8 @@ def _extract_stay_features(
                 row["cxr_count_24h"] = np.nan
             continue
         wend = intime + pd.Timedelta(hours=wh)
-        ce_w = ce_stay[ce_stay["charttime"] < wend]
-        le_w = le_stay[le_stay["charttime"] < wend]
+        ce_w = ce_stay[ce_stay["available_time"] < wend]
+        le_w = le_stay[le_stay["available_time"] < wend]
 
         all_vital_ids = [iid for ids in VITAL_ITEMIDS.values() for iid in ids]
         row[f"vitals_count_{wh}h"] = int(ce_w[ce_w["itemid"].isin(all_vital_ids)].shape[0])
@@ -467,8 +491,8 @@ def _extract_stay_features(
 
     # 24h-specific observation features
     wend24 = intime + pd.Timedelta(hours=24)
-    le_24 = le_stay[le_stay["charttime"] < wend24]
-    ce_24 = ce_stay[ce_stay["charttime"] < wend24]
+    le_24 = le_stay[le_stay["available_time"] < wend24]
+    ce_24 = ce_stay[ce_stay["available_time"] < wend24]
 
     row["abg_count_24h"] = int(le_24[le_24["itemid"].isin(LAB_ITEMIDS["abg"])].shape[0])
     row["has_blood_culture_24h"] = int(
@@ -495,19 +519,22 @@ def _extract_stay_features(
         inputevents[
             (inputevents["starttime"] >= intime) &
             (inputevents["starttime"] < wend24) &
-            (inputevents["itemid"].isin(VASOPRESSOR_ITEMIDS))
+            (inputevents["itemid"].isin(VASOPRESSOR_ITEMIDS)) &
+            (inputevents["storetime"] < window_end)
         ].shape[0] > 0
     )
     row["mechanical_ventilation_24h"] = int(
         procedureevents[
             (procedureevents["starttime"] >= intime) &
             (procedureevents["starttime"] < wend24) &
-            (procedureevents["itemid"].isin(MV_ITEMIDS))
+            (procedureevents["itemid"].isin(MV_ITEMIDS)) &
+            (procedureevents["storetime"] < window_end)
         ].shape[0] > 0
     )
     presc_stay = prescriptions[
         (prescriptions["starttime"] >= intime) &
-        (prescriptions["starttime"] < wend24)
+        (prescriptions["starttime"] < wend24) &
+        (prescriptions["order_time"] < window_end)
     ]
     abx_mask = presc_stay["drug"].str.lower().str.contains(
         "|".join(ANTIBIOTIC_KEYWORDS), na=False
@@ -525,7 +552,8 @@ def _count_orders(prescriptions: pd.DataFrame,
                   t_start: pd.Timestamp, t_end: pd.Timestamp) -> int:
     sub = prescriptions[
         (prescriptions["starttime"] >= t_start) &
-        (prescriptions["starttime"] < t_end)
+        (prescriptions["starttime"] < t_end) &
+        (prescriptions["order_time"] < t_end)
     ]
     return int(len(sub))
 
@@ -546,20 +574,25 @@ def _extract_labels(
     window_end = intime + pd.Timedelta(hours=window_h)
 
     # ICU mortality
-    dod = _parse_time(pd.Series([stay.get("dod")])).iloc[0]
-    icu_mort = int(pd.notna(dod) and intime <= dod <= outtime)
 
-    # In-hospital mortality from admissions table
-    inhosp_mort = int(stay.get("hospital_expire_flag", 0) == 1)
+    # 精确住院死亡时间；日期级 DOD 不作为小时级时间。
+    death_time = stay.get("deathtime", pd.NaT)
+    expired = stay.get("hospital_expire_flag", 0) == 1
+    if expired and (pd.isna(death_time) or death_time > stay.get("dischtime", pd.NaT)):
+        icu_mort = np.nan
+        inhosp_mort = np.nan
+    else:
+        icu_mort = int(expired and window_end < death_time <= outtime) if expired else 0
+        inhosp_mort = int(expired and death_time > window_end) if expired else 0
 
     # AKI: creatinine rise >= 0.3 or >= 1.5x baseline within 48h after window
-    aki = _compute_aki(labevents, intime, window_end)
+    aki = _compute_aki(labevents, intime, window_end, stay.get("dischtime"))
 
     # Sepsis deterioration: SOFA rise >= 2 within 24h after window
-    sep_det = _compute_sepsis_deterioration(chartevents, window_end)
+    sep_det = _compute_sepsis_deterioration(chartevents, window_end, outtime)
 
     # Escalation: vasopressors / MV / ICU transfer within 24h after window
-    esc = _compute_escalation(inputevents, procedureevents, window_end)
+    esc = _compute_escalation(inputevents, procedureevents, window_end, outtime)
 
     return {
         "icu_mortality": icu_mort,
@@ -571,25 +604,28 @@ def _extract_labels(
 
 
 def _compute_aki(labevents: pd.DataFrame,
-                 intime: pd.Timestamp, window_end: pd.Timestamp) -> int:
+                 intime: pd.Timestamp, window_end: pd.Timestamp,
+                 discharge_time: pd.Timestamp) -> float:
     cr = labevents[
         labevents["itemid"].isin(LAB_ITEMIDS["creatinine"])
     ].sort_values("charttime")
-    cr = cr[cr["valuenum"].notna()]
+    cr = cr[cr["valuenum"].notna()].sort_values(["available_time", "charttime"])
     if len(cr) < 2:
-        return 0
-    baseline = cr[cr["charttime"] <= window_end]["valuenum"]
+        return np.nan
+    baseline = cr[cr["available_time"] < window_end]["valuenum"]
     if len(baseline) == 0:
-        return 0
-    baseline_val = float(baseline.iloc[0])
+        return np.nan
+    baseline_val = float(baseline.iloc[-1])
     post = cr[
         (cr["charttime"] > window_end) &
         (cr["charttime"] <= window_end + pd.Timedelta(hours=48))
     ]["valuenum"]
     if len(post) == 0:
-        return 0
+        return np.nan
     peak = float(post.max())
-    return int((peak - baseline_val >= 0.3) or (peak >= 1.5 * baseline_val))
+    if (peak - baseline_val >= 0.3) or (peak >= 1.5 * baseline_val):
+        return 1.0
+    return 0.0 if pd.notna(discharge_time) and discharge_time >= window_end + pd.Timedelta(hours=48) else np.nan
 
 
 def _gcs_total(chartevents: pd.DataFrame, t_start: pd.Timestamp, t_end: pd.Timestamp) -> float:
@@ -610,7 +646,8 @@ def _gcs_total(chartevents: pd.DataFrame, t_start: pd.Timestamp, t_end: pd.Times
 def _compute_sepsis_deterioration(
     chartevents: pd.DataFrame,
     window_end: pd.Timestamp,
-) -> int:
+    outtime: pd.Timestamp,
+) -> float:
     pre_start = window_end - pd.Timedelta(hours=6)
     post_end = window_end + pd.Timedelta(hours=24)
 
@@ -624,7 +661,7 @@ def _compute_sepsis_deterioration(
     MAP_ITEMIDS = [220052, 220181, 225312]
     pre_map = chartevents[
         (chartevents["charttime"] >= pre_start) &
-        (chartevents["charttime"] < window_end) &
+        (chartevents["available_time"] < window_end) &
         (chartevents["itemid"].isin(MAP_ITEMIDS))
     ]["valuenum"].dropna()
     post_map = chartevents[
@@ -632,17 +669,18 @@ def _compute_sepsis_deterioration(
         (chartevents["charttime"] < post_end) &
         (chartevents["itemid"].isin(MAP_ITEMIDS))
     ]["valuenum"].dropna()
-    if len(pre_map) > 0 and len(post_map) > 0:
-        if float(pre_map.median()) >= 70 and float(post_map.min()) < 65:
-            return 1
-
-    return 0
+    map_known = len(pre_map) > 0 and len(post_map) > 0
+    if map_known and float(pre_map.median()) >= 70 and float(post_map.min()) < 65:
+        return 1
+    gcs_known = pd.notna(gcs_pre) and pd.notna(gcs_post)
+    return 0.0 if map_known and gcs_known and outtime >= post_end else np.nan
 
 
 def _compute_escalation(
     inputevents: pd.DataFrame, procedureevents: pd.DataFrame,
-    window_end: pd.Timestamp
-) -> int:
+    window_end: pd.Timestamp, outtime: pd.Timestamp,
+) -> float:
+    """截点后 24 小时 ICU 内新启动升阶治疗；随访不足且未发生时记未知。"""
     t_end = window_end + pd.Timedelta(hours=24)
     vasopress = inputevents[
         (inputevents["starttime"] > window_end) &
@@ -654,7 +692,9 @@ def _compute_escalation(
         (procedureevents["starttime"] <= t_end) &
         (procedureevents["itemid"].isin(MV_ITEMIDS))
     ]
-    return int(len(vasopress) > 0 or len(mv) > 0)
+    if len(vasopress) or len(mv):
+        return 1.0
+    return 0.0 if outtime >= t_end else np.nan
 
 
 def _compute_comorbidities(diagnoses: pd.DataFrame) -> dict[int, dict]:

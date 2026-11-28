@@ -1,31 +1,38 @@
 data:
-  mimic_iv_dir: "data/raw/mimic_iv/mimic-iv-2.2"
-  eicu_dir: "data/raw/eicu/eicu-collaborative-research-database-2.0"
-
-time_windows: [3, 6, 12, 18, 24]
-
+  mimic_iv_dir: data/raw/mimic_iv/mimic-iv-2.2
+  eicu_dir: data/raw/eicu/eicu-collaborative-research-database-2.0
+  processed_data_root: data/processed/landmark_v2
+  split_registry: data/processed/landmark_v2/split_registry.parquet
+time_windows:
+- 3
+- 6
+- 12
+- 18
+- 24
 tasks:
-  - icu_mortality
-  - inhosp_mortality
-  - aki
-  - sepsis_deterioration
-  - escalation
-
+- icu_mortality
+- inhosp_mortality
+- aki
+- sepsis_deterioration
+- escalation
 training:
   seed: 42
-  train_val_test_split: [0.7, 0.1, 0.2]
+  train_val_test_split:
+  - 0.7
+  - 0.1
+  - 0.2
   xgboost:
     n_estimators: 500
     max_depth: 6
     learning_rate: 0.05
     subsample: 0.8
     colsample_bytree: 0.8
-    eval_metric: "auc"
+    eval_metric: auc
     early_stopping_rounds: 20
   logistic:
     max_iter: 1000
     C: 1.0
-    solver: "lbfgs"
+    solver: lbfgs
   random_forest:
     n_estimators: 500
     max_depth: 10
@@ -39,12 +46,22 @@ training:
     colsample_bytree: 0.8
     early_stopping_rounds: 20
   mlp:
-    hidden_layer_sizes: [64, 32]
+    hidden_layer_sizes:
+    - 64
+    - 32
     alpha: 0.0001
     learning_rate_init: 0.001
     max_iter: 300
     early_stopping: true
     n_iter_no_change: 10
-
 analysis:
   n_bootstrap: 1000
+protocol_version: landmark-v2-20261128
+predictor_sets:
+- clinical_state
+- observation
+- clinical_state_treatment
+- full_model
+state_representations:
+- first_measurements
+- first_plus_latest

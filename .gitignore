@@ -1,7 +1,4 @@
-# Local datasets and preprocessing caches
 /data/
-
-# Runtime logs and Python caches
 /logs/
 __pycache__/
 *.py[cod]
@@ -9,14 +6,38 @@ __pycache__/
 .venv/
 .DS_Store
 
-# 仅发布可复现图件的汇总结果；模型、患者级预测和匹配明细保留本地。
+# 仅发布协议、来源、审计与紧凑正式结果；患者概率、模型和匹配明细仅本地保存。
 /outputs/*
 !/outputs/analysis_protocol.json
+!/outputs/data_impact.csv
+!/outputs/legacy_split_conflicts.csv
+!/outputs/formal_release_manifest.json
+!/outputs/fig_checksum_before.txt
+!/outputs/data_source_manifest.json
+!/outputs/model_registry.csv.gz
+!/outputs/validation_report.json
 !/outputs/exp[1-5]/
 /outputs/exp[1-5]/*
-!/outputs/exp[1-5]/results.csv.gz
-!/outputs/exp1/paired_intervals.csv.gz
+!/outputs/exp1/model_metrics.csv.gz
+!/outputs/exp1/gain_metrics.csv.gz
 !/outputs/exp2/balance.csv
-!/outputs/exp2/context.csv.gz
-!/outputs/exp2/diagnosis.csv.gz
+!/outputs/exp2/matched_metrics.csv.gz
+!/outputs/exp2/matched_contrasts.csv.gz
+!/outputs/exp2/context_metrics.csv.gz
+!/outputs/exp2/diagnosis_metrics.csv.gz
+!/outputs/exp2/state_control_metrics.csv.gz
+!/outputs/exp2/state_control_contrasts.csv.gz
+!/outputs/exp2/state_control_coverage.csv
 !/outputs/exp2/matching_protocol.json
+!/outputs/exp3/gain_components.csv.gz
+!/outputs/exp3/transfer_components.csv.gz
+!/outputs/exp3/transfer_summary.csv.gz
+!/outputs/exp4/age_metrics.csv.gz
+!/outputs/exp4/age_contrasts.csv.gz
+!/outputs/exp4/age_transfer_contrasts.csv.gz
+!/outputs/exp4/age_eligibility.csv
+!/outputs/exp5/hospital_metrics.csv.gz
+!/outputs/exp5/hospital_reversal.csv.gz
+!/outputs/exp5/hospital_eligibility.csv
+!/outputs/exp5/probability_metrics.csv.gz
+!/outputs/exp5/probability_contrasts.csv.gz

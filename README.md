@@ -1,144 +1,38 @@
 # Medical AI Observation Dependence
 
-Code for the PNAS study: *"Clinical monitoring patterns can mislead medical AI training"*
+本仓库分析 ICU 预测模型对观察行为、治疗和临床状态的依赖。正式结果采用按预测截点重建的成人风险集；每个截点只使用此前可获得的输入。数据来自 MIMIC-IV 2.2 和 eICU-CRD 2.0，本地原始数据不随仓库发布。
 
-GitHub repository name: `medical-ai-monitoring-shortcuts`.
+## 正式方案
 
-## Overview
+- 任务：ICU Death、Hospital Death、AKI、Deterioration、Escalation。Deterioration 是操作性恶化终点，不表示脓毒症诊断。
+- 算法：Logistic Regression、Random Forest、XGBoost、LightGBM、MLP；窗口 3/6/12/18/24 h；种子 42–46。
+- 四输入组：`clinical_state`、`observation`、`clinical_state_treatment`、`full_model`。
+- 三增益：`observation_gain = AUROC(full_model) − AUROC(clinical_state_treatment)`；`treatment_gain = AUROC(clinical_state_treatment) − AUROC(clinical_state)`；`combined_gain = AUROC(full_model) − AUROC(clinical_state)`。
+- 概率误差：`brier_improvement = Brier(clinical_state_treatment) − Brier(full_model)`；正值表示总体 Brier 误差减小。
+- 外部主分析只将两项死亡结局解释为跨医院验证；其余三项完整保留为探索性结果。
 
-This codebase quantifies how much medical AI models depend on clinical observation behaviour (how intensively a patient is monitored) rather than pure disease state, via:
+[证据与未确定事项](docs/audit/landmark_v2_uncertainties.md) 逐项记录原始字段能支持的结论及不能直接证明的时间语义。正式定义、bootstrap、患者划分见 `outputs/analysis_protocol.json`；逐窗口人数变化见 `outputs/data_impact.csv`。
 
-- **ODI** (Observation Dependence Index): AUROC(M-Model) − AUROC(D-Model)
+## 运行
 
-Five experiments (exp1–exp5) test this metric's magnitude, robustness, and fairness implications.
-
----
-
-## Environment Setup
-
-```bash
-conda create -n medical-ai-monitoring-shortcuts python=3.10 -y
-conda activate medical-ai-monitoring-shortcuts
-
-# Install dependencies
-# Run from the repository root
-pip install -r requirements.txt
-```
-
----
-
-## Data Preparation
-
-Both datasets require PhysioNet CITI training certification.
-Apply at: https://physionet.org/settings/credentialing/
-
-Place downloaded files at the following paths (relative to the repository root):
-
-```
-data/
-└── raw/
-    ├── mimic_iv/
-    │   ├── hosp/
-    │   │   ├── patients.csv.gz
-    │   │   ├── admissions.csv.gz
-    │   │   ├── labevents.csv.gz
-    │   │   ├── prescriptions.csv.gz
-    │   │   └── diagnoses_icd.csv.gz
-    │   └── icu/
-    │       ├── icustays.csv.gz
-    │       ├── chartevents.csv.gz     # ~30 GB
-    │       ├── inputevents.csv.gz
-    │       └── procedureevents.csv.gz
-    └── eicu/
-        ├── patient.csv.gz
-        ├── lab.csv.gz
-        ├── vitalPeriodic.csv.gz
-        ├── medication.csv.gz
-        ├── apachePatientResult.csv.gz
-        └── hospital.csv.gz
-```
-
-Download commands (replace `{username}` with your PhysioNet account):
+在 `code/` 目录、安装 `requirements.txt` 后执行。原始文件放在配置中的 `data/raw/` 路径。
 
 ```bash
-# MIMIC-IV v2.2
-wget -r -N -c -np --user {username} --ask-password \
-  https://physionet.org/files/mimiciv/2.2/ -P data/raw/mimic_iv/
-
-# eICU-CRD v2.0
-wget -r -N -c -np --user {username} --ask-password \
-  https://physionet.org/files/eicu-crd/2.0/ -P data/raw/eicu/
+python scripts/build_poe_times.py
+python scripts/build_cohort.py --config configs/default.yaml --dataset mimic --output-dir data/processed/landmark_v2_staging
+python scripts/build_cohort.py --config configs/default.yaml --dataset eicu --output-dir data/processed/landmark_v2_staging
+python scripts/run_formal.py --stage run --workers 8
 ```
 
----
+长任务可按 `prepare`、`plan`、`train`、`infer`、`evaluate`、`collect`、`validate`、`promote` 分段运行。`train` 按每个具体输入组的 `fit_id` 与模型、预处理器 SHA 续跑；`infer` 只读取已完成权重；`evaluate/collect/validate` 不隐式训练或推理。正式总流程在 staging 内完成校验后再替换正式产物。
 
-## Running the Pipeline
+## 结果
 
-All commands are run from the repository root (the local `code/` directory).
+- `outputs/exp1/model_metrics.csv.gz`、`gain_metrics.csv.gz`：逐配置×输入组指标和配对增益。
+- `outputs/exp2/`：固定测试集匹配、平衡、入院情境、诊断录入扩展及独立状态增强结果。24 h Hospital Death 的最新生命体征对照额外拟合 20 个模型；主模型网格为 2,500 个组拟合。
+- `outputs/exp3/`：内部来源分解与跨医院转移变化。
+- `outputs/exp4/`：年龄分组及年龄差转移。
+- `outputs/exp5/`：逐医院表现、反转比例与住院死亡 24 h 概率误差。
+- `outputs/models/`：本地模型、预处理器、完整内部和外部患者概率与来源 manifest；不推送原始数据或患者级产物。
 
-### Step 1: Build Cohorts
-
-```bash
-# Full run
-python scripts/build_cohort.py --config configs/default.yaml
-
-# Smoke test (500 stays, verify column names)
-python scripts/build_cohort.py --smoke-test
-
-# Single dataset
-python scripts/build_cohort.py --dataset mimic
-python scripts/build_cohort.py --dataset eicu
-```
-
-### 正式实验
-
-所有命令从 `code/` 运行。五模型主分析在实验 1 拟合 D、O、D+T、F，实验 2–5 复用相同的正式权重。
-
-```bash
-python scripts/exp1_train_grid.py
-python scripts/exp2_ablation_severity.py
-python scripts/exp3_ablation_grouping.py
-python scripts/exp4_age_odi_transfer.py
-```
-
-实验 4 与实验 5 共用评估入口；运行最后一条命令会生成两者的汇总表。也可使用 `python scripts/exp5_external_validation.py`。正式结果直接写到 `outputs/exp1/` 至 `outputs/exp5/`，共享权重及完整测试预测保存在 `outputs/models/`。单格续跑可使用实验 1 的 `--task`、`--model`、`--window` 和 `--seed` 参数。
-
-### 图件
-
-```bash
-python fig/build_delivery.py  # 15 个独立面板与图例，PDF/SVG/PNG
-```
-
-独立图例导出需要 Ghostscript（`gs`），用于裁剪 PDF/SVG 的画布边界。
-
-Git 已包含五个实验的汇总结果、匹配平衡表及分析协议，可直接用于重新绘图。模型权重、预处理器、患者级预测和匹配明细仅保存在本地；汇总表中的 `prediction_file` 是对应的本地引用。Fig. 2 包含 A–D 四个面板，Fig. 1–3 的 B/C 文件名和绘图入口已按最终顺序统一。
-
-绘图只读取 `outputs/exp1/` 至 `outputs/exp5/` 的正式表，最终图件保存在 `fig/fig1b/`、`fig/fig1c/` 至 `fig/fig5c/` 等分面板目录中。历史 `results/` 已删除；正式绘图只使用 `outputs/`。`fig/style.py` 统一独立面板的尺寸、字体和颜色。
-
----
-
-## 项目目录
-
-`src/data/` 负责队列与特征处理，`src/models/` 保存模型实现，`src/exp1/` 至 `src/exp5/` 分别保存五个实验的方法。原有 `scripts/build_cohort.py` 与 `scripts/exp1_train_grid.py` 至 `scripts/exp5_external_validation.py` 是正式入口。五个实验复用实验 1 保存的模型；D、O、D+T、F 四组权重只保存一份。
-
-`data/raw/` 与 `data/processed/` 保存输入及处理数据。当前正式结果直接在 `outputs/`：
-
-```text
-outputs/
-├── analysis_protocol.json
-├── models/
-│   └── tabular/{task}/{model}/seed{seed}/{window}h/
-├── exp1/    # 主模型比较
-├── exp2/    # 截点前临床状态匹配与情境分层
-├── exp3/    # 共享完整模型的治疗重分组
-├── exp4/    # 年龄分层
-└── exp5/    # 外部医院验证
-```
-
-每个正式格点保留四组权重、必要预处理、完整内部测试预测及 `manifest.json`。`outputs/` 不保存绘图代码、生成图件、ZIP、日志或中间 bootstrap 缓存。论文 `docs/manuscripts/` 保持原稿，`fig/` 已按新结果重新生成。正式结果入口为 `outputs/exp1/` 至 `outputs/exp5/`，共享权重与患者级预测位于 `outputs/models/`。
-
-### 运行日志
-
-五个实验的日志统一放在 `logs/exp1/` 至 `logs/exp5/`，由正式入口自动记录命令、代码提交与源文件指纹、终端输出及完成状态。同一格点或阶段再次执行会覆盖原日志；不同格点使用独立文件，smoke 日志带 `smoke_` 前缀。exp4 和 exp5 共用一次评估，对应日志在两个实验目录各保存一份。强制终止的日志可能没有结束标记，不应视为完成。
-
-旧实现的日志已清除；此前正式结果缺少可核实的运行日志，不追补或伪造。日志不上传 Git。Smoke 数据位于 `data/processed/smoke/`，smoke 模型位于 `outputs/smoke/models/`，不与日志或正式模型混放。
+所有结果保留完整计算精度，单类别 AUROC 记为不可评估，Brier 可独立计算。五个种子是重复拟合，不是五倍独立患者。`fig/` 和论文在本轮保持原样。

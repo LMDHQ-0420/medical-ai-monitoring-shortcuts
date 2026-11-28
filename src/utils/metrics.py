@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score, brier_score_loss
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 
 from .bootstrap import bootstrap_ci
 
@@ -43,8 +43,12 @@ def calibration_slope_intercept(
     """Logistic calibration: regress y_true on logit(y_pred)."""
     eps = 1e-7
     logit_pred = np.log(np.clip(y_pred, eps, 1 - eps) / (1 - np.clip(y_pred, eps, 1 - eps)))
-    lr = LinearRegression().fit(logit_pred.reshape(-1, 1), y_true)
-    return float(lr.coef_[0]), float(lr.intercept_)
+    if len(np.unique(y_true)) < 2:
+        return float("nan"), float("nan")
+    lr = LogisticRegression(penalty=None, solver="lbfgs", max_iter=1000).fit(
+        logit_pred.reshape(-1, 1), y_true
+    )
+    return float(lr.coef_[0, 0]), float(lr.intercept_[0])
 
 
 def compute_all_metrics(

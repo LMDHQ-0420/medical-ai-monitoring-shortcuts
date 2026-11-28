@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from .feature_groups import DISEASE_FEATURES, OBSERVATION_FEATURES, MIXED_FEATURES, LABEL_COLS
+from .feature_groups import CLINICAL_STATE_FEATURES, OBSERVATION_FEATURES, TREATMENT_FEATURES, LABEL_COLS
 
 
 class EHRTransformer:

@@ -4,7 +4,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from src.exp2 import clinical_state, evaluate, matching
+from src.exp2 import clinical_state, matching
+from src.formal.statistics import paired_interval
 
 
 def test_latest_available_vital_ignores_late_entry(tmp_path, monkeypatch):
@@ -46,13 +47,10 @@ def test_matching_uses_exact_context_and_unique_patients():
 
 
 def test_bootstrap_resamples_matched_pairs():
-    frame = pd.DataFrame({
-        'pair_index': [0, 0, 1, 1, 2, 2], 'arm': ['high', 'low']*3,
-        'y_true': [1, 0, 1, 0, 1, 0],
-        'pred_D': [.8, .2, .7, .3, .6, .4],
-        'pred_DT': [.8, .2, .7, .3, .6, .4],
-        'pred_F': [.9, .1, .8, .2, .7, .3],
-    })
-    out = evaluate.pair_interval(frame, 42, 30)
-    assert out['bootstrap_unit'] == 'matched_pair'
-    assert out['odi_residual_ci_low'] <= out['odi_residual_ci_high']
+    y=np.array([1,0,1,0,1,0])
+    prob={'clinical_state':np.array([.8,.2,.7,.3,.6,.4]),
+          'clinical_state_treatment':np.array([.8,.2,.7,.3,.6,.4]),
+          'full_model':np.array([.9,.1,.8,.2,.7,.3])}
+    out=paired_interval(y,prob,30,'test-pairs',np.array([0,0,1,1,2,2]))
+    assert out['bootstrap_unit']=='matched_pair'
+    assert out['observation_gain_ci_low']<=out['observation_gain_ci_high']

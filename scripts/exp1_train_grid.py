@@ -1,42 +1,44 @@
-"""统一正式训练入口：五种表格模型共用患者划分与输出目录。"""
+"""正式主模型入口；配置和处理数据目录显式传入统一 trainer。"""
 from __future__ import annotations
 import argparse
+import json
 import sys
 from pathlib import Path
+import pandas as pd
 import yaml
-
-ROOT=Path(__file__).resolve().parent.parent
-sys.path.insert(0,str(ROOT))
-from src.exp1.trainer import MODELS,TASKS,WINDOWS,SEEDS,run_cell
-from src.utils.logger import experiment_log
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from src.exp1.trainer import MODELS, TASKS, WINDOWS, SEEDS, fit_group
+from src.data.feature_groups import PREDICTOR_SETS
 
 
 def main():
-    parser=argparse.ArgumentParser()
-    parser.add_argument('--config',default='configs/default.yaml')
-    parser.add_argument('--task',choices=TASKS)
-    parser.add_argument('--model',choices=MODELS)
-    parser.add_argument('--window',type=int,choices=WINDOWS)
-    parser.add_argument('--seed',type=int,choices=SEEDS)
-    parser.add_argument('--output-root',type=Path,default=ROOT/'outputs')
-    parser.add_argument('--smoke-test',action='store_true')
-    args=parser.parse_args()
-    cfg=yaml.safe_load(Path(args.config).read_text())
-    tasks=[args.task] if args.task else cfg['tasks']
-    models=[args.model] if args.model else list(MODELS)
-    windows=[args.window] if args.window else cfg['time_windows']
-    seeds=[args.seed] if args.seed is not None else SEEDS
-    if args.smoke_test:
-        tasks,models,windows,seeds=tasks[:1],['lr'],windows[-1:],seeds[:1]
-    root=args.output_root.resolve()
-    for task in tasks:
-        for model in models:
-            for window in windows:
-                for seed in seeds:
-                    name=f'{task}_{model}_seed{seed}_{window}h'
-                    if args.smoke_test:name='smoke_'+name
-                    with experiment_log('exp1',name,detail=f'output_root={root}'):
-                        run_cell(root,task,model,window,seed,smoke=args.smoke_test)
+    p = argparse.ArgumentParser()
+    p.add_argument("--config", type=Path, default=ROOT / "configs/default.yaml")
+    p.add_argument("--data-root", type=Path, required=True)
+    p.add_argument("--output-root", type=Path, required=True)
+    p.add_argument("--protocol", type=Path, required=True)
+    p.add_argument("--split-registry", type=Path, required=True)
+    p.add_argument("--task", choices=TASKS)
+    p.add_argument("--model", choices=MODELS)
+    p.add_argument("--window", type=int, choices=WINDOWS)
+    p.add_argument("--seed", type=int, choices=SEEDS)
+    p.add_argument("--predictor-set", choices=tuple(PREDICTOR_SETS))
+    p.add_argument("--action", choices=("plan", "train", "infer"), default="train")
+    args = p.parse_args()
+    config = yaml.safe_load(args.config.read_text())
+    protocol = json.loads(args.protocol.read_text())
+    registry = pd.read_parquet(args.split_registry)
+    for task in ([args.task] if args.task else TASKS):
+        for model in ([args.model] if args.model else MODELS):
+            for window in ([args.window] if args.window else WINDOWS):
+                for seed in ([args.seed] if args.seed is not None else SEEDS):
+                    for predictor_set in ([args.predictor_set] if args.predictor_set else PREDICTOR_SETS):
+                        result = fit_group(config, args.data_root, args.output_root, protocol,
+                                           task, model, window, seed, "first_measurements",
+                                           predictor_set, registry, action=args.action)
+                        print(task, model, window, seed, predictor_set,
+                              result.get("fit_action", result.get("fit_source")), flush=True)
 
-
-if __name__=='__main__':main()
+if __name__ == "__main__":
+    main()

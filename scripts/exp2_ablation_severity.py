@@ -1,35 +1,19 @@
-"""实验 2：截点前临床状态匹配及诊断录入分层。复用 exp1 正式模型。"""
+"""实验 2 正式入口：调用统一流程的已冻结评价阶段。"""
 from __future__ import annotations
 import argparse
+import json
 import sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT))
-from src.exp2.clinical_state import build as build_clinical_state
-from src.exp2.diagnosis_timing import build as build_diagnosis
-from src.exp2.matching import run as match_test
-from src.exp2.evaluate import run as evaluate_test
-from src.exp2.diagnosis_strata import run as evaluate_diagnosis
-from src.utils.logger import experiment_log
-
+from scripts.run_formal import evaluate
 
 def main():
-    p=argparse.ArgumentParser()
-    p.add_argument('--stage',choices=['prepare','match','evaluate','diagnosis','all'],default='all')
-    p.add_argument('--output-root',type=Path,default=ROOT/'outputs')
-    p.add_argument('--bootstrap',type=int,default=200)
-    a=p.parse_args()
-    root=a.output_root.resolve()
-    stages={
-        'prepare':lambda:(build_clinical_state(),build_diagnosis()),
-        'match':lambda:match_test(root),
-        'evaluate':lambda:evaluate_test(root,a.bootstrap),
-        'diagnosis':lambda:evaluate_diagnosis(root),
-    }
-    for stage,run in stages.items():
-        if a.stage in (stage,'all'):
-            with experiment_log('exp2',stage,detail=f'output_root={root}'):
-                run()
-
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--data-root',type=Path,default=ROOT/'data/processed/landmark_v2_staging')
+    parser.add_argument('--output-root',type=Path,default=ROOT/'outputs/.landmark_v2_staging')
+    args=parser.parse_args()
+    protocol=json.loads((args.output_root/'analysis_protocol.json').read_text())
+    evaluate(args.output_root,args.data_root,protocol)
 
 if __name__=='__main__':main()

@@ -29,36 +29,29 @@ def test_treatment_after_cutoff_does_not_change_input():
     assert before.loc[1,'antibiotics_24h']==1
 
 
-def test_treatment_group_excludes_observation_order():
-    from src.data.feature_groups import MIXED_FEATURES,OBSERVATION_FEATURES
-    assert 'blood_culture_sent_24h' not in MIXED_FEATURES
-    assert 'has_blood_culture_24h' in OBSERVATION_FEATURES
-    assert set(MIXED_FEATURES)=={'antibiotics_24h','vasopressors_24h','mechanical_ventilation_24h'}
-
-
-def test_active_d_excludes_whole_stay_fields():
-    from src.data.feature_groups import DISEASE_FEATURES
+def test_semantic_predictor_sets_exclude_unavailable_fields():
+    from src.data.feature_groups import (CLINICAL_STATE_FEATURES, OBSERVATION_FEATURES,
+                                         TREATMENT_FEATURES, PREDICTOR_SETS, features_for)
     uncertain={'sofa_score','has_diabetes','has_ckd','has_heart_failure','has_copd','has_cancer',
                'dx_infection','dx_cardiovascular','dx_respiratory','dx_renal','dx_other'}
-    assert uncertain.isdisjoint(DISEASE_FEATURES)
-    assert {'age','gender','admission_source','temp_first','creatinine_first'}.issubset(DISEASE_FEATURES)
+    assert uncertain.isdisjoint(CLINICAL_STATE_FEATURES)
+    assert 'blood_culture_sent_24h' not in TREATMENT_FEATURES
+    assert 'has_blood_culture_24h' in OBSERVATION_FEATURES
+    assert len(features_for('clinical_state_treatment','first_plus_latest')) == 26
+    assert len(features_for('full_model','first_plus_latest')) == 56
+    assert set(PREDICTOR_SETS)=={'clinical_state','observation','clinical_state_treatment','full_model'}
 
 
-def test_smoke_and_formal_paths_and_wrong_sample_cache():
-    from pathlib import Path
-    from src.exp1.trainer import cell_path,paired_cache_matches
-    root=Path('/tmp/pnas_test')
-    smoke=cell_path(root,'icu_mortality','lr',3,42,True)
-    formal=cell_path(root,'icu_mortality','lr',3,42,False)
-    assert smoke!=formal and '/smoke/' in str(smoke) and '/models/' in str(formal)
-    expected=pd.DataFrame({'subject_id':[1,2,3],'stay_id':[11,12,13],'icu_mortality':[0,1,0]})
-    saved=pd.DataFrame({'pair_id':[1,2,3],'stay_id':[11,12,13],'y_true':[0,1,0]})
-    manifest={'split_counts':{'test':{'n':3,'positive':1}}}
-    assert paired_cache_matches(saved,expected,manifest,'icu_mortality')
-    assert not paired_cache_matches(saved,expected,{**manifest,'split_counts':{'test':{'n':100,'positive':1}}},'icu_mortality')
-    assert not paired_cache_matches(saved.iloc[::-1],expected,manifest,'icu_mortality')
-    wrong=saved.copy();wrong.loc[1,'y_true']=0
-    assert not paired_cache_matches(wrong,expected,manifest,'icu_mortality')
+def test_fit_identity_ignores_audit_column_but_not_training_value():
+    from src.formal.identity import fit_identity
+    df=pd.DataFrame({'subject_id':[1,2,3], 'stay_id':[11,12,13],
+                     'icu_mortality':[0,1,0], 'hr_first':[70.,80.,90.], 'audit':[1,2,3]})
+    args=(df,df,'icu_mortality',['hr_first'],'lr',42,{'C':1.0},'prep-v1','impl-v1',False)
+    first=fit_identity(*args)
+    assert first==fit_identity(df.assign(audit=99),*args[1:])
+    assert first!=fit_identity(df.assign(hr_first=[71.,80.,90.]),*args[1:])
+    assert first!=fit_identity(df.assign(icu_mortality=[1,1,0]),*args[1:])
+    assert first!=fit_identity(df,df,'icu_mortality',['hr_first'],'xgb',42,{'C':1.0},'prep-v1','impl-v1',True)
 
 
 def test_tabular_input_validation():

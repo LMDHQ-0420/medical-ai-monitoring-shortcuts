@@ -1,57 +1,42 @@
-"""复用冻结模型的 eICU 预测，另报截点前诊断录入分层。"""
+"""外部截点前录入诊断分层，仅作探索性分析。"""
 from __future__ import annotations
-
-import json
+import itertools
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score
+from src.data.feature_groups import PREDICTOR_SETS
+from src.exp1.trainer import MODELS,TASKS,WINDOWS,SEEDS,atomic_csv
+from src.exp5.external_validation import read_external
+from src.formal.statistics import assess,gains
 
-ROOT = Path(__file__).resolve().parents[2]
-from src.exp1.trainer import MODELS, SEEDS, TASKS, WINDOWS
-from src.exp5.external_validation import predict_external
-
-STRATA = ("infection", "cardiovascular", "respiratory", "renal", "other_recorded", "not_recorded")
+STRATA=("infection","cardiovascular","respiratory","renal","other_recorded","not_recorded")
 
 
-def run(run_dir: Path) -> None:
-    diagnosis = pd.read_parquet(ROOT / "data/processed/eicu_fig2_diagnosis.parquet")
-    rows = []
-    for window in WINDOWS:
-        eicu = pd.read_parquet(ROOT / f"data/processed/eicu_{window}h.parquet")
-        groups = diagnosis.loc[diagnosis.window_h.eq(window)].drop(columns="window_h")
-        for task in TASKS:
-            for model in MODELS:
-                for seed in SEEDS:
-                    cell = run_dir / "models/tabular" / task / model / f"seed{seed}" / f"{window}h"
-                    manifest = json.loads((cell / "manifest.json").read_text())
-                    if manifest.get("status") != "complete" or manifest.get("run_type") != "formal":
-                        raise ValueError(f"正式权重未完成：{cell}")
-                    prediction = predict_external(cell, eicu.loc[eicu[task].notna()], task)
-                    joined = prediction.merge(groups, on="stay_id", validate="one_to_one")
-                    if len(joined) != len(prediction):
-                        raise ValueError(f"eICU 诊断键不覆盖外部预测：{cell}")
-                    for stratum in STRATA:
-                        d = joined.loc[joined[stratum]]
-                        n, positive = len(d), int(d.y_true.sum())
-                        if n < 20 or positive == 0 or positive == n:
-                            rows.append({"task": task, "model": model, "window_h": window, "seed": seed,
-                                         "run_id": "formal", "diagnosis": stratum, "n": n,
-                                         "positive": positive, "status": "ineligible",
-                                         "reason": "n<20_or_single_label"})
-                            continue
-                        y = d.y_true.to_numpy(dtype=int)
-                        aD = roc_auc_score(y, d.pred_D)
-                        aDT = roc_auc_score(y, d.pred_DT)
-                        aF = roc_auc_score(y, d.pred_F)
-                        rows.append({"task": task, "model": model, "window_h": window, "seed": seed,
-                                     "run_id": "formal", "diagnosis": stratum, "n": n,
-                                     "positive": positive, "status": "complete", "reason": "",
-                                     "auc_D": aD, "auc_DT": aDT, "auc_F": aF,
-                                     "odi_raw": aF - aD, "odi_residual": aF - aDT,
-                                     "definition": "diagnosis entered before prediction cutoff; named strata may overlap; no record is not no disease",
-                                     "interpretation": "exploratory external comparison; outcome definitions not harmonized"})
-                    print("eICU diagnosis", task, model, window, seed, flush=True)
-    pd.DataFrame(rows).to_csv(run_dir / "exp2/diagnosis.csv.gz", index=False, compression="gzip")
-    print("complete", len(rows), "rows", flush=True)
+def collect(root:Path,data_root:Path,protocol:dict):
+    side=pd.read_parquet(data_root/"eicu_diagnosis_timing.parquet")
+    rows=[]
+    for task,model,window_h,seed in itertools.product(TASKS,MODELS,WINDOWS,SEEDS):
+        frames={}
+        for predictor_set in PREDICTOR_SETS:
+            _,frame=read_external(root,task,model,window_h,seed,predictor_set)
+            frames[predictor_set]=frame
+        base=frames["full_model"]
+        flags=side.loc[side.window_h.eq(window_h),["stay_id",*STRATA]]
+        joined=base.merge(flags,on="stay_id",validate="one_to_one")
+        if len(joined)!=len(base):
+            raise ValueError("诊断侧表未覆盖外部预测")
+        for stratum in STRATA:
+            part=joined.loc[joined[stratum]]
+            ix=part.index.to_numpy()
+            y=part.y_true.to_numpy(dtype=int)
+            metrics={name:assess(y,frame.loc[ix,"probability"].to_numpy()) for name,frame in frames.items()}
+            rows.append({"analysis_id":protocol["analysis_id"],"task":task,"model":model,
+                         "window_h":window_h,"seed":seed,"diagnosis_stratum":stratum,
+                         "n":len(y),"n_positive":int(y.sum()),"n_negative":int(len(y)-y.sum()),
+                         "evaluable":metrics["full_model"]["evaluable"],
+                         "unevaluable_reason":metrics["full_model"]["unevaluable_reason"],
+                         "stratum_definition":"diagnosis/admissionDx entered before cutoff; categories may overlap",
+                         "external_endpoint_status":"primary" if task in ("icu_mortality","inhosp_mortality") else "exploratory",
+                         **gains(metrics)})
+    atomic_csv(root/"exp2/diagnosis_metrics.csv.gz",pd.DataFrame(rows))
+    return len(rows)
